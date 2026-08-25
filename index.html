@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bridge Course — інтерактиви</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#f0f0f2;--card:#fafafa;--border:#d5d5dc;--text:#1c1c22;--dim:#6b6b78;--head:#0f0f14;
+--green:#1a7f37;--greenBg:rgba(26,127,55,.10);--blue:#0a5cc4;--blueBg:rgba(10,92,196,.10);
+--font:'Segoe UI','Helvetica Neue',sans-serif;--fmono:'Fira Code','Cascadia Code',Consolas,monospace}
+[data-theme="dark"]{
+--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#8b949e;--head:#ffffff;
+--green:#3fb950;--greenBg:rgba(63,185,80,.12);--blue:#58a6ff;--blueBg:rgba(88,166,255,.12)}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;transition:background .25s,color .25s}
+.toggle{position:fixed;top:16px;right:20px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;line-height:1}
+.wrap{max-width:960px;margin:0 auto;padding:64px 24px 96px}
+.eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:10px}
+h1{font-size:32px;line-height:1.25;color:var(--head);margin-bottom:12px}
+.lede{font-size:15.5px;color:var(--text);max-width:660px;margin-bottom:8px}
+.note{font-size:13.5px;color:var(--dim);max-width:660px;margin-bottom:36px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:border-color .2s,transform .2s}
+a.card:hover{border-color:var(--blue);transform:translateY(-2px)}
+.card .num{font-family:var(--fmono);font-size:11px;color:var(--dim);letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:8px;min-height:22px;align-items:flex-start}
+.card .layer{color:var(--head);font-weight:700;white-space:nowrap;padding-top:2px}
+.card .lname{line-height:1.4;padding-top:2px}
+.card h2{font-size:16.5px;color:var(--head);margin-bottom:6px;line-height:1.35}
+.card p{font-size:13.5px;color:var(--text);line-height:1.55}
+.card.soon{opacity:.62}
+.badge{margin-left:auto;flex-shrink:0;white-space:nowrap;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+.badge.ready{background:var(--greenBg);color:var(--green)}
+.badge.soon{background:var(--blueBg);color:var(--blue)}
+footer{margin-top:44px;font-size:13px;color:var(--dim);border-top:1px solid var(--border);padding-top:18px}
+@media(max-width:620px){.wrap{padding:44px 16px 72px}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<button class="toggle" id="t" aria-label="Змінити тему">🌙</button>
+<div class="wrap">
+  <div class="eye">Bridge Course · The Harness</div>
+  <h1>Інтерактиви до восьми тем курсу</h1>
+  <p class="lede">Кожна тема курсу має власний scroll-інтерактив: історія розгортається згори вниз, а наступний крок відкривається після відповіді на питання. Матеріал спирається на наскрізний приклад — агента служби підтримки, який класифікує звернення, перевіряє факти, діє і фіксує результат.</p>
+  <p class="note">Теми додаються в міру готовності. Відкрийте будь-яку картку з позначкою «готово», щоб пройти інтерактив.</p>
+
+  <div class="grid">
+    <a class="card" href="tema1_pipeline_scroll.html">
+      <div class="num"><span class="layer">Тема 1</span> <span class="lname">Контракт і валідація</span> <span class="badge ready">готово</span></div>
+      <h2>Pipeline валідації LLM-виходів</h2>
+      <p>Один JSON від моделі проходить п'ять шарів перевірки — від синтаксису до дозволів агента — і зупиняється там, де вперше порушує контракт.</p>
+    </a>
+
+    <a class="card" href="tema2_tool_call_scroll.html">
+      <div class="num"><span class="layer">Тема 2</span> <span class="lname">Інструменти і дозволи</span> <span class="badge ready">готово</span></div>
+      <h2>validate_and_execute: від наміру до дії</h2>
+      <p>Один виклик інструменту проходить сім кроків контролю: бюджет, реєстр, схема, контекст, дозволи, ідемпотентне виконання і облік ефекту.</p>
+    </a>
+
+    <div class="card soon">
+      <div class="num"><span class="layer">Тема 3</span> <span class="lname">Пошук і ембеддинги</span> <span class="badge soon">у роботі</span></div>
+      <h2>Що бачить ембеддинг</h2>
+      <p>Пари фрагментів із реальними значеннями близькості показують, чому схожі за змістом тексти отримують різні оцінки.</p>
+    </div>
+
+    <div class="card soon">
+      <div class="num"><span class="layer">Тема 4</span> <span class="lname">Retrieval і пам'ять</span> <span class="badge soon">у роботі</span></div>
+      <h2>Воронка пошуку</h2>
+      <p>Корпус звужується від сотень документів до трьох фрагментів у відповіді, і кожен етап воронки відсіює свою частину.</p>
+    </div>
+
+    <div class="card soon">
+      <div class="num"><span class="layer">Тема 5</span> <span class="lname">Оцінювання якості</span> <span class="badge soon">у роботі</span></div>
+      <h2>Знайди точку відхилення</h2>
+      <p>Три кейси-розслідування: за трасою виконання потрібно визначити крок, на якому агент відхилився від очікуваної поведінки.</p>
+    </div>
+
+    <div class="card soon">
+      <div class="num"><span class="layer">Тема 6</span> <span class="lname">Безпека і межі</span> <span class="badge soon">у роботі</span></div>
+      <h2>Карта загроз Harness</h2>
+      <p>Шість компонентів системи, загрози для кожного і механізми захисту, які закривають конкретний клас атак.</p>
+    </div>
+
+    <div class="card soon">
+      <div class="num"><span class="layer">Тема 7</span> <span class="lname">Оркестрація і трасування</span> <span class="badge soon">у роботі</span></div>
+      <h2>Стан, правила і зворотний зв'язок</h2>
+      <p>Автомат станів агента, петля evaluator-optimizer і траса виконання, за якою відновлюється хід ухвалення рішень.</p>
+    </div>
+
+    <div class="card soon">
+      <div class="num"><span class="layer">Тема 8</span> <span class="lname">Інтеграція контурів</span> <span class="badge soon">у роботі</span></div>
+      <h2>Два контури: happy path і failure path</h2>
+      <p>Наскрізний сценарій проходить обидва шляхи — успішне завершення і збій із відновленням стану після таймауту.</p>
+    </div>
+  </div>
+
+  <footer>Bridge Course — восьмитижнева дисципліна для розробників, які входять у програму з автономних AI-систем.</footer>
+</div>
+<script>
+const t=document.getElementById('t');
+t.addEventListener('click',()=>{const d=document.documentElement.getAttribute('data-theme')==='dark';
+document.documentElement.setAttribute('data-theme',d?'light':'dark');t.textContent=d?'🌙':'☀️';});
+</script>
+</body>
+</html>

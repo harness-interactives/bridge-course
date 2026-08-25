@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pipeline валідації — Тема 1</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#8b949e;
+--green:#3fb950;--greenBg:rgba(63,185,80,.12);--red:#f85149;--redBg:rgba(248,81,73,.12);
+--blue:#58a6ff;--blueBg:rgba(88,166,255,.12);--gold:#d29922;--goldBg:rgba(210,153,34,.12);
+--accent:#7ee787;--font:'Segoe UI','Helvetica Neue',sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden}
+
+/* ─── RAIL ─── */
+.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:linear-gradient(180deg,#0d1117 0%,#101820 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:32px 20px}
+.rail-icon{font-size:48px;margin-bottom:16px}
+.rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
+.rail h1{font-size:20px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:12px;color:#fff}
+.rail-sub{font-size:13px;color:var(--dim);text-align:center;line-height:1.5}
+.rail-progress{position:absolute;bottom:24px;font-size:12px;color:var(--dim)}
+
+/* ─── MAIN ─── */
+.main{margin-left:260px;max-width:720px;padding:40px 32px 120px}
+
+/* ─── NODES ─── */
+.node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
+.node.locked{opacity:.25;pointer-events:none}
+.node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
+.node .dot.red{background:var(--red)}
+.node .dot.blue{background:var(--blue)}
+.node .dot.gold{background:var(--gold)}
+.node-date{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px}
+.node-beat{font-size:18px;font-weight:700;color:#fff;margin-bottom:12px}
+.node-body{font-size:14px;color:var(--text);line-height:1.7}
+.node-body p{margin-bottom:10px}
+
+/* ─── CODE BLOCK ─── */
+.codeblock{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'Fira Code','Cascadia Code',monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;color:#c9d1d9;white-space:pre}
+.kw{color:#ff7b72}.fn{color:#d2a8ff}.str{color:#a5d6ff}.cm{color:#8b949e}.tp{color:#79c0ff}
+
+/* ─── SPOT (question) ─── */
+.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none}
+.spot.open{display:block}
+.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px}
+.spot-q{font-size:15px;font-weight:600;color:#fff;margin-bottom:14px}
+.spot-opts{display:flex;flex-direction:column;gap:8px}
+.spot-opt{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;color:var(--text)}
+.spot-opt:hover{border-color:var(--blue)}
+.spot-opt.correct{border-color:var(--green);background:var(--greenBg)}
+.spot-opt.wrong{border-color:var(--red);background:var(--redBg)}
+.spot-opt.disabled{pointer-events:none;opacity:.6}
+.spot-fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
+.spot-fb.show{display:block}
+.spot-fb.pass{background:var(--greenBg);border:1px solid rgba(63,185,80,.3)}
+.spot-fb.fail{background:var(--redBg);border:1px solid rgba(248,81,73,.3)}
+
+/* ─── TAKEAWAYS ─── */
+.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0}
+.takeaway-card .tk-icon{font-size:24px;margin-bottom:6px}
+.takeaway-card .tk-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+.takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
+
+/* ─── FINISH ─── */
+.finish-card{background:linear-gradient(135deg,#161b22,#1a2332);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
+.finish-card h2{font-size:22px;color:#fff;margin-bottom:8px}
+.finish-card p{font-size:14px;color:var(--dim)}
+.score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:800px){
+.rail{display:none}
+.main{margin-left:0;padding:24px 16px 80px}
+}
+</style>
+</head>
+<body>
+
+<div class="rail">
+  <div class="rail-icon">🔧</div>
+  <div class="rail-eye">Тема 1 · Інтерактив</div>
+  <h1>Pipeline валідації LLM-виходів</h1>
+  <div class="rail-sub">Один JSON. П'ять шарів перевірки.<br>Історія від запиту до виконання.</div>
+  <div class="rail-progress" id="progress">0 / 0</div>
+</div>
+
+<div class="main" id="timeline"></div>
+
+<script>
+const NODES = [
+  // ──── SCENE 1: THE JSON ────
+  {
+    date:'Контекст', beat:'Клієнт написав у підтримку',
+    body:`<p>«У мене списали гроші двічі за одне замовлення.» Агент підтримки — це LLM-система, яка класифікує звернення, визначає пріоритет і пропонує дію. Модель повертає структурований JSON, який код має перевірити перед виконанням.</p>
+<p>Ось що повернула модель:</p>
+<div class="codeblock">{
+  "<span class="str">category</span>":    "<span class="str">billing_problem</span>",
+  "<span class="str">priority</span>":    "<span class="str">urgent</span>",
+  "<span class="str">should_escalate</span>": "<span class="str">yes</span>",
+  "<span class="str">recommended_action</span>": "<span class="str">check_payment_status</span>",
+  "<span class="str">user_message</span>": "<span class="str">Ми перевіримо статус вашої оплати</span>"
+}</div>
+<p>Цей JSON пройде через п'ять шарів валідації. На кожному — інша перевірка. Подивимось, де він зупиниться.</p>`
+  },
+
+  // ──── LAYER 1 ────
+  {
+    date:'Шар 1', beat:'JSON Parsing',
+    body:`<p>Перша перевірка — чи відповідь взагалі є валідним JSON. <code>json.loads()</code> перевіряє синтаксис: дужки, коми, лапки. Нічого більше.</p>
+<div class="codeblock"><span class="kw">import</span> json
+
+<span class="kw">try</span>:
+    data = json.<span class="fn">loads</span>(raw_response)
+<span class="kw">except</span> json.JSONDecodeError <span class="kw">as</span> e:
+    <span class="kw">return</span> <span class="fn">safe_fallback</span>(e)</div>
+<p>Наш JSON синтаксично правильний — дужки збігаються, коми на місці, рядки в лапках. <strong>Шар 1 пропускає.</strong></p>`,
+    spot:{
+      type:'predict', q:'Що НЕ перевіряє json.loads()?',
+      opts:[
+        ['Чи закриті всі дужки',0],
+        ['Чи є коми між елементами',0],
+        ['Чи значення "billing_problem" дозволене контрактом',1],
+        ['Чи рядки в подвійних лапках',0]
+      ],
+      fb:'json.loads() перевіряє лише синтаксис JSON. Він не знає нічого про контракт — які поля дозволені, які значення валідні. "billing_problem" пройде json.loads() без проблем.'
+    }
+  },
+
+  // ──── LAYER 2 ────
+  {
+    date:'Шар 2', beat:'Pydantic — програмний контракт', crit:1,
+    body:`<p>JSON пройшов parsing. Тепер Pydantic перевіряє структуру за контрактом: чи є всі required-поля, чи збігаються типи, чи значення входять в enum, чи немає зайвих полів.</p>
+<div class="codeblock"><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, ConfigDict, Field
+<span class="kw">from</span> typing <span class="kw">import</span> Literal
+
+<span class="kw">class</span> <span class="tp">SupportDecision</span>(BaseModel):
+    model_config = ConfigDict(extra=<span class="str">"forbid"</span>, strict=<span class="kw">True</span>)
+    category: Literal[<span class="str">"account_access"</span>,<span class="str">"payment_issue"</span>,
+                       <span class="str">"delivery_issue"</span>,<span class="str">"other"</span>]
+    priority: Literal[<span class="str">"low"</span>,<span class="str">"medium"</span>,<span class="str">"high"</span>]
+    should_escalate: <span class="tp">bool</span>
+    recommended_action: Literal[<span class="str">"reply_with_template"</span>,
+        <span class="str">"check_payment_status"</span>,<span class="str">"create_support_ticket"</span>,
+        <span class="str">"no_action"</span>]
+    user_message: <span class="tp">str</span> = Field(min_length=<span class="str">1</span>, max_length=<span class="str">300</span>)
+    reasoning_summary: <span class="tp">str</span> | <span class="kw">None</span> = <span class="kw">None</span></div>
+<p>Результат для нашого JSON:</p>
+<div class="codeblock" style="border-color:var(--red)"><span class="cm">3 помилки валідації:</span>
+category: <span class="str">"billing_problem"</span> — немає в enum
+  [дозволено: account_access, payment_issue, delivery_issue, other]
+priority: <span class="str">"urgent"</span> — немає в enum
+  [дозволено: low, medium, high]
+should_escalate: <span class="str">"yes"</span> — рядок замість boolean
+  [strict=True: "yes" не конвертується в true]</div>
+<p><strong>Pipeline зупиняється тут.</strong> Три помилки — три різних типи: невалідне значення enum, невалідне значення enum, невалідний тип. Далі — retry або safe fallback.</p>`,
+    spot:{
+      type:'predict', q:'Чому strict=True критичний у цьому контракті?',
+      opts:[
+        ['Без нього Pydantic відхиляє зайві поля',0],
+        ['Без нього Pydantic тихо конвертує "yes" в true',1],
+        ['Без нього json.loads() не парсить JSON',0],
+        ['Без нього enum-перевірка не працює',0]
+      ],
+      fb:'Без strict=True Pydantic v2 автоматично конвертує рядки "yes", "true", "1" у boolean True. Помилка пройде непоміченою — і агент ескалюватиме звернення на основі рядка "yes", який ніхто не перевірив.'
+    }
+  },
+
+  // ──── LAYER 3 (hypothetical) ────
+  {
+    date:'Шар 3', beat:'Семантична валідація',
+    body:`<p>Уявімо, модель виправила помилки: <code>"payment_issue"</code>, <code>"low"</code>, <code>true</code>. Pydantic прийняв. Але чи має сенс це рішення?</p>
+<div class="codeblock"><span class="kw">def</span> <span class="fn">validate_semantics</span>(d, text):
+    errors = []
+    money_kw = [<span class="str">"оплат"</span>,<span class="str">"списан"</span>,<span class="str">"рахун"</span>,<span class="str">"кошт"</span>]
+    <span class="kw">if</span> <span class="fn">any</span>(k <span class="kw">in</span> text.lower() <span class="kw">for</span> k <span class="kw">in</span> money_kw):
+        <span class="kw">if</span> d.priority == <span class="str">"low"</span>:
+            errors.append(<span class="str">"Фінансова проблема з priority=low"</span>)
+    <span class="kw">if</span> d.should_escalate <span class="kw">and</span> d.priority == <span class="str">"low"</span>:
+        errors.append(<span class="str">"Ескалація суперечить низькому пріоритету"</span>)
+    <span class="kw">if</span> d.should_escalate <span class="kw">and</span> d.recommended_action == <span class="str">"no_action"</span>:
+        errors.append(<span class="str">"Ескалація без дії — суперечність"</span>)
+    <span class="kw">return</span> errors</div>
+<div class="codeblock" style="border-color:var(--red)"><span class="cm">validate_semantics() →</span>
+  "<span class="str">Фінансова проблема з priority=low</span>"
+  "<span class="str">Ескалація суперечить низькому пріоритету</span>"</div>
+<p>Клієнт повідомляє про подвійне списання — <code>priority: "low"</code> не має сенсу. І <code>should_escalate: true</code> при цьому суперечить низькому пріоритету. <strong>Структурно правильно, логічно — ні.</strong></p>`,
+    spot:{
+      type:'quiz', q:'Pydantic (шар 2) міг би зловити цю помилку?',
+      opts:[
+        ['Так — треба додати validator',0],
+        ['Ні — Pydantic перевіряє структуру, не бізнес-логіку',1],
+        ['Так — через Field(ge=...) можна обмежити',0]
+      ],
+      fb:'Pydantic перевіряє типи, enum, обмеження полів. Залежності між полями ("якщо фінансова проблема, то priority не може бути low") — це бізнес-логіка, відповідальність шару 3. Змішування цих рівнів ускладнює підтримку.'
+    }
+  },
+
+  // ──── LAYER 4 ────
+  {
+    date:'Шар 4', beat:'Policy — дозволи агента',
+    body:`<p>Рішення логічне. Але чи має агент <em>право</em> виконати цю дію?</p>
+<div class="codeblock">ALLOWED_ACTIONS = {
+    <span class="str">"reply_with_template"</span>: send_template,
+    <span class="str">"check_payment_status"</span>: check_payment,
+    <span class="str">"create_support_ticket"</span>: create_ticket,
+    <span class="str">"no_action"</span>: <span class="kw">lambda</span> d: <span class="kw">None</span>,
+}
+
+<span class="kw">def</span> <span class="fn">validate_policy</span>(d):
+    <span class="kw">if</span> d.recommended_action <span class="kw">not in</span> ALLOWED_ACTIONS:
+        <span class="kw">raise</span> PolicyViolation(
+          f<span class="str">"Дія {d.recommended_action} не в allowlist"</span>)</div>
+<p>Дія <code>"check_payment_status"</code> входить в allowlist — агент має право перевіряти статус оплати. <strong>Шар 4 пропускає.</strong></p>
+<p>Але якби модель запропонувала <code>"approve_refund"</code> — policy зупинив би: агент класифікує, не ініціює повернення. Policy відповідає на «чи можна», а не «чи розумно» — логічна якість рішення це відповідальність шару 3.</p>`,
+    spot:{
+      type:'quiz', q:'LLM запропонувала дію "approve_refund". Який шар зупинить першим?',
+      opts:[
+        ['Шар 2 — Pydantic відхилить бо немає в enum',1],
+        ['Шар 4 — Policy зупинить бо не в allowlist',0],
+        ['Шар 3 — семантика виявить суперечність',0]
+      ],
+      fb:'Шар 2 спрацює першим: "approve_refund" не входить в Literal enum контракту. Policy (шар 4) навіть не побачить цей запит — pipeline зупиняється на першому шарі, що виявив помилку. Це і є defence in depth: два незалежних бар\'єри для одної загрози.'
+    }
+  },
+
+  // ──── LAYER 5 ────
+  {
+    date:'Шар 5', beat:'Executor — детерміноване виконання',
+    body:`<p>Усі перевірки пройдені. Код виконує дію через allowlist-маппінг:</p>
+<div class="codeblock"><span class="kw">def</span> <span class="fn">execute</span>(d):
+    fn = ALLOWED_ACTIONS.get(d.recommended_action)
+    <span class="kw">if</span> fn <span class="kw">is None</span>:
+        <span class="kw">return</span> <span class="fn">safe_fallback</span>()
+    <span class="kw">return</span> fn(d)
+
+<span class="cm"># НІКОЛИ:</span>
+<span class="cm"># globals()[d.recommended_action](d)</span></div>
+<p>Дія виконується через словник дозволених функцій — не через <code>globals()</code> або <code>eval()</code>. Модель не може викликати довільну функцію, навіть якщо «запропонує» її назву.</p>`
+  },
+
+  // ──── SUMMARY ────
+  {
+    date:'Підсумок', beat:'Що сталося з нашим JSON',
+    body:`<p>Вхідний JSON впав на <strong>шарі 2</strong> (Pydantic) з трьома помилками. Навіть якщо виправити структурні помилки — він впав би на <strong>шарі 3</strong> (семантика) з двома бізнес-помилками.</p>
+<p>Два незалежних рівні захисту спрацювали. Кожен ловить свій клас помилок. Жоден не замінює інший.</p>`,
+    spot:{
+      type:'quiz', q:'Яке головне правило pipeline валідації?',
+      opts:[
+        ['Достатньо одного надійного шару',0],
+        ['Кожен шар ловить свій клас помилок — жоден не замінює інший',1],
+        ['Семантична валідація важливіша за структурну',0],
+        ['Policy має перевіряти бізнес-логіку',0]
+      ],
+      fb:'Defence in depth: шари незалежні. json.loads() не знає про контракт. Pydantic не знає про бізнес-логіку. Семантика не знає про дозволи. Policy не знає про техніку виконання. Кожен робить одне — і робить добре.'
+    }
+  },
+
+  // ──── TAKEAWAYS ────
+  {
+    date:'Що забрати з собою', beat:'Три речі, які варто запам\'ятати', scene2:1,
+    body:'',
+    spot:{type:'takeaways', items:[
+      ['🔧','Вихід LLM — це пропозиція, не команда','Модель повертає структурований намір. Код перевіряє його на п\'яти рівнях перед виконанням. Без цих перевірок кожна відповідь — ризик.'],
+      ['🛡️','strict=True — не опція, а необхідність','Без strict-режиму Pydantic тихо конвертує "yes" в true, "1" в 1. Помилка проходить непоміченою і стає рішенням агента.'],
+      ['⚖️','Кожен шар — свій клас помилок','Структура (шар 2), логіка (шар 3) і дозволи (шар 4) — три незалежних бар\'єри. Змішування робить систему крихкою.']
+    ]}
+  }
+];
+
+// ──── ENGINE ────
+let answered = new Set();
+let score = 0;
+let totalQ = 0;
+
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  let html = '';
+  NODES.forEach((n, i) => {
+    const locked = i > 0 ? ' locked' : '';
+    const dotClass = n.crit ? 'red' : (n.scene2 ? 'blue' : '');
+    html += `<div class="node${locked}" id="node${i}">
+      <div class="dot ${dotClass}"></div>
+      <div class="node-date">${n.date}</div>
+      <div class="node-beat">${n.beat}</div>
+      <div class="node-body">${n.body}</div>
+      ${n.spot ? renderSpot(n.spot, i) : ''}
+    </div>`;
+  });
+  tl.innerHTML = html;
+  updateProgress();
+  // auto-open first spot
+  const first = document.querySelector('#node0 .spot');
+  if (first) first.classList.add('open');
+  // unlock nodes without spots automatically
+  unlockNext(0);
+}
+
+function renderSpot(s, ni) {
+  if (s.type === 'takeaways') {
+    return `<div class="spot open" id="spot${ni}">
+      ${s.items.map(([icon,title,body]) => `
+        <div class="takeaway-card">
+          <div class="tk-icon">${icon}</div>
+          <div class="tk-title">${title}</div>
+          <div class="tk-body">${body}</div>
+        </div>`).join('')}
+      <div class="finish-card" style="margin-top:24px">
+        <h2>Pipeline пройдено</h2>
+        <div class="score-bar" id="scoreDisplay"></div>
+        <p>Тепер ви бачите, як п'ять шарів валідації захищають систему від кожного класу помилок.</p>
+      </div>
+    </div>`;
+  }
+  totalQ++;
+  const tag = s.type === 'predict' ? 'Що далі?' : 'Перевірте себе';
+  return `<div class="spot" id="spot${ni}">
+    <div class="spot-tag">${tag}</div>
+    <div class="spot-q">${s.q}</div>
+    <div class="spot-opts">
+      ${s.opts.map(([text, correct], oi) =>
+        `<div class="spot-opt" onclick="answer(${ni},${oi},${correct})">${text}</div>`
+      ).join('')}
+    </div>
+    <div class="spot-fb" id="fb${ni}">${s.fb}</div>
+  </div>`;
+}
+
+function answer(ni, oi, correct) {
+  if (answered.has(ni)) return;
+  answered.add(ni);
+  const spot = document.getElementById('spot'+ni);
+  const opts = spot.querySelectorAll('.spot-opt');
+  opts.forEach((o,i) => {
+    o.classList.add('disabled');
+    const isCorrect = NODES[ni].spot.opts[i][1];
+    if (i === oi) o.classList.add(correct ? 'correct' : 'wrong');
+    if (isCorrect) o.classList.add('correct');
+  });
+  if (correct) score++;
+  const fb = document.getElementById('fb'+ni);
+  fb.classList.add('show', correct ? 'pass' : 'fail');
+  unlockNext(ni);
+  updateProgress();
+  // Update score display if takeaways visible
+  const sd = document.getElementById('scoreDisplay');
+  if (sd) sd.textContent = score + ' / ' + totalQ;
+}
+
+function unlockNext(fromIdx) {
+  // Unlock the next node if current has no spot or spot is answered
+  let next = fromIdx + 1;
+  while (next < NODES.length) {
+    const node = document.getElementById('node'+next);
+    if (!node) break;
+    node.classList.remove('locked');
+    const spot = document.getElementById('spot'+next);
+    if (spot && !spot.classList.contains('open')) {
+      spot.classList.add('open');
+    }
+    // If this node has a question spot and it's not answered, stop
+    if (NODES[next].spot && NODES[next].spot.type !== 'takeaways' && !answered.has(next)) {
+      break;
+    }
+    next++;
+  }
+}
+
+function updateProgress() {
+  document.getElementById('progress').textContent = answered.size + ' / ' + totalQ;
+}
+
+renderTimeline();
+</script>
+</body>
+</html>

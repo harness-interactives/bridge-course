@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Виклик інструментів — Тема 2</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#f0f0f2;--card:#fafafa;--railBg:#e9e9ee;--border:#d5d5dc;--text:#1c1c22;--dim:#6b6b78;--head:#0f0f14;
+--green:#1a7f37;--greenBg:rgba(26,127,55,.10);--red:#c1291f;--redBg:rgba(193,41,31,.10);
+--blue:#0a5cc4;--blueBg:rgba(10,92,196,.10);--gold:#9a6700;--goldBg:rgba(154,103,0,.12);
+--accent:#1a7f37;--mono:#f2f2f5;
+--font:'Segoe UI','Helvetica Neue',sans-serif;--fmono:'Fira Code','Cascadia Code',Consolas,monospace}
+[data-theme="dark"]{
+--bg:#0d1117;--card:#161b22;--railBg:#101820;--border:#30363d;--text:#c9d1d9;--dim:#8b949e;--head:#ffffff;
+--green:#3fb950;--greenBg:rgba(63,185,80,.12);--red:#f85149;--redBg:rgba(248,81,73,.12);
+--blue:#58a6ff;--blueBg:rgba(88,166,255,.12);--gold:#d29922;--goldBg:rgba(210,153,34,.12);
+--accent:#7ee787;--mono:#0d1117}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;transition:background .25s,color .25s}
+
+/* ─── RAIL ─── */
+.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:var(--railBg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:28px 18px;overflow-y:auto}
+.rail-icon{font-size:40px;margin-bottom:10px}
+.rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
+.rail h1{font-size:19px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:10px;color:var(--head)}
+.rail-sub{font-size:12.5px;color:var(--dim);text-align:center;line-height:1.5;margin-bottom:20px}
+.stack{width:100%;border-top:1px solid var(--border);padding-top:14px}
+.stack-title{font-size:10px;text-transform:uppercase;letter-spacing:1.6px;color:var(--dim);margin-bottom:8px;text-align:center}
+.stack-item{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim);padding:3px 6px;border-radius:6px;line-height:1.35}
+.stack-item .mark{font-size:11px;opacity:.55}
+.stack-item.now{background:var(--greenBg);color:var(--green);font-weight:700}
+.stack-item.now .mark{opacity:1}
+.stack-item .here{margin-left:auto;font-size:9.5px;letter-spacing:1px}
+.rail-progress{margin-top:16px;font-size:12px;color:var(--dim)}
+.toggle{position:fixed;top:16px;right:20px;z-index:20;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;line-height:1}
+
+/* ─── MAIN ─── */
+.main{margin-left:260px;max-width:860px;padding:40px 28px 120px}
+.node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
+.node.locked{opacity:.25;pointer-events:none}
+.node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
+.node .dot.red{background:var(--red)}.node .dot.blue{background:var(--blue)}.node .dot.gold{background:var(--gold)}
+.node-date{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px}
+.node-beat{font-size:18px;font-weight:700;color:var(--head);margin-bottom:12px}
+.node-body{font-size:14px;color:var(--text);line-height:1.7}
+.node-body p{margin-bottom:10px}
+.node-body strong{color:var(--head)}
+code{font-family:var(--fmono);font-size:12.5px;background:var(--mono);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+
+/* ─── BLOCKS ─── */
+.quote{border-left:3px solid var(--blue);background:var(--blueBg);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:14px;line-height:1.6}
+.callcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0}
+.callcard .cc-head{font-family:var(--fmono);font-size:13px;color:var(--head);font-weight:700;margin-bottom:8px}
+.callcard .cc-row{display:flex;gap:10px;font-size:13px;padding:3px 0;border-top:1px solid var(--border)}
+.callcard .cc-row:first-of-type{border-top:none}
+.callcard .cc-key{font-family:var(--fmono);font-size:12.5px;color:var(--dim);min-width:110px}
+.callcard .cc-val{font-family:var(--fmono);font-size:12.5px;color:var(--head)}
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.tbl th{text-align:left;background:var(--card);color:var(--head);font-weight:700;padding:8px 10px;border:1px solid var(--border);font-size:12.5px}
+.tbl td{padding:8px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
+.tbl td code{font-size:12px}
+.tbl-wrap{overflow-x:auto}
+.log{background:var(--mono);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:var(--fmono);font-size:12.5px;line-height:1.75;overflow-x:auto;white-space:pre;color:var(--text)}
+.log .ok{color:var(--green)}.log .bad{color:var(--red)}.log .note{color:var(--dim)}.log .hl{color:var(--blue)}
+.risk-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700;margin-right:6px;white-space:nowrap}
+.risk-read{background:var(--greenBg);color:var(--green)}
+.risk-write{background:var(--blueBg);color:var(--blue)}
+.risk-dest{background:var(--goldBg);color:var(--gold)}
+.risk-irr{background:var(--redBg);color:var(--red)}
+.callout{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;line-height:1.65}
+.callout .co-title{font-weight:700;color:var(--head);margin-bottom:4px}
+.states{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.state{border:1px solid var(--border);background:var(--card);border-radius:999px;padding:5px 12px;font-family:var(--fmono);font-size:12px;color:var(--text)}
+.state.term{border-color:var(--green);color:var(--green)}
+.state.pause{border-color:var(--gold);color:var(--gold)}
+.state.fail{border-color:var(--red);color:var(--red)}
+.ladder{margin:12px 0}
+.ladder .lv{display:flex;gap:12px;align-items:flex-start;padding:9px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--card);font-size:13px}
+.ladder .lv-n{font-family:var(--fmono);font-weight:700;color:var(--blue);min-width:64px}
+
+/* ─── SPOT ─── */
+.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none}
+.spot.open{display:block}
+.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px}
+.spot-q{font-size:15px;font-weight:600;color:var(--head);margin-bottom:14px}
+.spot-opts{display:flex;flex-direction:column;gap:8px}
+.spot-opt{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;color:var(--text)}
+.spot-opt:hover{border-color:var(--blue)}
+.spot-opt.correct{border-color:var(--green);background:var(--greenBg)}
+.spot-opt.wrong{border-color:var(--red);background:var(--redBg)}
+.spot-opt.disabled{pointer-events:none;opacity:.65}
+.spot-fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
+.spot-fb.show{display:block}
+.spot-fb.pass{background:var(--greenBg);border:1px solid var(--green)}
+.spot-fb.fail{background:var(--redBg);border:1px solid var(--red)}
+
+/* ─── TAKEAWAYS ─── */
+.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0}
+.takeaway-card .tk-icon{font-size:24px;margin-bottom:6px}
+.takeaway-card .tk-title{font-size:15px;font-weight:700;color:var(--head);margin-bottom:6px}
+.takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
+.finish-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
+.finish-card h2{font-size:22px;color:var(--head);margin-bottom:8px}
+.finish-card p{font-size:14px;color:var(--dim)}
+.score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
+@media(max-width:800px){.rail{display:none}.main{margin-left:0;padding:24px 16px 80px}}
+</style>
+</head>
+<body>
+
+<button class="toggle" id="themeToggle" aria-label="Змінити тему">🌙</button>
+
+<div class="rail">
+  <div class="rail-icon">⚙️</div>
+  <div class="rail-eye">Тема 2 · Інтерактив</div>
+  <h1>validate_and_execute: від наміру до дії</h1>
+  <div class="rail-sub">Один tool call проходить сім кроків перевірки — від пропозиції моделі до виконаної дії.</div>
+  <div class="stack">
+    <div class="stack-title">Шари Harness</div>
+    <div class="stack-item"><span class="mark">░</span>Контракт і валідація</div>
+    <div class="stack-item now"><span class="mark">█</span>Інструменти і дозволи<span class="here">ВИ ТУТ</span></div>
+    <div class="stack-item"><span class="mark">░</span>Пошук і ембеддинги</div>
+    <div class="stack-item"><span class="mark">░</span>Retrieval і пам'ять</div>
+    <div class="stack-item"><span class="mark">░</span>Оцінювання якості</div>
+    <div class="stack-item"><span class="mark">░</span>Безпека і межі</div>
+    <div class="stack-item"><span class="mark">░</span>Оркестрація і трасування</div>
+    <div class="stack-item"><span class="mark">░</span>Інтеграція контурів</div>
+  </div>
+  <div class="rail-progress" id="progress">0 / 0</div>
+</div>
+
+<div class="main" id="timeline"></div>
+
+<script>
+const NODES = [
+  {
+    date:'Контекст', beat:'Звернення клієнта і перша пропозиція моделі',
+    body:`<p>Агент підтримки з Теми 1 отримує три інструменти різних класів ризику: <code>check_payment_status</code> (читання), <code>create_support_ticket</code> (запис) і <code>refund_customer</code> (повернення коштів). Клієнт пише:</p>
+<div class="quote">Я оплатив замовлення ORD-12345, гроші списалися, але статус досі «не оплачено». Це вже втретє з вашим сервісом! Поверніть мені гроші негайно.</div>
+<p>Доречний перший крок — read-only виклик <code>check_payment_status</code>, який дає фактичні дані замість припущень. Через варіативність генерації той самий запит може дати інший результат:</p>
+<div class="callcard">
+  <div class="cc-head">tool_call · call_a91c</div>
+  <div class="cc-row"><span class="cc-key">name</span><span class="cc-val">refund_customer</span></div>
+  <div class="cc-row"><span class="cc-key">order_id</span><span class="cc-val">ORD-12345</span></div>
+  <div class="cc-row"><span class="cc-key">amount</span><span class="cc-val">2500</span></div>
+  <div class="cc-row"><span class="cc-key">reason</span><span class="cc-val">Клієнт вимагає повернення через проблему зі статусом оплати</span></div>
+</div>
+<p>Виклик бездоганний за формою: інструмент існує, аргументи відповідають схемі, ідентифікатор у правильному форматі, сума виглядає правдоподібно. Жодна синтаксична перевірка його не зупинить. Небезпечний він одразу з п'яти причин:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Проблема</th><th>У чому полягає</th></tr>
+<tr><td>Дія не відповідає ситуації</td><td>Клієнт повідомив про розбіжність статусу, тому правильний перший крок — перевірка оплати</td></tr>
+<tr><td>Модель піддалася тиску в тексті</td><td>Формулювання «поверніть гроші негайно» — це вимога користувача, і модель перенесла її в дію</td></tr>
+<tr><td>Сума нічим не підтверджена</td><td><code>amount: 2500</code> модель згенерувала: у контексті сума не зазначена</td></tr>
+<tr><td>Пропущено крок перевірки</td><td>Оплата, можливо, взагалі не списувалася, і тоді повернення безпідставне</td></tr>
+<tr><td>Клас ризику проігноровано</td><td>Destructive-операція запропонована першим кроком, без ескалації і без підтвердження</td></tr>
+</table></div>
+<p>Далі цей виклик проходить сім кроків <code>validate_and_execute</code>. Кожен крок закриває свій клас помилок.</p>`,
+    spot:{
+      type:'predict', q:'Яка перевірка зупинить виклик із сумою 2500?',
+      opts:[
+        ['Схема аргументів, оскільки 2500 виходить за допустимий діапазон',0],
+        ['Контекстна перевірка суми за даними платіжної системи',1],
+        ['Перевірка існування інструменту в реєстрі',0],
+        ['Парсинг JSON, який поверне помилку структури',0]
+      ],
+      fb:'Схема бачить лише форму: 2500 — додатне число в межах діапазону, тому крок 3 виклик пропустить. Зупиняє його крок 4: сума звіряється з фактично списаною сумою замовлення, і 2500 їй не відповідає.'
+    }
+  },
+
+  {
+    date:'Основа', beat:'Класифікація інструментів за ризиком',
+    body:`<p>Клас ризику присвоюється кожному інструменту явно, під час реєстрації в системі, і зберігається поруч зі схемою. Від класу залежить, чи можна викликати інструмент автоматично, чи можна повторювати невдалий виклик і чи потрібне підтвердження людини.</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Клас</th><th>Приклади</th><th>Наслідок помилкового виклику</th><th>Чи можна виправити</th></tr>
+<tr><td><span class="risk-tag risk-read">READ-ONLY</span></td><td><code>check_payment_status</code>, <code>search_knowledge_base</code></td><td>Зайве навантаження, можливий витік даних у контекст</td><td>Так, наслідків для даних немає</td></tr>
+<tr><td><span class="risk-tag risk-write">WRITE</span></td><td><code>create_support_ticket</code>, <code>add_note</code></td><td>Зайвий або неправильний запис</td><td>Так, запис можна виправити або видалити</td></tr>
+<tr><td><span class="risk-tag risk-dest">DESTRUCTIVE</span></td><td><code>refund_customer</code>, <code>send_email_to_customer</code></td><td>Фінансова втрата, небажана комунікація</td><td>Частково: гроші можна стягнути назад, лист відкликати неможливо</td></tr>
+<tr><td><span class="risk-tag risk-irr">IRREVERSIBLE</span></td><td><code>delete_account</code>, <code>purge_user_data</code></td><td>Повна втрата даних або доступу</td><td>Ні</td></tr>
+</table></div>
+<p>Щоб присвоїти клас, достатньо послідовно поставити чотири питання:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Питання</th><th>Якщо «так»</th></tr>
+<tr><td>Чи змінює виклик стан системи?</td><td>Мінімум write; якщо «ні» — read-only</td></tr>
+<tr><td>Чи виходить ефект за межі вашої системи (гроші, листи, зовнішні API)?</td><td>Мінімум destructive</td></tr>
+<tr><td>Чи можна ефект повністю скасувати штатним способом?</td><td>Якщо «ні» — destructive або irreversible</td></tr>
+<tr><td>Чи торкається виклик персональних або фінансових даних?</td><td>Підвищити клас на рівень або додати окрему політику доступу</td></tr>
+</table></div>
+<div class="callout"><div class="co-title">Складність із класифікацією — сигнал про інструмент</div>Якщо клас визначити важко, інструмент зазвичай робить забагато. Виклик <code>manage_order(action, ...)</code>, який залежно від аргументу читає, змінює або скасовує замовлення, — це три інструменти трьох класів, склеєні в один, і політику безпеки для нього написати неможливо.</div>`,
+    spot:{
+      type:'quiz', q:'До якого класу належить send_email_to_customer?',
+      opts:[
+        ['Write, оскільки формально виклик лише створює запис у черзі розсилки',0],
+        ['Destructive: надісланий лист відкликати неможливо',1],
+        ['Read-only, оскільки лист не змінює даних замовлення в системі',0]
+      ],
+      fb:'Межу між класами визначає наслідок виклику. Технічно виклик додає запис у чергу, проте ефект виходить за межі системи і скасуванню не підлягає, тому за наслідками це destructive-операція.'
+    }
+  },
+
+  {
+    date:'Крок 1', beat:'Бюджет викликів процесу',
+    body:`<p>Перша перевірка стосується права процесу на ще одну дію. Агентний цикл — це <code>while</code>, кількість ітерацій у якому визначає модель. Модель, яка отримала незрозумілий їй результат, здатна викликати той самий інструмент знову і знову, і жоден окремий виклик при цьому не буде невалідним.</p>
+<p>Бюджет живе в стані процесу і має два ліміти:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Ліміт</th><th>Типове значення</th><th>Що ловить</th></tr>
+<tr><td>На один інструмент</td><td>5 викликів</td><td>Зациклення на одному інструменті з тими самими аргументами</td></tr>
+<tr><td>Загальний на процес</td><td>15 викликів</td><td>Блукання моделі по всьому набору інструментів</td></tr>
+</table></div>
+<p>Вичерпання бюджету — штатний перехід: процес завершується безпечним резервним сценарієм, найчастіше ескалацією на людину, з повним журналом того, що агент устиг зробити. Показові патерни в журналі, наприклад п'ять поспіль однакових викликів, стають матеріалом для покращення описів інструментів і промпту.</p>`,
+    spot:{
+      type:'predict', q:'Бюджет — 5 викликів на інструмент і 15 на процес. Що ловить саме ліміт на інструмент?',
+      opts:[
+        ['Зациклення на одному інструменті',1],
+        ['Загальну вартість сесії в токенах моделі',0],
+        ['Блукання моделі по всьому набору доступних інструментів',0],
+        ['Повільну відповідь зовнішнього платіжного API',0]
+      ],
+      fb:'Два ліміти доповнюють один одного. Ліміт на інструмент зупиняє повторення одного виклику, загальний ліміт зупиняє перебір усього набору. Вартість токенів і швидкість API — окремі задачі, які вирішують інші механізми.'
+    }
+  },
+
+  {
+    date:'Крок 2', beat:'Існування інструменту в реєстрі',
+    body:`<p>Модель генерує назву інструменту так само, як генерує текст, тому назва може виявитися вигаданою: <code>check_payment</code> замість <code>check_payment_status</code> або <code>refund_now</code>, якого в системі немає взагалі.</p>
+<p>Реєстр інструментів — це джерело правди: якщо назви в ньому немає, виклик відхиляється до будь-яких інших перевірок. Причина відмови повертається моделі як результат інструменту, і наступним кроком модель може згенерувати виправлений виклик. Цикл виправлень обмежений тим самим бюджетом із кроку 1.</p>
+<p>Виклик <code>refund_customer</code> у реєстрі є, тому крок 2 пропускає його далі.</p>`
+  },
+
+  {
+    date:'Крок 3', beat:'Валідація аргументів за схемою',
+    body:`<p>Валідація входу інструменту складається з трьох послідовних перевірок, і кроки 2–4 виконують саме їх:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Перевірка</th><th>Питання</th><th>Що ловить</th></tr>
+<tr><td>Існування інструменту</td><td>Чи є така назва в реєстрі?</td><td>Вигадані назви: <code>check_payment</code>, <code>refund_now</code></td></tr>
+<tr><td>Схема аргументів</td><td>Чи відповідають аргументи контракту?</td><td>Неправильні типи, зайві поля, порушені обмеження</td></tr>
+<tr><td>Контекстна перевірка</td><td>Чи узгоджені аргументи з реальними даними?</td><td>Неіснуючий <code>order_id</code>, чуже замовлення, застарілі дані</td></tr>
+</table></div>
+<p>Схема <code>refund_customer</code> задає формат ідентифікатора <code>ORD-XXXXX</code>, додатну суму в межах діапазону і причину зі списку дозволених значень. Обіцянка провайдера моделі дотримуватися схеми валідацію на вашому боці не скасовує: строгі режими підтримують не всі можливості JSON Schema, поведінка різниться між провайдерами й версіями, а інструмент може викликатися не лише з одного API.</p>
+<p>Для нашого виклику схема проходить: формат збігається, сума додатна, причина заповнена. <strong>Структурно виклик валідний.</strong></p>`,
+    spot:{
+      type:'quiz', q:'Чому аргументи від моделі валідують у себе, навіть коли провайдер обіцяє відповідність схемі?',
+      opts:[
+        ['Валідація пришвидшує обробку виклику на боці застосунку',0],
+        ['Поведінка строгих режимів різниться між провайдерами й версіями',1],
+        ['Провайдер повертає аргументи в іншому порядку, ніж описано в схемі',0]
+      ],
+      fb:'Строгі режими підтримують не всі можливості JSON Schema, а поведінка змінюється від версії до версії. Крім того, той самий інструмент може викликатися з кількох місць системи, тому гарантія одного API покриває лише частину шляхів.'
+    }
+  },
+
+  {
+    date:'Крок 4', beat:'Контекстна перевірка аргументів', crit:1,
+    body:`<p>Схема перевіряє форму ідентифікатора, проте не бачить, чи існує таке замовлення, чи належить воно саме цьому клієнту і чи не «склеїла» модель ідентифікатор із двох різних, згаданих у розмові.</p>
+<p>Контекстна перевірка звіряє аргументи з <strong>верифікованим значенням із власного контексту процесу</strong> — ідентифікатором, який встановив детермінований код на початку сесії з автентифікованого запиту користувача. Це сильніший інваріант, ніж запит до бази: навіть реально існуюче, але чуже замовлення буде відхилене.</p>
+<p>Для суми діє те саме правило. Фактично списано 1800, і саме це число система вважає правдою. Виклик із першої ноди на цьому кроці зупиняється:</p>
+<div class="log"><span class="bad">rejected</span>  refund_customer
+          <span class="note">amount 2500.0 does not match charged amount 1800.0</span></div>
+<div class="callout"><div class="co-title">Порівнюємо лише з тим, що встановив код</div>Якщо модель у полі причини написала «клієнт сплатив 2500», а платіжна система каже 1800, для перевірок існує лише 1800. Твердження моделі ніколи не стають джерелом даних для власних перевірок системи.</div>`,
+    spot:{
+      type:'predict', q:'Модель повернула реально існуючий order_id, який належить іншому клієнту. Що зупинить виклик?',
+      opts:[
+        ['Схема: формат ORD-XXXXX збігається, тому виклик пройде далі',0],
+        ['Звірка з верифікованим ідентифікатором сесії',1],
+        ['Запит до бази даних, який підтвердить наявність замовлення',0]
+      ],
+      fb:'Схема бачить лише формат, а запит до бази підтвердить, що замовлення існує, і пропустить виклик. Відхиляє його звірка з ідентифікатором, який код встановив з автентифікованого запиту: чуже замовлення цьому значенню не дорівнює.'
+    }
+  },
+
+  {
+    date:'Крок 5', beat:'Модель дозволів: три виміри', crit:1,
+    body:`<p>Схема відповідає на питання «чи правильно сформований виклик». Модель дозволів відповідає на інше: чи має право саме цей агент виконати саме цю дію саме зараз. Базовий принцип — заборонено все, що явно не дозволено.</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Вимір</th><th>Питання</th><th>Приклад</th></tr>
+<tr><td>Агент</td><td>Хто викликає?</td><td>Агент першої лінії не має <code>refund_customer</code>, агент-супервізор має</td></tr>
+<tr><td>Сценарій</td><td>У межах якої задачі?</td><td>У сценарії «консультація» доступні лише read-only інструменти</td></tr>
+<tr><td>Стан процесу</td><td>На якому кроці процесу?</td><td>У стані класифікації запис заборонений: агент ще не з'ясував факти</td></tr>
+</table></div>
+<p>Третій вимір найменш очевидний і найважливіший. Набір доречних дій змінюється від кроку до кроку, тому allowlist — це функція від стану процесу:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Стан процесу</th><th>Дозволені інструменти</th></tr>
+<tr><td><code>classification</code></td><td><code>check_payment_status</code></td></tr>
+<tr><td><code>resolution</code></td><td><code>check_payment_status</code>, <code>create_support_ticket</code>, <code>refund_customer</code></td></tr>
+</table></div>
+<div class="callout"><div class="co-title">Модель дозволів, яку ви носили в кишені</div>Готельна ключ-картка працює за тими самими трьома вимірами. Хто: ваша картка відчиняє ваш номер, картка покоївки — номери її поверху. За яких умов: басейн відчиняється лише до 22:00. На якому кроці: після чекауту та сама картка не працює ніде. Коли картка не спрацьовує, замок не вгадує, чи можна вас пустити, — спірні випадки вирішує людина на ресепшені.</div>
+<p>Обмежувати варто і видимість: інструмент, заборонений у поточному стані, краще взагалі не показувати моделі в цьому запиті. Це покращує поведінку, проте перевірка дозволу на боці коду залишається обов'язковою.</p>`,
+    spot:{
+      type:'quiz', q:'Чому allowlist прив’язують до стану процесу?',
+      opts:[
+        ['Так зменшується кількість описів інструментів у запиті до моделі',0],
+        ['Набір доречних дій змінюється від кроку до кроку',1],
+        ['Стан процесу зберігається в базі, тому перевірка виконується швидше',0]
+      ],
+      fb:'Поки агент класифікує звернення, йому нічого записувати, і доступ до write-інструментів на цьому етапі створює зайву поверхню для помилки. Дозвіл на створення заявки з’являється тоді, коли створення заявки стає легітимним наступним кроком.'
+    }
+  },
+
+  {
+    date:'Крок 5 · продовження', beat:'Три рішення і підтвердження людиною',
+    body:`<p>Статичний allowlist каже, чи доступний інструмент у принципі. Частина рішень залежить від значень аргументів і стану світу в момент виклику: інструмент дозволений, а конкретний виклик — ні. Тому рішення шару дозволів має три значення:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Рішення</th><th>Що відбувається</th></tr>
+<tr><td><code>ALLOW</code></td><td>Виклик виконується автоматично</td></tr>
+<tr><td><code>DENY</code></td><td>Виклик відхиляється, модель отримує причину</td></tr>
+<tr><td><code>REQUIRE_APPROVAL</code></td><td>Процес призупиняється до рішення людини</td></tr>
+</table></div>
+<p>Політика прив'язується до класу ризику:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Клас ризику</th><th>Політика за замовчуванням</th></tr>
+<tr><td><span class="risk-tag risk-read">READ-ONLY</span></td><td>Автоматично, без питань</td></tr>
+<tr><td><span class="risk-tag risk-write">WRITE</span></td><td>Автоматично, з лімітами і записом в аудит</td></tr>
+<tr><td><span class="risk-tag risk-dest">DESTRUCTIVE</span></td><td>Підтвердження людиною; автоматично лише в межах явного ліміту</td></tr>
+<tr><td><span class="risk-tag risk-irr">IRREVERSIBLE</span></td><td>Агенту заборонено: дію виконує лише людина у власному інтерфейсі</td></tr>
+</table></div>
+<p>Профіль нашого агента містить три інструменти і ліміт автоматичного повернення <strong>1000</strong>. Фактично списано 1800. Модель пропонує повернути 1500 — сума легітимна за фактом оплати і перевищує повноваження агента, тому шар дозволів повертає <code>REQUIRE_APPROVAL</code>.</p>
+<p>Технічно це найскладніше рішення з трьох, бо воно розриває процес у часі. Три вимоги до підтвердження:</p>
+<div class="ladder">
+<div class="lv"><span class="lv-n">Прив'язка</span><span>Людина затверджує точний знімок виклику з аргументами, зафіксований хешем. Будь-яка зміна виклику після затвердження робить підтвердження недійсним.</span></div>
+<div class="lv"><span class="lv-n">Контекст</span><span>Запит містить текст звернення, результати виконаних перевірок, обґрунтування моделі і причину зупинки. Кнопка «Підтвердити?» без контексту дає ритуал замість контролю.</span></div>
+<div class="lv"><span class="lv-n">Термін</span><span>Непідтверджений запит через визначений час переходить у відхилений, а процес — у безпечний стан. Відкладені назавжди рішення дають підвішені назавжди процеси.</span></div>
+</div>`,
+    spot:{
+      type:'predict', q:'Сума 1500, фактично списано 1800, ліміт агента 1000. Яке рішення поверне шар дозволів?',
+      opts:[
+        ['ALLOW: сума не перевищує фактично списані 1800',0],
+        ['REQUIRE_APPROVAL: операція легітимна і понад ліміт',1],
+        ['DENY: сума 1500 перевищує ліміт повноважень агента 1000',0]
+      ],
+      fb:'Результат перевірки динамічної умови не бінарний. Сума 500 у межах ліміту — ALLOW. Сума 2500 понад фактично списану — DENY. Сума 1500 перевищує ліміт агента і не перевищує оплату, тому це легітимна операція, яка вимагає людини.'
+    }
+  },
+
+  {
+    date:'Крок 6', beat:'Ідемпотентність перед повторами',
+    body:`<p>Дозвіл отримано, і далі починається зовнішній світ, який не гарантує нічого. В агентній системі ненадійних боків два, і вони перемножуються:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Джерело</th><th>Прояви</th><th>Приклад</th></tr>
+<tr><td>Модель</td><td>Неправильний інструмент, вигадані аргументи, недоречний момент, зациклення</td><td><code>refund_customer</code> першим кроком із сумою 2500</td></tr>
+<tr><td>Зовнішній світ</td><td>Помилка, повільна відповідь, часткова відповідь, відсутність відповіді</td><td>Платіжний API відповів через 40 секунд або не відповів узагалі</td></tr>
+</table></div>
+<p>Ключова властивість таймауту: він повідомляє, що результат операції невідомий. Запит міг не дійти, міг дійти і впасти, міг дійти, виконатися — і загубилася лише відповідь. Для читання різниці немає. Для повернення коштів ця різниця дорівнює подвійному списанню.</p>
+<p><strong>Ключ ідемпотентності</strong> робить невизначеність нешкідливою. Він обчислюється детерміновано з ідентифікатора процесу, номера кроку, назви інструменту й аргументів: той самий крок того самого процесу дає той самий ключ, скільки б разів система не повторювала спробу. Випадковий ключ, згенерований у момент виклику, захисту не дає — повторна спроба згенерує новий.</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Операція</th><th>Ідемпотентна природно?</th><th>Що робити</th></tr>
+<tr><td>Читання (<code>check_payment_status</code>)</td><td>Так</td><td>Повторювати вільно</td></tr>
+<tr><td>Створення заявки (<code>create_support_ticket</code>)</td><td>Ні, кожен виклик — нова заявка</td><td>Ключ: повтор повертає ту саму заявку</td></tr>
+<tr><td>Установлення значення (статус = paid)</td><td>Так за ефектом</td><td>Переконатися, що операція встановлює значення замість того, щоб додавати дельту</td></tr>
+<tr><td>Списання і нарахування (<code>refund_customer</code>)</td><td>Ні, ефект накопичується</td><td>Ключ обов'язковий, бажано і на боці API</td></tr>
+<tr><td>Надсилання листа (<code>send_email_to_customer</code>)</td><td>Ні, кожен виклик — новий лист</td><td>Ключ і дедуплікація на боці відправника</td></tr>
+</table></div>
+<p>Ключ передається і в сам зовнішній API: платіжні системи підтримують його майже завжди. Тоді захист працює навіть у сценарії «запит дійшов, відповідь загубилася», де у вашому сховищі результату ще немає.</p>
+<div class="callout"><div class="co-title">Порядок проєктування</div>Спочатку кожен write- і destructive-інструмент отримує механізм ідемпотентності, і лише після цього системі дозволяється повторювати виклики. Ідемпотентність є передумовою для повторів.</div>`,
+    spot:{
+      type:'quiz', q:'Виклик refund_customer завершився таймаутом. Яка реакція коректна?',
+      opts:[
+        ['Вважати виклик невдалим і виконати його заново',0],
+        ['Повторити з тим самим ключем ідемпотентності',1],
+        ['Позначити процес як failed і чекати ручної перевірки оператором',0]
+      ],
+      fb:'Таймаут не означає «операція не виконалась»: він означає «результат невідомий». Повтор під тим самим ключем закриває обидва випадки: якщо перша спроба пройшла, друга поверне її результат, якщо ні — виконає операцію вперше.'
+    }
+  },
+
+  {
+    date:'Крок 6 · продовження', beat:'Повтори, таймаути і запобіжник',
+    body:`<p>Тепер, коли повтор безпечний, лишається питання, що саме можна повторювати. Відповідь визначають дві осі: чи є помилка тимчасовою і чи є операція ідемпотентною.</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Тип помилки</th><th>Read-only та ідемпотентний write</th><th>Неідемпотентний destructive</th></tr>
+<tr><td>Таймаут, розрив мережі</td><td>Повторювати з backoff</td><td>Тільки з ключем ідемпотентності</td></tr>
+<tr><td>HTTP 5xx, перевантаження</td><td>Повторювати з backoff</td><td>Тільки з ключем</td></tr>
+<tr><td>HTTP 429 (ліміт частоти)</td><td>Повторювати після зазначеної паузи</td><td>Так само, з ключем</td></tr>
+<tr><td>HTTP 4xx: невалідні дані</td><td>Не повторювати: помилка не тимчасова</td><td>Не повторювати</td></tr>
+<tr><td>Відмова політики (DENY)</td><td>Не повторювати: відмова політики є рішенням системи</td><td>Не повторювати</td></tr>
+</table></div>
+<p>Затримка між спробами зростає експоненційно і має випадковий розкид: пауза подвоюється (0,5 → 1 → 2 → 4 секунди зі стелею 8), а розкид розводить повтори різних процесів у часі, щоб вони не били синхронними хвилями.</p>
+<p>Таймаути потрібні на трьох рівнях, і кожен має свою роль:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Рівень</th><th>Що обмежує</th><th>Порядок величин</th><th>Що відбувається при перевищенні</th></tr>
+<tr><td>Виклик інструменту</td><td>Одне звернення до зовнішнього API</td><td>Секунди</td><td>Повтор або помилка в контекст моделі</td></tr>
+<tr><td>Крок процесу</td><td>Генерація, виклики і повтори одного кроку</td><td>Десятки секунд</td><td>Крок переривається, вмикається резервний сценарій</td></tr>
+<tr><td>Процес загалом</td><td>Усе оброблення звернення</td><td>Хвилини</td><td>Процес переходить у безпечний завершальний стан</td></tr>
+</table></div>
+<p>Багаторівневість тут — арифметика: три спроби з backoff до 8 секунд і таймаутом 10 секунд складаються у хвилини очікування, а цикл «модель викликає інструмент → отримує помилку → викликає знову» здатен тривати нескінченно, залишаючись формально коректним на кожній ітерації.</p>
+<p><strong>Запобіжник (circuit breaker)</strong> заводиться на зовнішню залежність і працює як автомат у щитку. Після <strong>3 збоїв поспіль</strong> коло розмикається, і наступні виклики відхиляються миттєво протягом <strong>30 секунд</strong>. Далі пропускається одна пробна спроба: успіх повертає коло в робочий стан, невдача знову розмикає його.</p>
+<div class="states"><span class="state term">closed · виклики проходять</span><span class="state fail">open · миттєва відмова 30 с</span><span class="state pause">half_open · одна пробна спроба</span></div>
+<p>Для агентної системи запобіжник має додаткову цінність: миттєва відмова повертається в контекст моделі як структурована помилка «платіжний сервіс тимчасово недоступний, повтор недоцільний», і модель одразу переходить до альтернативного плану замість витрачати ітерації на виклики, приречені висіти до таймауту.</p>`,
+    spot:{
+      type:'quiz', q:'Чим запобіжник відрізняється від обмеження частоти викликів?',
+      opts:[
+        ['Обидва механізми рахують кількість викликів за одиницю часу',0],
+        ['Запобіжник реагує на збої залежності',1],
+        ['Обмеження частоти захищає систему від недоступної залежності',0]
+      ],
+      fb:'Обмеження частоти стримує здорову систему від надмірної активності і рахує виклики. Запобіжник захищає від хворої залежності і рахує збої. Зовні вони схожі, бо обидва не пускають виклики далі.'
+    }
+  },
+
+  {
+    date:'Крок 6 · фінал', beat:'Ієрархія резервних сценаріїв',
+    body:`<p>Повтори, таймаути і запобіжник рано чи пізно впираються в ситуацію «виконати не вдалося остаточно». Що робити далі, визначає ієрархія, спроєктована заздалегідь:</p>
+<div class="ladder">
+<div class="lv"><span class="lv-n">Рівень 1</span><span>Повтор із backoff: тимчасовий збій минає сам.</span></div>
+<div class="lv"><span class="lv-n">Рівень 2</span><span>Альтернативне джерело: статус оплати береться з власної бази із застереженням про можливу неактуальність.</span></div>
+<div class="lv"><span class="lv-n">Рівень 3</span><span>Деградація: агент не може перевірити оплату, проте створює заявку і чесно повідомляє, що перевірка виконається пізніше.</span></div>
+<div class="lv"><span class="lv-n">Рівень 4</span><span>Ескалація: людина отримує збережений стан процесу з класифікацією, результатами вдалих перевірок і журналом невдалих спроб.</span></div>
+</div>
+<p>Ескалація — штатний стан системи. Головна вимога до всієї ієрархії: <strong>резервний сценарій чесний і не імітує успіх</strong>. Деградований режим прямо повідомляє користувачу і моделі, що результат неповний. Повідомлення «Ми все перевірили, очікуйте» у ситуації, коли нічого не перевірено, дає відкладені наслідки замість резервного сценарію.</p>`
+  },
+
+  {
+    date:'Крок 7', beat:'Стан процесу і облік ефекту', crit:1,
+    body:`<p>Останній крок фіксує, що сталося. Спокусливий шлях — вважати, що стан уже є в контексті розмови з моделлю. Причин, чому контекст не може бути єдиним носієм стану, п'ять, і кожна самодостатня:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Причина</th><th>Пояснення</th></tr>
+<tr><td>Контекст не переживає збій</td><td>Процес упав між кроками — історія повідомлень зникла разом із ним, і система не знає, чи виконано повернення коштів</td></tr>
+<tr><td>Контекст не переживає паузу</td><td>Очікування підтвердження може тривати добу, і тримати процес живим у пам'яті весь цей час неможливо</td></tr>
+<tr><td>Контекст — сировина для генерації</td><td>«Що вже зроблено» в контексті є текстом, який модель інтерпретує; факт виконання ефекту має читати код</td></tr>
+<tr><td>Контекст незручний для запитів</td><td>Питання «скільки викликів refund зробив процес» вирішується зверненням до структурованого поля замість парсингу історії</td></tr>
+<tr><td>Контекст належить одній розмові</td><td>Ескалація передає процес людині, а відновлення після збою може виконувати інший екземпляр застосунку</td></tr>
+</table></div>
+<p>Звідси напрямок залежності: стан — джерело правди, контекст — його проєкція для генерації. Формалізує стан скінченний автомат із явним переліком станів і переходів:</p>
+<div class="states"><span class="state">received</span><span class="state">classification</span><span class="state">resolution</span><span class="state pause">pending_approval</span><span class="state">executing</span><span class="state fail">failed</span><span class="state term">completed</span><span class="state term">escalated</span></div>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>З стану</th><th>У стан</th><th>Умова переходу</th><th>Хто ініціює</th></tr>
+<tr><td>classification</td><td>resolution</td><td>Рішення моделі пройшло контракт і семантику</td><td>Код</td></tr>
+<tr><td>resolution</td><td>executing</td><td>Дія обрана, шар дозволів повернув ALLOW</td><td>Код</td></tr>
+<tr><td>resolution</td><td>pending_approval</td><td>Шар дозволів повернув REQUIRE_APPROVAL</td><td>Код</td></tr>
+<tr><td>pending_approval</td><td>executing</td><td>Людина затвердила саме цей виклик (звірка хеша)</td><td>Код</td></tr>
+<tr><td>executing</td><td>completed</td><td>Виклик виконано, результат пройшов контракт виходу</td><td>Код</td></tr>
+<tr><td>executing</td><td>failed</td><td>Виконання остаточно не вдалося після повторів</td><td>Код</td></tr>
+</table></div>
+<p>Стовпчик «хто ініціює» одноманітний навмисно: перехід стану завжди виконує детермінований код. Не менш важливі відсутні рядки. Переходу <code>received → executing</code> немає, тому процес фізично не може виконати дію, минувши класифікацію і дозволи. Переходу <code>pending_approval → completed</code> немає, тому не можна завершити те, що чекає рішення. Кожен відсутній рядок — це клас помилок, який став неможливим структурно.</p>
+<p>Друга складова стану — реєстр побічних ефектів. Кожен виконаний write- або destructive-виклик реєструється окремим записом:</p>
+<div class="callcard">
+  <div class="cc-head">effect · запис у стані процесу</div>
+  <div class="cc-row"><span class="cc-key">tool</span><span class="cc-val">create_support_ticket</span></div>
+  <div class="cc-row"><span class="cc-key">idempotency_key</span><span class="cc-val">c3d4…</span></div>
+  <div class="cc-row"><span class="cc-key">result</span><span class="cc-val">ticket_id: TICKET-778</span></div>
+  <div class="cc-row"><span class="cc-key">compensatable</span><span class="cc-val">true — заявку можна закрити</span></div>
+  <div class="cc-row"><span class="cc-key">status</span><span class="cc-val">executed</span></div>
+</div>
+<p>Реєстр зберігає робочі дані для ухвалення рішень. Коли процес падає або скасовується, система читає з нього, що відкотити, що залишити і про що повідомити людину. Ефекти з позначкою <code>compensatable: true</code> компенсуються зворотною операцією, ефекти без неї означають, що процес можна тільки ескалювати з явним переліком того, що вже сталося.</p>
+<div class="callout"><div class="co-title">Порядок кроків проєктується заздалегідь</div>Некомпенсовні ефекти ставлять останніми: спершу перевірки, потім компенсовні дії, і лише в кінці незворотні. Тоді збій на будь-якому кроці залишає систему в стані, з якого є шлях назад.</div>
+<p>Стан зберігається в персистентне сховище після кожного переходу і кожного зареєстрованого ефекту, синхронно, до того як процес рушить далі. Персистентність без ідемпотентності дає відновлення, яке саме створює дублікати ефектів.</p>`,
+    spot:{
+      type:'predict', q:'Чому некомпенсовні дії ставлять останніми в порядку кроків процесу?',
+      opts:[
+        ['Вони найдовші за часом виконання',0],
+        ['Збій до них залишає шлях назад',1],
+        ['Так зменшується навантаження на зовнішній платіжний API',0]
+      ],
+      fb:'Найважливіше рішення щодо побічних ефектів ухвалюється до виконання, ще на етапі проєктування порядку кроків. Поки виконані лише перевірки і компенсовні дії, процес можна скасувати повністю. Після повернення коштів залишається тільки ескалація з переліком того, що вже сталося.'
+    }
+  },
+
+  {
+    date:'Сценарій А', beat:'Повернення коштів через підтвердження людини',
+    body:`<p>Процес у стані <code>resolution</code>, контекст містить верифіковане замовлення з фактичною оплатою 1800, ліміт агента — 1000. Модель пропонує повернути 1500. Шлях виклику крізь усі шари:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Крок</th><th>Шар</th><th>Результат</th></tr>
+<tr><td>1</td><td>Бюджет</td><td>Перший виклик — у межах</td></tr>
+<tr><td>2</td><td>Існування</td><td><code>refund_customer</code> є в реєстрі</td></tr>
+<tr><td>3</td><td>Схема</td><td>Аргументи валідні: формат, типи, діапазони</td></tr>
+<tr><td>4</td><td>Контекст</td><td><code>ORD-12345</code> збігається з верифікованим замовленням</td></tr>
+<tr><td>5</td><td>Дозволи</td><td>1500 ≤ 1800 (легітимно), 1500 &gt; 1000 (понад ліміт) → <strong>REQUIRE_APPROVAL</strong></td></tr>
+<tr><td>—</td><td>Стан</td><td>Перехід <code>resolution → pending_approval</code>, збережено хеш виклику</td></tr>
+</table></div>
+<p>Процес персистентно засинає. Оператор бачить текст звернення, підтверджений факт списання, суму, обґрунтування моделі і причину зупинки — і затверджує. Система звіряє хеш, виконує повернення під детермінованим ключем, реєструє некомпенсовний ефект і завершує процес. Журнал аудиту:</p>
+<div class="log">state_transition   received → classification
+state_transition   classification → resolution
+<span class="hl">permission</span>         refund_customer → require_approval
+                   <span class="note">"amount 1500.0 exceeds auto-limit 1000.0"</span>
+state_transition   resolution → pending_approval
+approval_requested <span class="hl">call_hash=fc7c29bd</span>
+<span class="ok">approval</span>           human:operator_7, decision=approved
+state_transition   pending_approval → executing   <span class="note">(actor: human:operator_7)</span>
+<span class="ok">state_transition</span>   executing → completed          <span class="note">"refund executed"</span></div>
+<p>Кожне питання майбутнього розбору має тут відповідь: чому зупинилися, хто дозволив, що саме дозволив і коли виконали. Якщо після виконання станеться збій і відновлений процес повторить крок, той самий ключ поверне той самий результат без другого списання.</p>`,
+    spot:{
+      type:'quiz', q:'Навіщо підтвердження прив’язують до хеша конкретного виклику?',
+      opts:[
+        ['Щоб оператор бачив короткий ідентифікатор запиту в інтерфейсі',0],
+        ['Щоб виконався саме той виклик, який бачила людина',1],
+        ['Щоб система могла повторити виклик після відновлення без нового підтвердження',0]
+      ],
+      fb:'Людина затверджує точний знімок інструменту й аргументів. Якщо після затвердження виклик хоч якось змінився, підтвердження недійсне і потрібне нове. Без цієї прив’язки виникає розрив між тим, що бачила людина, і тим, що виконає система.'
+    }
+  },
+
+  {
+    date:'Сценарій Б', beat:'Платіжний API недоступний',
+    body:`<p>Той самий процес, але модель обрала правильний перший крок — <code>check_payment_status</code>, — а платіжний API ліг. Виклик проходить кроки 1–5 (read-only у стані <code>resolution</code> → ALLOW) і входить у виконання:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Спроба</th><th>Результат</th><th>Дія системи</th></tr>
+<tr><td>0</td><td>Таймаут платіжного API</td><td>Запис в аудит, backoff, повтор</td></tr>
+<tr><td>1</td><td>Той самий таймаут</td><td>Запис в аудит, backoff, повтор</td></tr>
+<tr><td>2</td><td>Той самий таймаут</td><td>Спроби вичерпано, виконавець повертає невдачу</td></tr>
+</table></div>
+<p>Далі працює ієрархія резервних сценаріїв. Повтори вичерпані, альтернативного джерела статусу оплати в цього агента немає, тому вмикається деградований режим: агент фіксує проблему для ручної перевірки. Резервний виклик <code>create_support_ticket</code> проходить той самий виконавець і ті самі кроки — бюджет, схему, контекст, дозволи, ідемпотентне виконання.</p>
+<div class="log">state_transition   received → classification
+state_transition   classification → resolution
+<span class="hl">permission</span>         check_payment_status → allow
+<span class="bad">tool_call_failed</span>   attempt=0  <span class="note">"payment API timeout"</span>
+<span class="bad">tool_call_failed</span>   attempt=1  <span class="note">"payment API timeout"</span>
+<span class="bad">tool_call_failed</span>   attempt=2  <span class="note">"payment API timeout"</span>
+<span class="hl">permission</span>         create_support_ticket → allow
+<span class="ok">tool_result</span>        ticket_id=TICKET-c0a2
+state_transition   resolution → escalated
+                   <span class="note">"payment API unavailable, ticket created for manual check"</span></div>
+<p>Два моменти варті уваги. Резервний виклик не отримав жодних послаблень: деградований режим проходить ті самі перевірки, що й основний шлях. Фінальний стан чесний: процес переходить в ескалацію із заявкою, збереженим станом і повною історією невдалих спроб.</p>`,
+    spot:{
+      type:'predict', q:'Що робить фінал сценарію Б чесним щодо клієнта і оператора?',
+      opts:[
+        ['Агент повідомляє клієнта, що перевірка виконана успішно, і закриває звернення',0],
+        ['Процес переходить в escalated із заявкою і журналом',1],
+        ['Процес зупиняється мовчки, а оператор побачить його в черзі наступного дня',0]
+      ],
+      fb:'Резервний сценарій не імітує успіх. Людина отримує заявку, збережений стан процесу і всі три невдалі спроби з причинами, тому може продовжити роботу з тієї точки, де система зупинилася.'
+    }
+  },
+
+  {
+    date:'Підсумок', beat:'Один рядок і сім кроків за ним',
+    body:`<p>Виклик <code>validate_and_execute(tool_call)</code> — один рядок в оркестраторі. За ним стоять сім кроків, кожен із яких закриває окремий клас помилок:</p>
+<div class="tbl-wrap"><table class="tbl">
+<tr><th>Крок</th><th>Що перевіряє</th><th>Який клас помилок закриває</th></tr>
+<tr><td>1. Бюджет</td><td>Право процесу на ще один виклик</td><td>Зациклення і блукання моделі</td></tr>
+<tr><td>2. Існування</td><td>Наявність назви в реєстрі</td><td>Вигадані інструменти</td></tr>
+<tr><td>3. Схема</td><td>Форму аргументів</td><td>Неправильні типи, зайві поля, порушені діапазони</td></tr>
+<tr><td>4. Контекст</td><td>Узгодженість із верифікованими даними</td><td>Чужі замовлення, вигадані суми</td></tr>
+<tr><td>5. Дозволи</td><td>Право агента на цю дію зараз</td><td>Дії понад повноваження, destructive без людини</td></tr>
+<tr><td>6. Виконання</td><td>Ідемпотентність, повтори, таймаути, запобіжник</td><td>Подвійні ефекти, каскадні відмови, підвисання</td></tr>
+<tr><td>7. Облік</td><td>Запис переходу і побічного ефекту</td><td>Втрата знання про виконані дії після збою</td></tr>
+</table></div>`
+  },
+
+  {
+    date:'Що забрати з собою', beat:'Три речі, які варто запам\'ятати', scene2:1,
+    body:'',
+    spot:{type:'takeaways', items:[
+      ['⚡','Клас ризику визначає глибину контролю','Read-only виклик можна повторити без наслідків, destructive повторювати не можна. Клас присвоюється явно під час реєстрації інструменту і визначає політику дозволів, правила повторів і потребу в підтвердженні людини.'],
+      ['🔑','Ідемпотентність передує повторам','Ключ обчислюється детерміновано з ідентифікатора процесу, номера кроку й аргументів, тому будь-який повтор дає той самий ключ. Спочатку інструмент отримує ідемпотентність, і лише потім системі дозволяється повторювати виклики.'],
+      ['💾','Стан процесу зберігається окремо від контексту','Контекст розмови зникає після збою і не переживає паузу на добу. Переходи станів і виконані побічні ефекти пишуться в персистентне сховище синхронно, і саме з нього процес відновлюється.']
+    ]}
+  }
+];
+
+// ─── THEME ───
+const tgl = document.getElementById('themeToggle');
+tgl.addEventListener('click', () => {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  tgl.textContent = dark ? '🌙' : '☀️';
+});
+
+// ─── ENGINE ───
+let answered = new Set(), score = 0, totalQ = 0;
+
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  let html = '';
+  NODES.forEach((n, i) => {
+    const locked = i > 0 ? ' locked' : '';
+    const dotClass = n.crit ? 'red' : (n.scene2 ? 'blue' : '');
+    html += `<div class="node${locked}" id="node${i}"><div class="dot ${dotClass}"></div><div class="node-date">${n.date}</div><div class="node-beat">${n.beat}</div><div class="node-body">${n.body}</div>${n.spot ? renderSpot(n.spot, i) : ''}</div>`;
+  });
+  tl.innerHTML = html;
+  updateProgress();
+  const first = document.querySelector('#node0 .spot');
+  if (first) first.classList.add('open');
+  unlockNext(0);
+}
+
+function renderSpot(s, ni) {
+  if (s.type === 'takeaways') {
+    return `<div class="spot open" id="spot${ni}">${s.items.map(([icon,title,body]) => `<div class="takeaway-card"><div class="tk-icon">${icon}</div><div class="tk-title">${title}</div><div class="tk-body">${body}</div></div>`).join('')}<div class="finish-card" style="margin-top:24px"><h2>validate_and_execute пройдено</h2><div class="score-bar" id="scoreDisplay"></div><p>Сім кроків контролю ведуть tool call від наміру моделі до виконаної дії або чесної відмови.</p></div></div>`;
+  }
+  totalQ++;
+  const tag = s.type === 'predict' ? 'Що далі?' : 'Перевірте себе';
+  return `<div class="spot" id="spot${ni}"><div class="spot-tag">${tag}</div><div class="spot-q">${s.q}</div><div class="spot-opts">${s.opts.map(([text, correct], oi) => `<div class="spot-opt" onclick="answer(${ni},${oi},${correct})">${text}</div>`).join('')}</div><div class="spot-fb" id="fb${ni}">${s.fb}</div></div>`;
+}
+
+function answer(ni, oi, correct) {
+  if (answered.has(ni)) return;
+  answered.add(ni);
+  const spot = document.getElementById('spot'+ni);
+  const opts = spot.querySelectorAll('.spot-opt');
+  opts.forEach((o,i) => { o.classList.add('disabled'); if (i === oi) o.classList.add(correct ? 'correct' : 'wrong'); if (NODES[ni].spot.opts[i][1]) o.classList.add('correct'); });
+  if (correct) score++;
+  const fb = document.getElementById('fb'+ni);
+  fb.classList.add('show', correct ? 'pass' : 'fail');
+  unlockNext(ni);
+  updateProgress();
+  const sd = document.getElementById('scoreDisplay');
+  if (sd) sd.textContent = score + ' / ' + totalQ;
+}
+
+function unlockNext(fromIdx) {
+  let next = fromIdx + 1;
+  while (next < NODES.length) {
+    const node = document.getElementById('node'+next);
+    if (!node) break;
+    node.classList.remove('locked');
+    const spot = document.getElementById('spot'+next);
+    if (spot && !spot.classList.contains('open')) spot.classList.add('open');
+    if (NODES[next].spot && NODES[next].spot.type !== 'takeaways' && !answered.has(next)) break;
+    next++;
+  }
+}
+
+function updateProgress() { document.getElementById('progress').textContent = answered.size + ' / ' + totalQ; }
+renderTimeline();
+</script>
+</body>
+</html>
