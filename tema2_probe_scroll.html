@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Перед конспектом — Тема 2</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#f0f0f2;--card:#fafafa;--railBg:#e9e9ee;--border:#d5d5dc;--text:#1c1c22;--dim:#6b6b78;--head:#0f0f14;
+--green:#1a7f37;--greenBg:rgba(26,127,55,.10);--red:#c1291f;--redBg:rgba(193,41,31,.10);
+--blue:#0a5cc4;--blueBg:rgba(10,92,196,.10);--gold:#9a6700;--goldBg:rgba(154,103,0,.12);
+--accent:#1a7f37;--mono:#f2f2f5;
+--font:'Segoe UI','Helvetica Neue',sans-serif;--fmono:'Fira Code','Cascadia Code',Consolas,monospace}
+[data-theme="dark"]{
+--bg:#0d1117;--card:#161b22;--railBg:#101820;--border:#30363d;--text:#c9d1d9;--dim:#8b949e;--head:#ffffff;
+--green:#3fb950;--greenBg:rgba(63,185,80,.12);--red:#f85149;--redBg:rgba(248,81,73,.12);
+--blue:#58a6ff;--blueBg:rgba(88,166,255,.12);--gold:#d29922;--goldBg:rgba(210,153,34,.12);
+--accent:#7ee787;--mono:#0d1117}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;transition:background .25s,color .25s}
+
+/* ─── RAIL ─── */
+.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:var(--railBg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:28px 18px;overflow-y:auto}
+.rail-icon{font-size:40px;margin-bottom:10px}
+.rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
+.rail h1{font-size:19px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:10px;color:var(--head)}
+.rail-sub{font-size:12.5px;color:var(--dim);text-align:center;line-height:1.5;margin-bottom:20px}
+.stack{width:100%;border-top:1px solid var(--border);padding-top:14px}
+.stack-title{font-size:10px;text-transform:uppercase;letter-spacing:1.6px;color:var(--dim);margin-bottom:8px;text-align:center}
+.stack-item{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim);padding:3px 6px;border-radius:6px;line-height:1.35}
+.stack-item .mark{font-size:11px;opacity:.55}
+.stack-item.now{background:var(--greenBg);color:var(--green);font-weight:700}
+.stack-item.now .mark{opacity:1}
+.stack-item .here{margin-left:auto;font-size:9.5px;letter-spacing:1px}
+.rail-progress{margin-top:16px;font-size:12px;color:var(--dim)}
+.toggle{position:fixed;top:16px;right:20px;z-index:20;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;line-height:1}
+
+/* ─── MAIN ─── */
+.main{margin-left:260px;max-width:860px;padding:40px 28px 120px}
+.node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
+.node.locked{opacity:.25;pointer-events:none}
+.node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
+.node .dot.red{background:var(--red)}.node .dot.blue{background:var(--blue)}.node .dot.gold{background:var(--gold)}
+.node-date{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px}
+.node-beat{font-size:18px;font-weight:700;color:var(--head);margin-bottom:12px}
+.node-body{font-size:14px;color:var(--text);line-height:1.7}
+.node-body p{margin-bottom:10px}
+.node-body strong{color:var(--head)}
+code{font-family:var(--fmono);font-size:12.5px;background:var(--mono);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+
+/* ─── BLOCKS ─── */
+.quote{border-left:3px solid var(--blue);background:var(--blueBg);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:14px;line-height:1.6}
+.callcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0}
+.callcard .cc-head{font-family:var(--fmono);font-size:13px;color:var(--head);font-weight:700;margin-bottom:8px}
+.callcard .cc-row{display:flex;gap:10px;font-size:13px;padding:3px 0;border-top:1px solid var(--border)}
+.callcard .cc-row:first-of-type{border-top:none}
+.callcard .cc-key{font-family:var(--fmono);font-size:12.5px;color:var(--dim);min-width:110px}
+.callcard .cc-val{font-family:var(--fmono);font-size:12.5px;color:var(--head)}
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.tbl th{text-align:left;background:var(--card);color:var(--head);font-weight:700;padding:8px 10px;border:1px solid var(--border);font-size:12.5px}
+.tbl td{padding:8px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
+.tbl td code{font-size:12px}
+.tbl-wrap{overflow-x:auto}
+.log{background:var(--mono);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:var(--fmono);font-size:12.5px;line-height:1.75;overflow-x:auto;white-space:pre;color:var(--text)}
+.log .ok{color:var(--green)}.log .bad{color:var(--red)}.log .note{color:var(--dim)}.log .hl{color:var(--blue)}
+.risk-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700;margin-right:6px;white-space:nowrap}
+.risk-read{background:var(--greenBg);color:var(--green)}
+.risk-write{background:var(--blueBg);color:var(--blue)}
+.risk-dest{background:var(--goldBg);color:var(--gold)}
+.risk-irr{background:var(--redBg);color:var(--red)}
+.callout{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;line-height:1.65}
+.callout .co-title{font-weight:700;color:var(--head);margin-bottom:4px}
+.states{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.state{border:1px solid var(--border);background:var(--card);border-radius:999px;padding:5px 12px;font-family:var(--fmono);font-size:12px;color:var(--text)}
+.state.term{border-color:var(--green);color:var(--green)}
+.state.pause{border-color:var(--gold);color:var(--gold)}
+.state.fail{border-color:var(--red);color:var(--red)}
+.ladder{margin:12px 0}
+.ladder .lv{display:flex;gap:12px;align-items:flex-start;padding:9px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--card);font-size:13px}
+.ladder .lv-n{font-family:var(--fmono);font-weight:700;color:var(--blue);min-width:64px}
+
+/* ─── SPOT ─── */
+.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none}
+.spot.open{display:block}
+.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px}
+.spot-q{font-size:15px;font-weight:600;color:var(--head);margin-bottom:14px}
+.spot-opts{display:flex;flex-direction:column;gap:8px}
+.spot-opt{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;color:var(--text)}
+.spot-opt:hover{border-color:var(--blue)}
+.spot-opt.correct{border-color:var(--green);background:var(--greenBg)}
+.spot-opt.wrong{border-color:var(--red);background:var(--redBg)}
+.spot-opt.disabled{pointer-events:none;opacity:.65}
+.spot-fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
+.spot-fb.show{display:block}
+.spot-fb.pass{background:var(--greenBg);border:1px solid var(--green)}
+.spot-fb.fail{background:var(--redBg);border:1px solid var(--red)}
+
+/* ─── TAKEAWAYS ─── */
+.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0}
+.takeaway-card .tk-icon{font-size:24px;margin-bottom:6px}
+.takeaway-card .tk-title{font-size:15px;font-weight:700;color:var(--head);margin-bottom:6px}
+.takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
+.finish-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
+.finish-card h2{font-size:22px;color:var(--head);margin-bottom:8px}
+.finish-card p{font-size:14px;color:var(--dim)}
+.score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
+@media(max-width:800px){.rail{display:none}.main{margin-left:0;padding:24px 16px 80px}}
+</style>
+</head>
+<body>
+
+<button class="toggle" id="themeToggle" aria-label="Змінити тему">🌙</button>
+
+<div class="rail">
+  <div class="rail-icon">🧭</div>
+  <div class="rail-eye">Тема 2 · Перед конспектом</div>
+  <h1>П'ять місць, де інтуїція розходиться з інженерією</h1>
+  <div class="rail-sub">П'ять ситуацій із життя агента, який уміє діяти. У кожній очевидна відповідь виявляється неточною. Розбір — у конспекті теми.</div>
+  <div class="stack">
+    <div class="stack-title">Шари Harness</div>
+    <div class="stack-item"><span class="mark">░</span>Контракт і валідація</div>
+    <div class="stack-item now"><span class="mark">█</span>Інструменти і дозволи<span class="here">ВИ ТУТ</span></div>
+    <div class="stack-item"><span class="mark">░</span>Пошук і ембеддинги</div>
+    <div class="stack-item"><span class="mark">░</span>Retrieval і пам'ять</div>
+    <div class="stack-item"><span class="mark">░</span>Оцінювання якості</div>
+    <div class="stack-item"><span class="mark">░</span>Безпека і межі</div>
+    <div class="stack-item"><span class="mark">░</span>Оркестрація і трасування</div>
+    <div class="stack-item"><span class="mark">░</span>Інтеграція контурів</div>
+  </div>
+  <div class="rail-progress" id="progress">0 / 0</div>
+</div>
+
+<div class="main" id="timeline"></div>
+
+<script>
+const NODES = [
+
+  {
+    date:'Ситуація 1', beat:'Виклик, до якого неможливо причепитися',
+    body:`<p>Агент підтримки має три інструменти: <code>check_payment_status</code> (читання), <code>create_support_ticket</code> (запис) і <code>refund_customer</code> (повернення коштів). Клієнт пише:</p>
+<div class="quote">Я оплатив замовлення ORD-12345, гроші списалися, але статус досі «не оплачено». Це вже втретє з вашим сервісом! Поверніть мені гроші негайно.</div>
+<p>Модель відповідає викликом інструменту:</p>
+<div class="callcard">
+  <div class="cc-head">tool_call · call_a91c</div>
+  <div class="cc-row"><span class="cc-key">name</span><span class="cc-val">refund_customer</span></div>
+  <div class="cc-row"><span class="cc-key">order_id</span><span class="cc-val">ORD-12345</span></div>
+  <div class="cc-row"><span class="cc-key">amount</span><span class="cc-val">2500</span></div>
+  <div class="cc-row"><span class="cc-key">reason</span><span class="cc-val">Клієнт вимагає повернення через проблему зі статусом оплати</span></div>
+</div>
+<p>Інструмент існує. Ідентифікатор у правильному форматі. Сума додатна і виглядає правдоподібно. Причина заповнена. У розмові з клієнтом сума жодного разу не звучала.</p>`,
+    spot:{
+      type:'probe', q:'Що зупинить цей виклик?',
+      opts:[
+        ['Валідація за схемою: сума виходить за межі дозволеного діапазону',0],
+        ['Звірка суми з фактично списаною за замовленням',1],
+        ['Перевірка, що інструмент refund_customer існує в реєстрі',0],
+        ['Розбір JSON, який поверне помилку структури',0]
+      ],
+      fb:'Схема бачить форму, а не походження значення: 2500 — додатне число в допустимих межах, і жодна структурна перевірка його не спинить. Потрібен шар, який звіряє аргумент із даними, що їх установив код, а не модель. Скільки таких шарів має бути і в якому порядку вони стоять — розбирає розділ про валідацію входу.'
+    }
+  },
+
+  {
+    date:'Ситуація 2', beat:'Тридцять секунд мовчання',
+    body:`<p>Повернення дозволено, виклик пішов до платіжного API. Спливає таймаут: тридцять секунд, відповіді немає.</p>
+<div class="log">
+  <div class="lv"><span class="lv-n">14:02:11</span> refund_customer → payment API</div>
+  <div class="lv"><span class="lv-n">14:02:41</span> <span class="bad">timeout, відповіді немає</span></div>
+</div>
+<p>Система має вирішити, що робити далі. Перед цим варто відповісти на простіше питання.</p>`,
+    spot:{
+      type:'probe', q:'Що система знає про операцію в цю мить?',
+      opts:[
+        ['Операція не виконалась, запит не дійшов до сервісу',0],
+        ['Виконалась операція чи ні, система не знає',1],
+        ['Операція виконалась, загубилася лише відповідь',0],
+        ['Операція виконається згодом, коли сервіс відновиться',0]
+      ],
+      fb:'Таймаут повідомляє про відсутність відповіді, а не про відсутність ефекту. Запит міг не дійти. Міг дійти і впасти. Міг виконатися, і загубилася сама відповідь. Для читання статусу різниця несуттєва, для руху грошей — це і є ціна помилки. З цього розрізнення виростає весь розділ про стійкість викликів.'
+    }
+  },
+
+  {
+    date:'Ситуація 3', beat:'Надійність, яка зробила гірше', crit:1,
+    body:`<p>Команда побачила таймаути в журналі і зробила очевидне: додала три повторні спроби з паузами між ними. Зміна пройшла рев'ю без зауважень.</p>
+<p>Через тиждень приходять скарги на подвійні списання. Журнали чисті: модель жодного разу не помилилася з інструментом, аргументи щоразу валідні, дозволи на місці.</p>`,
+    spot:{
+      type:'probe', q:'Яке з рішень команди виявилося помилковим?',
+      opts:[
+        ['Повтор застосували до операції, яка його не витримує',1],
+        ['Три спроби — забагато, вистачило б однієї',0],
+        ['Паузи між спробами були надто короткими',0],
+        ['Таймаут у тридцять секунд занизький для платіжного API у пікові години',0]
+      ],
+      fb:'Кожне рішення окремо обґрунтоване: таймаут потрібен, повтор після збою потрібен. Небезпечним стало їх поєднання з операцією, кожне виконання якої рухає гроші. Автор навмисно ставить механізм безпечного повторення перед дозволом повторювати — це найважливіший порядок у темі, і в конспекті він винесений в окреме попередження.'
+    }
+  },
+
+  {
+    date:'Ситуація 4', beat:'Доба очікування',
+    body:`<p>Сума перевищила ліміт агента, і процес зупинився на підтвердженні людиною. Оператор побачив запит наступного ранку і натиснув «Підтвердити» — через двадцять годин після зупинки.</p>
+<p>Стан процесу до цього моменту жив там, де його найзручніше було тримати: в історії повідомлень із моделлю. Там є все — класифікація звернення, результат перевірки оплати, обґрунтування рішення.</p>`,
+    spot:{
+      type:'probe', q:'Що станеться, коли оператор натисне «Підтвердити»?',
+      opts:[
+        ['Процес продовжиться з місця зупинки, історія повна',0],
+        ['Історії немає, і система не знає, що вже зроблено',1],
+        ['Модель відновить хід процесу за контекстом розмови',0],
+        ['Процес почнеться спочатку і повторить усі перевірки',0]
+      ],
+      fb:'Історія повідомлень живе в пам\'яті процесу, і доба очікування її не переживає. Проблема при цьому глибша за втрату даних: навіть уціліла історія залишається текстом, який модель <em>інтерпретує</em>, тоді як факт виконаного повернення коштів має читати код. Куди тоді класти стан і як він співвідноситься з контекстом — предмет окремого розділу.'
+    }
+  },
+
+  {
+    date:'Ситуація 5', beat:'Дві кнопки',
+    body:`<p>Оператор отримує запит на підтвердження в такому вигляді:</p>
+<div class="callcard">
+  <div class="cc-head">Потрібне підтвердження</div>
+  <div class="cc-row"><span class="cc-key">дія</span><span class="cc-val">Повернути 1500 за ORD-12345</span></div>
+  <div class="cc-row"><span class="cc-key">вибір</span><span class="cc-val">Так / Ні</span></div>
+</div>
+<p>Формально контур замкнено: небезпечну дію не виконано автоматично, рішення ухвалює людина.</p>`,
+    spot:{
+      type:'probe', q:'Чого бракує цьому запиту?',
+      opts:[
+        ['Нічого: сума і замовлення вказані, рішення можна ухвалити',0],
+        ['Підстав: звернення, перевірених фактів, причини зупинки',1],
+        ['Кнопки «Відкласти» для складних випадків',0],
+        ['Зазначення, який саме агент ініціював виклик',0]
+      ],
+      fb:'Людина, якій показали суму і дві кнопки, фізично не може ухвалити поінформоване рішення — виходить ритуал контролю замість контролю. Вимог до підтвердження в темі три, і ця друга. Перша стосується того, до чого саме прив\'язується згода оператора. Третя — того, що станеться, якщо він не відповість узагалі.'
+    }
+  },
+
+  {
+    date:'Далі', beat:'З чим іти в конспект',
+    body:`<p>П\'ять ситуацій вище — це п\'ять питань, на які тема відповідає. Тримайте їх відкритими під час читання.</p>`,
+    spot:{
+      type:'takeaways',
+      finishTitle:'Питання поставлено',
+      finishText:'Розбіжність між очевидною відповіддю і правильною — робочий матеріал теми, а не помилка читача. Конспект знімає кожну з п\'яти по черзі.',
+      items:[
+        ['①','Що перевіряє схема і чого вона не бачить','Форма аргументу і його походження — різні питання. Шукайте, скільки перевірок стоїть між наміром моделі і викликом функції.'],
+        ['②','Три результати виклику замість двох','Успіх, відмова і невідомість. Третій визначає, які операції взагалі можна повторювати.'],
+        ['③','Порядок двох механізмів','Безпечне повторення і дозвіл повторювати вводяться саме в цьому порядку. Зверніть увагу, чому зворотний порядок дає подвійне списання.'],
+        ['④','Стан процесу і контекст моделі','Один із них — джерело правди, другий — його проєкція. Простежте напрямок залежності.'],
+        ['⑤','Що робить підтвердження справжнім','Три вимоги до запиту на підтвердження. Кожна закриває свій спосіб зламати контур.']
+      ]
+    }
+  }
+
+];
+
+
+// ─── THEME ───
+const tgl = document.getElementById('themeToggle');
+tgl.addEventListener('click', () => {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  tgl.textContent = dark ? '🌙' : '☀️';
+});
+
+// ─── ENGINE ───
+let answered = new Set(), score = 0, totalQ = 0;
+
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  let html = '';
+  NODES.forEach((n, i) => {
+    const locked = i > 0 ? ' locked' : '';
+    const dotClass = n.crit ? 'red' : (n.scene2 ? 'blue' : '');
+    html += `<div class="node${locked}" id="node${i}"><div class="dot ${dotClass}"></div><div class="node-date">${n.date}</div><div class="node-beat">${n.beat}</div><div class="node-body">${n.body}</div>${n.spot ? renderSpot(n.spot, i) : ''}</div>`;
+  });
+  tl.innerHTML = html;
+  updateProgress();
+  const first = document.querySelector('#node0 .spot');
+  if (first) first.classList.add('open');
+  unlockNext(0);
+}
+
+function renderSpot(s, ni) {
+  if (s.type === 'takeaways') {
+    const ft = s.finishTitle || 'validate_and_execute пройдено';
+    const fx = s.finishText || 'Сім кроків контролю ведуть tool call від наміру моделі до виконаної дії або чесної відмови.';
+    return `<div class="spot open" id="spot${ni}">${s.items.map(([icon,title,body]) => `<div class="takeaway-card"><div class="tk-icon">${icon}</div><div class="tk-title">${title}</div><div class="tk-body">${body}</div></div>`).join('')}<div class="finish-card" style="margin-top:24px"><h2>${ft}</h2><div class="score-bar" id="scoreDisplay"></div><p>${fx}</p></div></div>`;
+  }
+  totalQ++;
+  const tag = s.type === 'predict' ? 'Що далі?' : (s.type === 'probe' ? 'Як гадаєте?' : 'Перевірте себе');
+  return `<div class="spot" id="spot${ni}"><div class="spot-tag">${tag}</div><div class="spot-q">${s.q}</div><div class="spot-opts">${s.opts.map(([text, correct], oi) => `<div class="spot-opt" onclick="answer(${ni},${oi},${correct})">${text}</div>`).join('')}</div><div class="spot-fb" id="fb${ni}">${s.fb}</div></div>`;
+}
+
+function answer(ni, oi, correct) {
+  if (answered.has(ni)) return;
+  answered.add(ni);
+  const spot = document.getElementById('spot'+ni);
+  const opts = spot.querySelectorAll('.spot-opt');
+  opts.forEach((o,i) => { o.classList.add('disabled'); if (i === oi) o.classList.add(correct ? 'correct' : 'wrong'); if (NODES[ni].spot.opts[i][1]) o.classList.add('correct'); });
+  if (correct) score++;
+  const fb = document.getElementById('fb'+ni);
+  fb.classList.add('show', correct ? 'pass' : 'fail');
+  unlockNext(ni);
+  updateProgress();
+  const sd = document.getElementById('scoreDisplay');
+  if (sd) sd.textContent = score + ' / ' + totalQ;
+}
+
+function unlockNext(fromIdx) {
+  let next = fromIdx + 1;
+  while (next < NODES.length) {
+    const node = document.getElementById('node'+next);
+    if (!node) break;
+    node.classList.remove('locked');
+    const spot = document.getElementById('spot'+next);
+    if (spot && !spot.classList.contains('open')) spot.classList.add('open');
+    if (NODES[next].spot && NODES[next].spot.type !== 'takeaways' && !answered.has(next)) break;
+    next++;
+  }
+}
+
+function updateProgress() { document.getElementById('progress').textContent = answered.size + ' / ' + totalQ; }
+renderTimeline();
+</script>
+</body>
+</html>
