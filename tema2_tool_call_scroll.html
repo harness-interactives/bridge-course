@@ -20,7 +20,8 @@
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;transition:background .25s,color .25s}
 
 /* ─── RAIL ─── */
-.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:var(--railBg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:28px 18px;overflow-y:auto}
+.page{display:flex;max-width:1340px;margin:0 auto;align-items:flex-start}
+.rail{position:sticky;top:0;flex:none;width:298px;height:100vh;background:var(--railBg);border-right:1px solid var(--border);border-left:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:28px 18px;overflow-y:auto}
 .rail-icon{font-size:40px;margin-bottom:10px}
 .rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
 .rail h1{font-size:19px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:10px;color:var(--head)}
@@ -33,10 +34,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .stack-item.now .mark{opacity:1}
 .stack-item .here{margin-left:auto;font-size:9.5px;letter-spacing:1px}
 .rail-progress{margin-top:16px;font-size:12px;color:var(--dim)}
-.toggle{position:fixed;top:16px;right:20px;z-index:20;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;line-height:1}
+.toggle{position:fixed;top:16px;right:calc(max(0px,(100vw - 1340px)/2) + 26px);z-index:20;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;line-height:1}
 
 /* ─── MAIN ─── */
-.main{margin-left:max(260px, calc(50% - 300px));max-width:860px;padding:40px 28px 120px}
+.main{flex:1;min-width:0;max-width:1042px;padding:44px 52px 120px 56px;border-right:1px solid var(--border)}
 .node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
 .node.locked{opacity:.25;pointer-events:none}
 .node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
@@ -112,13 +113,14 @@ code{font-family:var(--fmono);font-size:12.5px;background:var(--mono);border:1px
 .finish-card h2{font-size:22px;color:var(--head);margin-bottom:8px}
 .finish-card p{font-size:14px;color:var(--dim)}
 .score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
-@media(max-width:800px){.rail{display:none}.main{margin-left:0 !important;padding:24px 16px 80px}}
+@media(max-width:900px){.page{display:block;max-width:none}.toggle{right:16px}.rail{position:static;width:auto;height:auto;border:none;border-bottom:1px solid var(--border)}.main{max-width:none;border-right:none;padding:24px 16px 80px}}
 </style>
 </head>
 <body>
 
 <button class="toggle" id="themeToggle" aria-label="Змінити тему">🌙</button>
 
+<div class="page">
 <div class="rail">
   <div class="rail-icon">⚙️</div>
   <div class="rail-eye">Тема 2 · Інтерактив</div>
@@ -157,6 +159,8 @@ code{font-family:var(--fmono);font-size:12.5px;background:var(--mono);border:1px
   </div>
   <div id="timeline"></div>
 </div>
+</div>
+
 
 <script>
 const NODES = [

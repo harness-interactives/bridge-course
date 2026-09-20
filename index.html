@@ -24,28 +24,34 @@ html[data-theme="dark"]{
   --pass:#5aa98b;--passSoft:#14241e;
 }
 html,body{background:var(--paper)}
-body{font-family:var(--sans);font-size:15.5px;line-height:1.72;color:var(--ink2);-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);font-size:16.5px;line-height:1.7;color:var(--ink2);-webkit-font-smoothing:antialiased}
 
 .toggle{
-  position:fixed;top:20px;right:24px;z-index:20;
+  position:fixed;top:20px;right:calc(max(0px,(100vw - 1400px)/2) + 26px);z-index:20;
   background:var(--surface);border:1px solid var(--rule);color:var(--ink2);
   font-family:var(--sans);font-size:12.5px;font-weight:500;padding:6px 13px;cursor:pointer;
 }
 .toggle:hover{border-color:var(--ink2);color:var(--ink)}
 .toggle:focus-visible{outline:2px solid var(--pass);outline-offset:2px}
 
-.wrap{max-width:844px;margin:0 auto;padding:72px 32px 120px}
+.page{display:flex;max-width:1400px;margin:0 auto;align-items:flex-start}
+.side{
+  position:sticky;top:0;flex:none;width:378px;min-height:100vh;
+  background:var(--surface);border-left:1px solid var(--rule);border-right:1px solid var(--rule);
+  padding:56px 34px 34px;display:flex;flex-direction:column;
+}
+.body{flex:1;min-width:0;max-width:1000px;padding:56px 56px 120px 56px;border-right:1px solid var(--rule)}
 
-.masthead{border-top:2px solid var(--ink);padding-top:24px;margin-bottom:56px}
+.masthead{border-top:2px solid var(--ink);padding-top:22px}
 .masthead .course{font-size:12.5px;color:var(--dim);margin-bottom:12px}
 .masthead h1{
-  font-weight:600;font-size:34px;line-height:1.16;letter-spacing:-.022em;
-  color:var(--ink);margin-bottom:18px;max-width:20ch;
+  font-weight:600;font-size:29px;line-height:1.2;letter-spacing:-.02em;
+  color:var(--ink);margin-bottom:16px;
 }
-.masthead p{max-width:64ch;margin-bottom:12px}
+.masthead p{font-size:14.5px;line-height:1.66;margin-bottom:12px}
 .masthead p:last-child{margin-bottom:0}
 
-.stack{border-top:1px solid var(--rule)}
+.stack{border-top:2px solid var(--ink)}
 
 .layer{border-bottom:1px solid var(--hair)}
 .layer-head{
@@ -60,8 +66,8 @@ button.layer-head{cursor:pointer}
 .g{display:block;width:13px;height:13px;border:1px solid var(--rule);transform:translateY(2px)}
 .layer-head:hover .g,.layer.open .g{background:var(--pass);border-color:var(--pass)}
 .layer-n{display:block;font-size:12.5px;color:var(--dim);margin-bottom:4px}
-.layer-t{display:block;font-weight:600;font-size:20px;line-height:1.3;letter-spacing:-.014em;color:var(--ink);margin-bottom:6px}
-.layer-d{display:block;font-size:14.5px;line-height:1.62;max-width:60ch}
+.layer-t{display:block;font-weight:600;font-size:21px;line-height:1.3;letter-spacing:-.014em;color:var(--ink);margin-bottom:6px}
+.layer-d{display:block;font-size:15px;line-height:1.62;max-width:64ch}
 .layer-meta{display:block;font-size:12.5px;color:var(--dim);white-space:nowrap;padding-top:2px}
 
 .parts{display:none;padding:0 0 22px 42px}
@@ -83,11 +89,15 @@ button.layer-head{cursor:pointer}
 .part-d{display:block;font-size:14px;line-height:1.58;max-width:56ch}
 .part-time{display:block;font-size:12.5px;color:var(--dim);white-space:nowrap}
 
-footer{margin-top:52px;border-top:1px solid var(--rule);padding-top:20px;font-size:13.5px;color:var(--dim);max-width:62ch}
+footer{margin-top:auto;padding-top:28px;font-size:13px;line-height:1.6;color:var(--dim)}
 
-@media(max-width:700px){
-  .wrap{padding:44px 20px 80px}
-  .masthead h1{font-size:27px}
+@media(max-width:900px){
+  .page{display:block;max-width:none}
+  .toggle{right:16px;top:14px}
+  .side{position:static;width:auto;min-height:0;border:none;border-bottom:1px solid var(--rule);padding:40px 20px 28px}
+  .body{max-width:none;border-right:none;padding:28px 20px 80px}
+  footer{margin-top:24px}
+  .masthead h1{font-size:26px}
   .layer-head{grid-template-columns:20px 1fr;gap:14px}
   .layer-meta{grid-column:2;padding-top:6px}
   .parts{padding-left:0}
@@ -102,14 +112,17 @@ footer{margin-top:52px;border-top:1px solid var(--rule);padding-top:20px;font-si
 
 <button class="toggle" id="themeToggle" aria-label="Змінити оформлення">Темне</button>
 
-<div class="wrap">
-
+<div class="page">
+<div class="side">
   <div class="masthead">
     <div class="course">Bridge Course · AI Engineering Foundations</div>
     <h1>Вісім шарів harness, кожен у роботі</h1>
     <p>Harness — шар керування, який перетворює модель на компонент продакшн-системи. Курс проходить його знизу вгору: контракт між моделлю і кодом, дозволи на дії, пошук у документах, пам'ять, оцінювання, безпека, оркестрація, інтеграція.</p>
     <p>Кожен інтерактив веде один сценарій крізь відповідний шар. Наступний крок відкривається після відповіді на питання, а наскрізний приклад спільний для всього курсу — агент служби підтримки, який класифікує звернення, перевіряє факти, діє і фіксує результат.</p>
   </div>
+    <footer>Шари 1, 2, 3 і 6 розібрані двома проходами — до читання конспекту і після нього. Відкрийте такий шар, щоб побачити пояснення і обрати частину.</footer>
+</div>
+<div class="body">
 
   <div class="stack">
 
@@ -287,8 +300,8 @@ footer{margin-top:52px;border-top:1px solid var(--rule);padding-top:20px;font-si
 
   </div>
 
-  <footer>Шари 1, 2, 3 і 6 розібрані двома проходами — до читання конспекту і після нього. Відкрийте такий шар, щоб побачити пояснення і обрати частину.</footer>
 
+</div>
 </div>
 
 <script>
