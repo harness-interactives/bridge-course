@@ -267,6 +267,61 @@ svg text{font-family:var(--sans)}
 .trace .t .bad,.bad{color:var(--refuse)}
 .trace .t .ok,.ok{color:var(--pass)}
 
+
+/* ───────── акценти ───────── */
+
+/* Застава заповнюється, коли ситуація пройдена */
+.gate{transition:background .34s cubic-bezier(.2,.7,.3,1), border-color .34s ease, transform .34s cubic-bezier(.2,.7,.3,1)}
+.node.cleared .gate{transform:rotate(45deg) scale(.86)}
+.node.stopped .gate{transform:rotate(45deg) scale(.86)}
+.node.here .gate{
+  animation:pulse 2.6s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 transparent}
+  50%{box-shadow:0 0 0 4px var(--passSoft)}
+}
+
+/* Лінія між заставами дотягується вниз у міру проходження */
+.node::before{transform-origin:top;transform:scaleY(0);transition:transform .5s cubic-bezier(.3,.7,.2,1) .06s}
+.node.cleared::before,.node.stopped::before,.node.here::before{transform:scaleY(1)}
+.node.cleared::before{background:var(--pass);opacity:.35}
+
+/* Нова ситуація зʼявляється відповіддю на дію читача */
+.node-inner{animation:enter .34s cubic-bezier(.2,.7,.3,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* Хід у рейці: тонка смуга під поточним шаром */
+.layer.on{position:relative}
+.layer.on::after{
+  content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+  background:var(--pass);opacity:.22;
+  transform:scaleX(var(--done,0));transform-origin:left;
+  transition:transform .5s cubic-bezier(.3,.7,.2,1);
+}
+
+/* Варіант відповіді відгукується на курсор */
+.opt{transition:border-color .16s ease, background .16s ease, padding-left .16s ease}
+.opt:hover:not(.off){padding-left:19px}
+.opt.yes,.opt.no{transition:border-color .2s ease, background .28s ease}
+
+/* Пояснення розкривається */
+.fb.show{animation:enter .3s cubic-bezier(.2,.7,.3,1) both}
+
+/* Цифри вирівнюються по колонках */
+.v,.n,.pt-n,.progress b,.tally b,td,th{font-variant-numeric:tabular-nums}
+
+/* Дані в картках підсвічуються при наведенні на рядок */
+.card .row{transition:background .16s ease}
+.card .row:hover{background:var(--sunken)}
+
+@media(prefers-reduced-motion:reduce){
+  .node::before{transform:scaleY(1);transition:none}
+  .node-inner,.fb.show{animation:none}
+  .node.here .gate{animation:none}
+  .layer.on::after{transition:none}
+}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -324,11 +379,11 @@ svg text{font-family:var(--sans)}
 <script>
 const NODES = [
   {
-    date:'Де ми', beat:'Від точного пошуку до production',
+    date:'Місце теми в курсі', beat:'Від точного пошуку до production',
     body:'<p>У Темі 3 ви побачили, що ембеддинг знаходить кандидатів, але не гарантує правильність. У цій темі — як побудувати конвеєр, де кожен крок зменшує кількість кандидатів і збільшує якість.</p><p>Ви побачите один запит, який проходить через воронку: від повного корпусу до 3 фрагментів у контексті LLM. Кожен крок — таблиця результатів: що залишилось, що відпало і чому.</p>'
   },
   {
-    date:'Візуал', beat:'Воронка пошуку',
+    date:'Воронка цілком', beat:'Воронка пошуку',
     body:'<svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:inherit}.lb{font-size:12px;font-weight:600;fill:var(--ink)}.num{font-size:22px;font-weight:700}.sm{font-size:10px;fill:var(--dim)}</style><polygon points="40,30 640,30 560,90 120,90" fill="var(--surface)" stroke="var(--ink2)" stroke-width="1"/><text class="num" x="340" y="60" text-anchor="middle" fill="var(--ink2)">847</text><text class="sm" x="340" y="78" text-anchor="middle">корпус</text><polygon points="120,95 560,95 500,145 180,145" fill="var(--passSoft)" stroke="var(--pass)" stroke-width="1"/><text class="lb" x="220" y="120" fill="var(--pass)">dense: 20</text><text class="lb" x="400" y="120" fill="var(--pass)">+ sparse: 15</text><polygon points="180,150 500,150 440,195 240,195" fill="var(--surface)" stroke="var(--ink2)" stroke-width="1"/><text class="num" x="340" y="178" text-anchor="middle" fill="var(--ink2)">12</text><text class="sm" x="340" y="192" text-anchor="middle">fusion (RRF)</text><polygon points="240,200 440,200 400,240 280,240" fill="var(--refuseSoft)" stroke="var(--refuse)" stroke-width="1"/><text class="num" x="340" y="225" text-anchor="middle" fill="var(--refuse)">5</text><text class="sm" x="340" y="238" text-anchor="middle">reranker</text><rect x="290" y="248" width="100" height="28" rx="6" fill="var(--pass)"/><text x="340" y="266" text-anchor="middle" fill="var(--surface)" style="font-size:14px;font-weight:700">3</text></svg>'
   },
   {
@@ -337,7 +392,7 @@ const NODES = [
   },
   {
     date:'Крок 1', beat:'Dense search — 847 → 20 кандидатів',
-    body:'<p>Запит перетворюється на вектор. Пошук знаходить 20 найближчих фрагментів за cosine similarity (HNSW, Recall@20 ≈ 0.95).</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule);background:var(--passSoft)"><td style="padding:6px 10px;width:30px">1</td><td style="padding:6px 10px">Політика повернення фіз. товарів v3.1</td><td style="padding:6px 10px;width:60px;text-align:right">.94</td><td style="padding:6px 10px;width:60px;color:var(--pass)">чинна</td></tr><tr style="border-bottom:1px solid var(--rule);background:var(--refuseSoft)"><td style="padding:6px 10px">2</td><td style="padding:6px 10px">Політика повернення фіз. товарів v2.0</td><td style="padding:6px 10px;text-align:right">.91</td><td style="padding:6px 10px;color:var(--refuse)">архівна</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px">3</td><td style="padding:6px 10px">FAQ: Як оформити повернення</td><td style="padding:6px 10px;text-align:right">.88</td><td style="padding:6px 10px;color:var(--pass)">чинна</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px">4</td><td style="padding:6px 10px">Гарантія на електроніку</td><td style="padding:6px 10px;text-align:right">.85</td><td style="padding:6px 10px;color:var(--pass)">чинна</td></tr><tr><td style="padding:6px 10px;color:var(--dim)" colspan="4">... ще 16 фрагментів зі score .60–.84</td></tr></table><p><strong>Проблема:</strong> архівна v2.0 на другому місці. Dense search не розрізняє версії.</p>',
+    body:'<p>Запит перетворюється на вектор. Пошук знаходить 20 найближчих фрагментів за cosine similarity (HNSW, Recall@20 ≈ 0.95).</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule);background:var(--passSoft)"><td style="padding:6px 10px;width:30px">1</td><td style="padding:6px 10px">Політика повернення фіз. товарів v3.1</td><td style="padding:6px 10px;width:60px;text-align:right">.94</td><td style="padding:6px 10px;width:60px;color:var(--pass)">чинна</td></tr><tr style="border-bottom:1px solid var(--rule);background:var(--refuseSoft)"><td style="padding:6px 10px">2</td><td style="padding:6px 10px">Політика повернення фіз. товарів v2.0</td><td style="padding:6px 10px;text-align:right">.91</td><td style="padding:6px 10px;color:var(--refuse)">архівна</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px">3</td><td style="padding:6px 10px">FAQ: Як оформити повернення</td><td style="padding:6px 10px;text-align:right">.88</td><td style="padding:6px 10px;color:var(--pass)">чинна</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px">4</td><td style="padding:6px 10px">Гарантія на електроніку</td><td style="padding:6px 10px;text-align:right">.85</td><td style="padding:6px 10px;color:var(--pass)">чинна</td></tr><tr><td style="padding:6px 10px;color:var(--dim)" colspan="4">... ще 16 фрагментів зі score .60–.84</td></tr></table><p><strong>Проблема</strong> в тому, що архівна v2.0 стоїть на другому місці: щільний пошук версій не розрізняє.</p>',
     spot:{
       type:'predict', q:'Архівна політика (v2.0) на 2 місці з score .91. Як її прибрати?',
       opts:[
@@ -371,7 +426,7 @@ const NODES = [
   },
   {
     date:'Крок 5', beat:'Відбір контексту — 5 → 3 для LLM',
-    body:'<p>Останній крок: скільки фрагментів подати в контекст? Більше — не завжди краще.</p><p><strong>Фрагменти 4 і 5</strong> (rerank .52 і .41) — слабко релевантні. Вони займатимуть токени в контексті і можуть відволікти модель від фрагментів 1–3.</p><p><strong>Фінальний контекст:</strong> 3 фрагменти, ~450 токенів. Модель отримує політику повернення, специфіку Apple і FAQ — достатньо для повної відповіді.</p><p><strong>Воронка: 847 → 20 (dense) + 15 (sparse) → 12 (fusion) → 5 (reranker) → 3 (контекст).</strong></p>'
+    body:'<p>Останній крок відповідає на питання, скільки фрагментів подати в контекст, і більша кількість не означає кращого результату.</p><p><strong>Фрагменти 4 і 5</strong> (rerank .52 і .41) — слабко релевантні. Вони займатимуть токени в контексті і можуть відволікти модель від фрагментів 1–3.</p><p><strong>Фінальний контекст:</strong> 3 фрагменти, ~450 токенів. Модель отримує політику повернення, специфіку Apple і FAQ — достатньо для повної відповіді.</p><p><strong>Воронка: 847 → 20 (dense) + 15 (sparse) → 12 (fusion) → 5 (reranker) → 3 (контекст).</strong></p>'
   },
   {
     date:'Що забрати з собою', beat:'Три речі, які варто запамʼятати', scene2:1,
@@ -470,6 +525,8 @@ function open(from){
 
 function tally(){
   const done = answered.size;
+  const cur = document.querySelector('.layer.on');
+  if (cur) cur.style.setProperty('--done', totalQ ? (done/totalQ).toFixed(3) : 0);
   document.getElementById('progress').innerHTML = done === 0
     ? `Попереду <b>${totalQ}</b> ситуацій`
     : `Пройдено <b>${done}</b> з ${totalQ}`;

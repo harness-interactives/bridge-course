@@ -267,6 +267,61 @@ svg text{font-family:var(--sans)}
 .trace .t .bad,.bad{color:var(--refuse)}
 .trace .t .ok,.ok{color:var(--pass)}
 
+
+/* ───────── акценти ───────── */
+
+/* Застава заповнюється, коли ситуація пройдена */
+.gate{transition:background .34s cubic-bezier(.2,.7,.3,1), border-color .34s ease, transform .34s cubic-bezier(.2,.7,.3,1)}
+.node.cleared .gate{transform:rotate(45deg) scale(.86)}
+.node.stopped .gate{transform:rotate(45deg) scale(.86)}
+.node.here .gate{
+  animation:pulse 2.6s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 transparent}
+  50%{box-shadow:0 0 0 4px var(--passSoft)}
+}
+
+/* Лінія між заставами дотягується вниз у міру проходження */
+.node::before{transform-origin:top;transform:scaleY(0);transition:transform .5s cubic-bezier(.3,.7,.2,1) .06s}
+.node.cleared::before,.node.stopped::before,.node.here::before{transform:scaleY(1)}
+.node.cleared::before{background:var(--pass);opacity:.35}
+
+/* Нова ситуація зʼявляється відповіддю на дію читача */
+.node-inner{animation:enter .34s cubic-bezier(.2,.7,.3,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* Хід у рейці: тонка смуга під поточним шаром */
+.layer.on{position:relative}
+.layer.on::after{
+  content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+  background:var(--pass);opacity:.22;
+  transform:scaleX(var(--done,0));transform-origin:left;
+  transition:transform .5s cubic-bezier(.3,.7,.2,1);
+}
+
+/* Варіант відповіді відгукується на курсор */
+.opt{transition:border-color .16s ease, background .16s ease, padding-left .16s ease}
+.opt:hover:not(.off){padding-left:19px}
+.opt.yes,.opt.no{transition:border-color .2s ease, background .28s ease}
+
+/* Пояснення розкривається */
+.fb.show{animation:enter .3s cubic-bezier(.2,.7,.3,1) both}
+
+/* Цифри вирівнюються по колонках */
+.v,.n,.pt-n,.progress b,.tally b,td,th{font-variant-numeric:tabular-nums}
+
+/* Дані в картках підсвічуються при наведенні на рядок */
+.card .row{transition:background .16s ease}
+.card .row:hover{background:var(--sunken)}
+
+@media(prefers-reduced-motion:reduce){
+  .node::before{transform:scaleY(1);transition:none}
+  .node-inner,.fb.show{animation:none}
+  .node.here .gate{animation:none}
+  .layer.on::after{transition:none}
+}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -325,16 +380,16 @@ svg text{font-family:var(--sans)}
 const NODES = [
   // ──── SCENE 0: CONTEXT ────
   {
-    date:'Про що це', beat:'Навіщо перевіряти те, що повернула модель',
-    body:`<p>LLM — недетермінований компонент. Один і той самий промпт може дати різні відповіді: правильну, майже правильну, і повністю неправильну. Модель не «виконує команду» — вона генерує найбільш імовірне продовження тексту. Іноді це саме те, що потрібно. Іноді — ні.</p>
-<p>Якщо ви будуєте систему, де відповідь LLM визначає, що зробить код (яку категорію присвоїти зверненню, який пріоритет поставити, чи ескалювати), — вам потрібен спосіб перевірити відповідь перед виконанням. Не вручну. Кодом.</p>
-<p>Pipeline валідації — це послідовність таких перевірок. Кожен шар ловить свій клас помилок: синтаксис, структуру, логіку, дозволи. Жоден шар не замінює інший. Разом вони формують контур, через який проходить кожна відповідь моделі.</p>
+    date:'Навіщо перевіряти вихід моделі', beat:'Навіщо перевіряти те, що повернула модель',
+    body:`<p>LLM — недетермінований компонент. Один і той самий промпт може дати різні відповіді: правильну, майже правильну, і повністю неправильну. Модель генерує найбільш імовірне продовження тексту, і результат такої генерації іноді збігається з потрібним, а іноді розходиться з ним.</p>
+<p>Якщо ви будуєте систему, де відповідь LLM визначає, що зробить код (яку категорію присвоїти зверненню, який пріоритет поставити, чи ескалювати), — вам потрібен спосіб перевіряти відповідь перед виконанням, і виконувати цю перевірку має код.</p>
+<p>Pipeline валідації — це послідовність таких перевірок. Кожен шар ловить свій клас помилок — синтаксис, структуру, логіку, дозволи — і жоден із них не підміняє інший, тому разом вони формують контур, через який проходить кожна відповідь моделі.</p>
 <p>У цьому інтерактиві ви побачите, як один конкретний JSON проходить через п'ять шарів — і де зупиняється.</p>`
   },
 
   // ──── SCENE 1: THE JSON ────
   {
-    date:'Сценарій', beat:'Клієнт написав у підтримку',
+    date:'Звернення клієнта', beat:'Клієнт написав у підтримку',
     body:`<p>«У мене списали гроші двічі за одне замовлення.» Агент підтримки — LLM-система, яка класифікує звернення, визначає пріоритет і пропонує дію. Модель повертає структурований JSON, який код має перевірити перед виконанням.</p>
 <p>Ось що повернула модель:</p>
 <div class="codeblock">{
@@ -344,24 +399,24 @@ const NODES = [
   "<span class="str">recommended_action</span>": "<span class="str">check_payment_status</span>",
   "<span class="str">user_message</span>": "<span class="str">Ми перевіримо статус вашої оплати</span>"
 }</div>
-<p>На перший погляд — розумна відповідь. Але три з п'яти значень не відповідають контракту. Подивимось, як pipeline це виявить.</p>`
+<p>На перший погляд відповідь виглядає розумною, проте три з п'яти значень не відповідають контракту, і далі видно, на якому шарі це виявляється.</p>`
   },
   {
-    date:'Огляд', beat:'Pipeline одним поглядом',
+    date:'Пʼять шарів разом', beat:'Pipeline одним поглядом',
     body:'<svg viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:inherit}.hd{font-size:13px;font-weight:700;fill:var(--ink)}.sub{font-size:11px;fill:var(--dim)}.ok{fill:var(--pass)}.fail{fill:var(--refuse)}.bx{rx:0;ry:0;stroke-width:1.5}</style><rect class="bx" x="10" y="10" width="660" height="52" fill="var(--passSoft)" stroke="var(--pass)"/><text class="hd ok" x="30" y="38">Шар 1</text><text class="sub" x="90" y="38">JSON parsing</text><text class="sub" x="560" y="38">✓ синтаксис OK</text><line x1="340" y1="62" x2="340" y2="78" stroke="var(--dim)" stroke-width="1.5" stroke-dasharray="4"/><rect class="bx" x="10" y="78" width="660" height="52" fill="var(--refuseSoft)" stroke="var(--refuse)"/><text class="hd fail" x="30" y="106">Шар 2</text><text class="sub" x="90" y="106">Pydantic + strict=True</text><text class="sub" x="460" y="106" style="fill:var(--refuse)">✗ 3 помилки: enum, enum, type</text><line x1="340" y1="130" x2="340" y2="146" stroke="var(--dim)" stroke-width="1.5" stroke-dasharray="4"/><rect class="bx" x="10" y="146" width="660" height="52" fill="var(--surface)" stroke="var(--rule)" opacity=".5"/><text class="hd" x="30" y="174" opacity=".4">Шар 3</text><text class="sub" x="90" y="174" opacity=".4">Семантична валідація</text><text class="sub" x="500" y="174" opacity=".4">не досягнуто</text><line x1="340" y1="198" x2="340" y2="214" stroke="var(--dim)" stroke-width="1" stroke-dasharray="4" opacity=".3"/><rect class="bx" x="10" y="214" width="320" height="46" fill="var(--surface)" stroke="var(--rule)" opacity=".5"/><text class="hd" x="30" y="240" opacity=".4">Шар 4</text><text class="sub" x="90" y="240" opacity=".4">Policy / дозволи</text><rect class="bx" x="350" y="214" width="320" height="46" fill="var(--surface)" stroke="var(--rule)" opacity=".5"/><text class="hd" x="370" y="240" opacity=".4">Шар 5</text><text class="sub" x="430" y="240" opacity=".4">Executor</text><text class="sub" x="200" y="295" style="font-size:12px;fill:var(--dim)">Pipeline зупинився на шарі 2. Шари 3–5 не перевірялись.</text></svg>'
   },
 
   // ──── LAYER 1 ────
   {
     date:'Шар 1', beat:'JSON Parsing',
-    body:`<p>Перша перевірка — чи відповідь взагалі є валідним JSON. <code>json.loads()</code> перевіряє синтаксис: дужки, коми, лапки. Нічого більше.</p>
+    body:`<p>Перша перевірка — чи відповідь взагалі є валідним JSON. <code>json.loads()</code> перевіряє лише синтаксис: дужки, коми, лапки.</p>
 <div class="codeblock"><span class="kw">import</span> json
 
 <span class="kw">try</span>:
     data = json.<span class="fn">loads</span>(raw_response)
 <span class="kw">except</span> json.JSONDecodeError <span class="kw">as</span> e:
     <span class="kw">return</span> <span class="fn">safe_fallback</span>(e)</div>
-<p>Наш JSON синтаксично правильний — дужки збігаються, коми на місці, рядки в лапках. <strong>Шар 1 пропускає.</strong></p>`,
+<p>Наш JSON синтаксично правильний — дужки збігаються, коми на місці, рядки в лапках, тому <strong>шар 1 пропускає його далі</strong>.</p>`,
     spot:{
       type:'predict', q:'Що НЕ перевіряє json.loads()?',
       opts:[
@@ -400,7 +455,7 @@ priority: <span class="str">"urgent"</span> — немає в enum
   [дозволено: low, medium, high]
 should_escalate: <span class="str">"yes"</span> — рядок замість boolean
   [strict=True: "yes" не конвертується в true]</div>
-<p><strong>Pipeline зупиняється тут.</strong> Три помилки — три різних типи: невалідне значення enum, невалідне значення enum, невалідний тип. Далі — retry або safe fallback.</p>`,
+<p><strong>Pipeline зупиняється тут.</strong> Три помилки — три різних типи: невалідне значення enum, невалідне значення enum, невалідний тип. Далі процес іде або на повторну спробу, або в безпечний резервний сценарій.</p>`,
     spot:{
       type:'predict', q:'Чому strict=True критичний у цьому контракті?',
       opts:[
@@ -416,7 +471,7 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
   // ──── LAYER 3 (hypothetical) ────
   {
     date:'Шар 3', beat:'Семантична валідація',
-    body:`<p>Уявімо, модель виправила помилки: <code>"payment_issue"</code>, <code>"low"</code>, <code>true</code>. Pydantic прийняв. Але чи має сенс це рішення?</p>
+    body:`<p>Уявімо, модель виправила помилки: <code>"payment_issue"</code>, <code>"low"</code>, <code>true</code>. Pydantic таку відповідь приймає, і залишається питання, чи має це рішення сенс по суті.</p>
 <div class="codeblock"><span class="kw">def</span> <span class="fn">validate_semantics</span>(d, text):
     errors = []
     money_kw = [<span class="str">"оплат"</span>,<span class="str">"списан"</span>,<span class="str">"рахун"</span>,<span class="str">"кошт"</span>]
@@ -431,7 +486,7 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
 <div class="codeblock" style="border-color:var(--refuse)"><span class="cm">validate_semantics() →</span>
   "<span class="str">Фінансова проблема з priority=low</span>"
   "<span class="str">Ескалація суперечить низькому пріоритету</span>"</div>
-<p>Клієнт повідомляє про подвійне списання — <code>priority: "low"</code> не має сенсу. І <code>should_escalate: true</code> при цьому суперечить низькому пріоритету. <strong>Структурно правильно, логічно — ні.</strong></p>`,
+<p>Клієнт повідомляє про подвійне списання — <code>priority: "low"</code> не має сенсу. І <code>should_escalate: true</code> при цьому суперечить низькому пріоритету. <strong>Структурно відповідь правильна, а логічно вона суперечлива.</strong></p>`,
     spot:{
       type:'quiz', q:'Pydantic (шар 2) міг би зловити цю помилку?',
       opts:[
@@ -446,7 +501,7 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
   // ──── LAYER 4 ────
   {
     date:'Шар 4', beat:'Policy — дозволи агента',
-    body:`<p>Рішення логічне. Але чи має агент <em>право</em> виконати цю дію?</p>
+    body:`<p>Рішення логічно узгоджене, і далі перевіряється, чи має агент <em>право</em> виконати цю дію.</p>
 <div class="codeblock">ALLOWED_ACTIONS = {
     <span class="str">"reply_with_template"</span>: send_template,
     <span class="str">"check_payment_status"</span>: check_payment,
@@ -458,7 +513,7 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
     <span class="kw">if</span> d.recommended_action <span class="kw">not in</span> ALLOWED_ACTIONS:
         <span class="kw">raise</span> PolicyViolation(
           f<span class="str">"Дія {d.recommended_action} не в allowlist"</span>)</div>
-<p>Дія <code>"check_payment_status"</code> входить в allowlist — агент має право перевіряти статус оплати. <strong>Шар 4 пропускає.</strong></p>
+<p>Дія <code>"check_payment_status"</code> входить в allowlist — агент має право перевіряти статус оплати, тому <strong>шар 4 пропускає виклик далі</strong>.</p>
 <p>Але якби модель запропонувала <code>"approve_refund"</code> — policy зупинив би: агент класифікує, не ініціює повернення. Policy відповідає на «чи можна», а не «чи розумно» — логічна якість рішення це відповідальність шару 3.</p>`,
     spot:{
       type:'quiz', q:'LLM запропонувала дію "approve_refund". Який шар зупинить першим?',
@@ -490,7 +545,7 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
   {
     date:'Підсумок', beat:'Що сталося з нашим JSON',
     body:`<p>Вхідний JSON впав на <strong>шарі 2</strong> (Pydantic) з трьома помилками. Навіть якщо виправити структурні помилки — він впав би на <strong>шарі 3</strong> (семантика) з двома бізнес-помилками.</p>
-<p>Два незалежних рівні захисту спрацювали. Кожен ловить свій клас помилок. Жоден не замінює інший.</p>`,
+<p>Спрацювали два незалежні рівні захисту, кожен на своєму класі помилок, і жоден із них не підміняє інший.</p>`,
     spot:{
       type:'quiz', q:'Яке головне правило pipeline валідації?',
       opts:[
@@ -601,6 +656,8 @@ function open(from){
 
 function tally(){
   const done = answered.size;
+  const cur = document.querySelector('.layer.on');
+  if (cur) cur.style.setProperty('--done', totalQ ? (done/totalQ).toFixed(3) : 0);
   document.getElementById('progress').innerHTML = done === 0
     ? `Попереду <b>${totalQ}</b> ситуацій`
     : `Пройдено <b>${done}</b> з ${totalQ}`;

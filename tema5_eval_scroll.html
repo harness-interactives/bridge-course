@@ -267,6 +267,61 @@ svg text{font-family:var(--sans)}
 .trace .t .bad,.bad{color:var(--refuse)}
 .trace .t .ok,.ok{color:var(--pass)}
 
+
+/* ───────── акценти ───────── */
+
+/* Застава заповнюється, коли ситуація пройдена */
+.gate{transition:background .34s cubic-bezier(.2,.7,.3,1), border-color .34s ease, transform .34s cubic-bezier(.2,.7,.3,1)}
+.node.cleared .gate{transform:rotate(45deg) scale(.86)}
+.node.stopped .gate{transform:rotate(45deg) scale(.86)}
+.node.here .gate{
+  animation:pulse 2.6s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 transparent}
+  50%{box-shadow:0 0 0 4px var(--passSoft)}
+}
+
+/* Лінія між заставами дотягується вниз у міру проходження */
+.node::before{transform-origin:top;transform:scaleY(0);transition:transform .5s cubic-bezier(.3,.7,.2,1) .06s}
+.node.cleared::before,.node.stopped::before,.node.here::before{transform:scaleY(1)}
+.node.cleared::before{background:var(--pass);opacity:.35}
+
+/* Нова ситуація зʼявляється відповіддю на дію читача */
+.node-inner{animation:enter .34s cubic-bezier(.2,.7,.3,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* Хід у рейці: тонка смуга під поточним шаром */
+.layer.on{position:relative}
+.layer.on::after{
+  content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+  background:var(--pass);opacity:.22;
+  transform:scaleX(var(--done,0));transform-origin:left;
+  transition:transform .5s cubic-bezier(.3,.7,.2,1);
+}
+
+/* Варіант відповіді відгукується на курсор */
+.opt{transition:border-color .16s ease, background .16s ease, padding-left .16s ease}
+.opt:hover:not(.off){padding-left:19px}
+.opt.yes,.opt.no{transition:border-color .2s ease, background .28s ease}
+
+/* Пояснення розкривається */
+.fb.show{animation:enter .3s cubic-bezier(.2,.7,.3,1) both}
+
+/* Цифри вирівнюються по колонках */
+.v,.n,.pt-n,.progress b,.tally b,td,th{font-variant-numeric:tabular-nums}
+
+/* Дані в картках підсвічуються при наведенні на рядок */
+.card .row{transition:background .16s ease}
+.card .row:hover{background:var(--sunken)}
+
+@media(prefers-reduced-motion:reduce){
+  .node::before{transform:scaleY(1);transition:none}
+  .node-inner,.fb.show{animation:none}
+  .node.here .gate{animation:none}
+  .layer.on::after{transition:none}
+}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -324,11 +379,11 @@ svg text{font-family:var(--sans)}
 <script>
 const NODES = [
   {
-    date:'Де ми', beat:'Від побудови до перевірки',
-    body:'<p>Агент побудований. Він валідує, шукає, викликає інструменти. Але як дізнатися, що він працює правильно — не зараз, а стабільно, з часом?</p><p>У цьому інтерактиві ви — інженер, який аналізує траєкторії агента. Ваше завдання: знайти <strong>першу точку відхилення</strong> — крок, де все пішло не так.</p>'
+    date:'Місце теми в курсі', beat:'Від побудови до перевірки',
+    body:'<p>Агент побудований і вміє валідувати, шукати й викликати інструменти. Залишається питання, як переконатися, що він працює правильно стабільно, а не лише в момент однієї перевірки.</p><p>У цьому інтерактиві ви — інженер, який аналізує траєкторії агента. Ваше завдання: знайти <strong>першу точку відхилення</strong> — крок, де все пішло не так.</p>'
   },
   {
-    date:'Візуал', beat:'Як виглядає траєкторія агента',
+    date:'Анатомія траєкторії', beat:'Як виглядає траєкторія агента',
     body:'<svg viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:inherit}.nd{rx:0;ry:0;stroke-width:2}.lb{font-size:11px;font-weight:600;fill:var(--surface)}.sub{font-size:10px;fill:var(--dim)}</style><rect class="nd" x="10" y="30" width="120" height="44" fill="var(--pass)" stroke="var(--pass)"/><text class="lb" x="70" y="50" text-anchor="middle">Класифікація</text><text x="70" y="64" text-anchor="middle" fill="var(--surface)" style="font-size:9px">payment_issue</text><line x1="130" y1="52" x2="160" y2="52" stroke="var(--pass)" stroke-width="2" marker-end="url(#ah)"/><rect class="nd" x="160" y="30" width="120" height="44" fill="var(--pass)" stroke="var(--pass)"/><text class="lb" x="220" y="50" text-anchor="middle">Пошук</text><text x="220" y="64" text-anchor="middle" fill="var(--surface)" style="font-size:9px">3 фрагменти</text><line x1="280" y1="52" x2="310" y2="52" stroke="var(--pass)" stroke-width="2"/><rect class="nd" x="310" y="30" width="120" height="44" fill="var(--pass)" stroke="var(--pass)"/><text class="lb" x="370" y="50" text-anchor="middle">check_order</text><text x="370" y="64" text-anchor="middle" fill="var(--surface)" style="font-size:9px">1 150 ₴</text><line x1="430" y1="52" x2="460" y2="52" stroke="var(--refuse)" stroke-width="2"/><rect class="nd" x="460" y="30" width="120" height="44" fill="var(--refuse)" stroke="var(--refuse)"/><text class="lb" x="520" y="50" text-anchor="middle">refund</text><text x="520" y="64" text-anchor="middle" fill="var(--surface)" style="font-size:9px">2 300 ₴ ✗</text><line x1="580" y1="52" x2="610" y2="52" stroke="var(--refuse)" stroke-width="2"/><rect class="nd" x="610" y="30" width="60" height="44" fill="var(--refuse)" stroke="var(--refuse)"/><text class="lb" x="640" y="55" text-anchor="middle">✗</text><text class="sub" x="490" y="110" text-anchor="middle">↑ перша точка відхилення</text><line x1="490" y1="98" x2="490" y2="78" stroke="var(--refuse)" stroke-width="1.5" stroke-dasharray="3"/></svg><p style="font-size:13px;color:var(--dim);margin-top:4px">Зелений → зелений → зелений → <span style="color:var(--refuse);font-weight:600">червоний</span> → червоний. Четвертий крок — де все пішло не так. Пʼятий — наслідок.</p>'
   },
   {
@@ -467,6 +522,8 @@ function open(from){
 
 function tally(){
   const done = answered.size;
+  const cur = document.querySelector('.layer.on');
+  if (cur) cur.style.setProperty('--done', totalQ ? (done/totalQ).toFixed(3) : 0);
   document.getElementById('progress').innerHTML = done === 0
     ? `Попереду <b>${totalQ}</b> ситуацій`
     : `Пройдено <b>${done}</b> з ${totalQ}`;

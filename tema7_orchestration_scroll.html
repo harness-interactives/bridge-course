@@ -267,6 +267,61 @@ svg text{font-family:var(--sans)}
 .trace .t .bad,.bad{color:var(--refuse)}
 .trace .t .ok,.ok{color:var(--pass)}
 
+
+/* ───────── акценти ───────── */
+
+/* Застава заповнюється, коли ситуація пройдена */
+.gate{transition:background .34s cubic-bezier(.2,.7,.3,1), border-color .34s ease, transform .34s cubic-bezier(.2,.7,.3,1)}
+.node.cleared .gate{transform:rotate(45deg) scale(.86)}
+.node.stopped .gate{transform:rotate(45deg) scale(.86)}
+.node.here .gate{
+  animation:pulse 2.6s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 transparent}
+  50%{box-shadow:0 0 0 4px var(--passSoft)}
+}
+
+/* Лінія між заставами дотягується вниз у міру проходження */
+.node::before{transform-origin:top;transform:scaleY(0);transition:transform .5s cubic-bezier(.3,.7,.2,1) .06s}
+.node.cleared::before,.node.stopped::before,.node.here::before{transform:scaleY(1)}
+.node.cleared::before{background:var(--pass);opacity:.35}
+
+/* Нова ситуація зʼявляється відповіддю на дію читача */
+.node-inner{animation:enter .34s cubic-bezier(.2,.7,.3,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* Хід у рейці: тонка смуга під поточним шаром */
+.layer.on{position:relative}
+.layer.on::after{
+  content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+  background:var(--pass);opacity:.22;
+  transform:scaleX(var(--done,0));transform-origin:left;
+  transition:transform .5s cubic-bezier(.3,.7,.2,1);
+}
+
+/* Варіант відповіді відгукується на курсор */
+.opt{transition:border-color .16s ease, background .16s ease, padding-left .16s ease}
+.opt:hover:not(.off){padding-left:19px}
+.opt.yes,.opt.no{transition:border-color .2s ease, background .28s ease}
+
+/* Пояснення розкривається */
+.fb.show{animation:enter .3s cubic-bezier(.2,.7,.3,1) both}
+
+/* Цифри вирівнюються по колонках */
+.v,.n,.pt-n,.progress b,.tally b,td,th{font-variant-numeric:tabular-nums}
+
+/* Дані в картках підсвічуються при наведенні на рядок */
+.card .row{transition:background .16s ease}
+.card .row:hover{background:var(--sunken)}
+
+@media(prefers-reduced-motion:reduce){
+  .node::before{transform:scaleY(1);transition:none}
+  .node-inner,.fb.show{animation:none}
+  .node.here .gate{animation:none}
+  .layer.on::after{transition:none}
+}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -324,16 +379,16 @@ svg text{font-family:var(--sans)}
 <script>
 const NODES = [
   {
-    date:'Де ми', beat:'Від компонентів до процесу',
-    body:'<p>Попередні шість тем побудували всі компоненти: валідацію, інструменти, пошук, памʼять, оцінювання, безпеку. Кожен працює окремо.</p><p>Ця тема — про те, як вони працюють <strong>разом як один процес</strong>. Агент може правильно класифікувати запит, знайти потрібний документ і викликати дозволений інструмент — і все одно зробити це в неправильному порядку, повторити вже завершену дію або продовжити роботу після вичерпання можливостей виправлення.</p><p>Три механізми перетворюють набір компонентів у керований процес: <strong>стан</strong>, <strong>правила</strong> і <strong>зворотний звʼязок</strong>.</p>'
+    date:'Місце теми в курсі', beat:'Від компонентів до процесу',
+    body:'<p>Попередні шість тем побудували всі компоненти: валідацію, інструменти, пошук, памʼять, оцінювання, безпеку, і кожен із них працює окремо.</p><p>Ця тема — про те, як вони працюють <strong>разом як один процес</strong>. Агент може правильно класифікувати запит, знайти потрібний документ і викликати дозволений інструмент — і все одно зробити це в неправильному порядку, повторити вже завершену дію або продовжити роботу після вичерпання можливостей виправлення.</p><p>Три механізми перетворюють набір компонентів у керований процес: <strong>стан</strong>, <strong>правила</strong> і <strong>зворотний звʼязок</strong>.</p>'
   },
   {
-    date:'Візуал', beat:'Автомат станів агента',
+    date:'Контур керування', beat:'Автомат станів агента',
     body:'<svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:inherit}.nd{rx:10;ry:10}.lb{font-size:12px;font-weight:600;fill:var(--surface)}.ed{font-size:9px;fill:var(--dim)}.inv{font-size:10px;fill:var(--refuse);font-style:italic}</style><defs><marker id="ag" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--dim)"/></marker></defs><rect class="nd" x="10" y="80" width="110" height="44" fill="var(--ink2)"/><text class="lb" x="65" y="106" text-anchor="middle">classify</text><line x1="120" y1="102" x2="160" y2="102" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#ag)"/><text class="ed" x="140" y="94">→</text><rect class="nd" x="160" y="80" width="110" height="44" fill="var(--ink2)"/><text class="lb" x="215" y="106" text-anchor="middle">verify</text><line x1="270" y1="102" x2="310" y2="102" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#ag)"/><rect class="nd" x="310" y="80" width="110" height="44" fill="var(--ink2)"/><text class="lb" x="365" y="106" text-anchor="middle">act</text><line x1="420" y1="102" x2="460" y2="102" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#ag)"/><rect class="nd" x="460" y="80" width="110" height="44" fill="var(--pass)"/><text class="lb" x="515" y="106" text-anchor="middle">confirm</text><line x1="570" y1="102" x2="610" y2="102" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#ag)"/><rect class="nd" x="610" y="85" width="50" height="34" fill="var(--pass)"/><text class="lb" x="635" y="106" text-anchor="middle">done</text><path d="M365,124 Q365,170 215,170 Q160,170 160,124" fill="none" stroke="var(--refuse)" stroke-width="1" stroke-dasharray="4" marker-end="url(#ag)"/><text class="ed" x="265" y="180" text-anchor="middle" style="fill:var(--refuse)">retry / repair</text><path d="M365,124 Q365,200 65,200 Q10,200 10,124" fill="none" stroke="var(--ink2)" stroke-width="1" stroke-dasharray="4" marker-end="url(#ag)"/><text class="ed" x="180" y="212" text-anchor="middle" style="fill:var(--ink2)">replan</text><text class="ed" x="340" y="40" text-anchor="middle">⏸️ act → confirm: може потребувати REQUIRE_APPROVAL (пауза для людини)</text><text class="inv" x="340" y="55" text-anchor="middle">інваріант: refund тільки після verify ✓</text></svg><p style="font-size:13px;color:var(--dim);margin-top:4px">Чотири стани, три реакції на збій (retry, repair, replan). Інваріант перевіряється перед кожним переходом.</p>'
   },
   {
     date:'Механізм 1', beat:'Стан — де ми зараз', crit:1,
-    body:'<p><strong>Стан процесу</strong> — типізований обʼєкт, який фіксує: який етап поточний, що вже зроблено, які дані отримано.</p><p>Це <strong>не</strong> контекст LLM, <strong>не</strong> памʼять агента, <strong>не</strong> стан зовнішніх систем. Це четвертий, окремий обʼєкт:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:180px">Стан процесу</td><td style="padding:6px 10px">Який етап, що зроблено, інваріанти. Персистентний.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Контекст LLM</td><td style="padding:6px 10px">Поточне вікно промпту. Живе один запит.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Памʼять агента</td><td style="padding:6px 10px">Факти між сесіями. Довгостроковий.</td></tr><tr><td style="padding:6px 10px;font-weight:600">Стан зовнішніх систем</td><td style="padding:6px 10px">Платіжна система, CRM. Не контролюється агентом.</td></tr></table><p><strong>Інваріант стану:</strong> умова, яка має виконуватися завжди. Наприклад: «refund не може бути виконаний, якщо транзакція не верифікована». Порушення інваріанту — критична помилка, незалежно від рішення моделі.</p>',
+    body:'<p><strong>Стан процесу</strong> — типізований обʼєкт, який фіксує: який етап поточний, що вже зроблено, які дані отримано.</p><p>Стан процесу є четвертим самостійним обʼєктом поряд із контекстом LLM, памʼяттю агента і станом зовнішніх систем:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:180px">Стан процесу</td><td style="padding:6px 10px">Який етап, що зроблено, інваріанти. Персистентний.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Контекст LLM</td><td style="padding:6px 10px">Поточне вікно промпту. Живе один запит.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Памʼять агента</td><td style="padding:6px 10px">Факти між сесіями. Довгостроковий.</td></tr><tr><td style="padding:6px 10px;font-weight:600">Стан зовнішніх систем</td><td style="padding:6px 10px">Платіжна система, CRM. Не контролюється агентом.</td></tr></table><p><strong>Інваріант стану:</strong> умова, яка має виконуватися завжди. Наприклад: «refund не може бути виконаний, якщо транзакція не верифікована». Порушення інваріанту — критична помилка, незалежно від рішення моделі.</p>',
     spot:{
       type:'quiz', q:'Runtime впав після виконання refund, але до оновлення стану процесу. Що станеться при перезапуску?',
       opts:[
@@ -346,7 +401,7 @@ const NODES = [
   },
   {
     date:'Механізм 2', beat:'Правила — що дозволено далі',
-    body:'<p><strong>Рішення моделі перевіряється оркестратором перед виконанням.</strong> LLM повертає пропозицію наступного кроку. Оркестратор перевіряє її відповідність стану, правилам і дозволам.</p><p><strong>Rule engine</strong> — детермінований компонент, який застосовує правила до пари (стан, пропозиція) і повертає одне з чотирьох рішень:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:140px">Виконати</td><td style="padding:6px 10px">Пропозиція відповідає правилам і стану</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Відхилити</td><td style="padding:6px 10px">Порушує інваріант або правило переходу</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Модифікувати</td><td style="padding:6px 10px">Пропозиція допустима з корекцією</td></tr><tr><td style="padding:6px 10px;font-weight:600">Ескалювати</td><td style="padding:6px 10px">Потрібне рішення людини</td></tr></table><p>Правила задані кодом, не промптом. Промпт може бути проігнорований. Код — ні.</p>',
+    body:'<p><strong>Рішення моделі перевіряється оркестратором перед виконанням.</strong> LLM повертає пропозицію наступного кроку. Оркестратор перевіряє її відповідність стану, правилам і дозволам.</p><p><strong>Rule engine</strong> — детермінований компонент, який застосовує правила до пари (стан, пропозиція) і повертає одне з чотирьох рішень:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:140px">Виконати</td><td style="padding:6px 10px">Пропозиція відповідає правилам і стану</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Відхилити</td><td style="padding:6px 10px">Порушує інваріант або правило переходу</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Модифікувати</td><td style="padding:6px 10px">Пропозиція допустима з корекцією</td></tr><tr><td style="padding:6px 10px;font-weight:600">Ескалювати</td><td style="padding:6px 10px">Потрібне рішення людини</td></tr></table><p>Правила задані кодом: промпт модель може проігнорувати, а код виконується незалежно від її рішення.</p>',
     spot:{
       type:'predict', q:'Модель запропонувала виконати refund, але стан показує: транзакція не верифікована. Що зробить rule engine?',
       opts:[
@@ -373,7 +428,7 @@ const NODES = [
   },
   {
     date:'Механізм 4', beat:'Контрольні точки і тривалі процеси',
-    body:'<p>Якщо процес тривіший за один запит — він має пережити збій, паузу і перезапуск. Контрольна точка (checkpoint) — збережений знімок стану, з якого можна відновити виконання.</p><p><strong>Коли потрібні:</strong> REQUIRE_APPROVAL зупиняє процес на години. Runtime може впасти в будь-який момент. Зовнішній сервіс може відповідати повільно.</p><p><strong>Що зберігається:</strong> поточний стан, виконані кроки, проміжні результати, ідемпотентні ключі. Усе, що потрібно для продовження без повторення.</p><p><strong>Звʼязок із Темою 2:</strong> ідемпотентність і стан процесу — ті самі механізми, але тепер вони працюють на рівні всього процесу, а не окремого виклику.</p>'
+    body:'<p>Якщо процес тривіший за один запит — він має пережити збій, паузу і перезапуск. Контрольна точка (checkpoint) — збережений знімок стану, з якого можна відновити виконання.</p><p><strong>Потрібні вони тому,</strong> що REQUIRE_APPROVAL зупиняє процес на години, runtime може впасти в будь-який момент, а зовнішній сервіс може відповідати повільно.</p><p><strong>Що зберігається:</strong> поточний стан, виконані кроки, проміжні результати, ідемпотентні ключі. Усе, що потрібно для продовження без повторення.</p><p><strong>Звʼязок із Темою 2:</strong> ідемпотентність і стан процесу — ті самі механізми, але тепер вони працюють на рівні всього процесу, а не окремого виклику.</p>'
   },
   {
     date:'Підсумок', beat:'Патерни оркестрації',
@@ -485,6 +540,8 @@ function open(from){
 
 function tally(){
   const done = answered.size;
+  const cur = document.querySelector('.layer.on');
+  if (cur) cur.style.setProperty('--done', totalQ ? (done/totalQ).toFixed(3) : 0);
   document.getElementById('progress').innerHTML = done === 0
     ? `Попереду <b>${totalQ}</b> ситуацій`
     : `Пройдено <b>${done}</b> з ${totalQ}`;

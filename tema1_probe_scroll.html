@@ -207,6 +207,61 @@ td:last-child,th:last-child{padding-right:0}
 .tally{font-size:14px;color:var(--dim)}
 .tally b{color:var(--ink);font-weight:600}
 
+
+/* ───────── акценти ───────── */
+
+/* Застава заповнюється, коли ситуація пройдена */
+.gate{transition:background .34s cubic-bezier(.2,.7,.3,1), border-color .34s ease, transform .34s cubic-bezier(.2,.7,.3,1)}
+.node.cleared .gate{transform:rotate(45deg) scale(.86)}
+.node.stopped .gate{transform:rotate(45deg) scale(.86)}
+.node.here .gate{
+  animation:pulse 2.6s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 transparent}
+  50%{box-shadow:0 0 0 4px var(--passSoft)}
+}
+
+/* Лінія між заставами дотягується вниз у міру проходження */
+.node::before{transform-origin:top;transform:scaleY(0);transition:transform .5s cubic-bezier(.3,.7,.2,1) .06s}
+.node.cleared::before,.node.stopped::before,.node.here::before{transform:scaleY(1)}
+.node.cleared::before{background:var(--pass);opacity:.35}
+
+/* Нова ситуація зʼявляється відповіддю на дію читача */
+.node-inner{animation:enter .34s cubic-bezier(.2,.7,.3,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* Хід у рейці: тонка смуга під поточним шаром */
+.layer.on{position:relative}
+.layer.on::after{
+  content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+  background:var(--pass);opacity:.22;
+  transform:scaleX(var(--done,0));transform-origin:left;
+  transition:transform .5s cubic-bezier(.3,.7,.2,1);
+}
+
+/* Варіант відповіді відгукується на курсор */
+.opt{transition:border-color .16s ease, background .16s ease, padding-left .16s ease}
+.opt:hover:not(.off){padding-left:19px}
+.opt.yes,.opt.no{transition:border-color .2s ease, background .28s ease}
+
+/* Пояснення розкривається */
+.fb.show{animation:enter .3s cubic-bezier(.2,.7,.3,1) both}
+
+/* Цифри вирівнюються по колонках */
+.v,.n,.pt-n,.progress b,.tally b,td,th{font-variant-numeric:tabular-nums}
+
+/* Дані в картках підсвічуються при наведенні на рядок */
+.card .row{transition:background .16s ease}
+.card .row:hover{background:var(--sunken)}
+
+@media(prefers-reduced-motion:reduce){
+  .node::before{transform:scaleY(1);transition:none}
+  .node-inner,.fb.show{animation:none}
+  .node.here .gate{animation:none}
+  .layer.on::after{transition:none}
+}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -265,7 +320,7 @@ td:last-child,th:last-child{padding-right:0}
 const NODES = [
 
   {
-    date:'Де ми', beat:'Межа між моделлю і кодом',
+    date:'Місце теми в курсі', beat:'Межа між моделлю і кодом',
     body:`<p>Курс присвячений harness — шару керування, який перетворює модель на компонент продакшн-системи. Перша тема будує найпершу межу цього шару: місце, де відповідь моделі перестає бути текстом і стає об'єктом, з яким працює код.</p>
 <p>Наскрізний приклад курсу — агент служби підтримки. Він читає звернення клієнта, класифікує його і пропонує наступну дію. Ось звернення:</p>
 <div class="quote">Я оплатив замовлення ORD-12345, гроші списалися двічі, але статус досі «не оплачено». Поверніть зайве списання.</div>
@@ -390,7 +445,7 @@ const NODES = [
   },
 
   {
-    date:'Далі', beat:'З чим іти в конспект',
+    date:'Підсумок проходу', beat:'З чим іти в конспект',
     body:`<p>П\'ять ситуацій вище ставлять п\'ять питань, на які тема дає розгорнуті відповіді, і читання буде прицільнішим, якщо тримати ці питання відкритими.</p>`,
     spot:{
       type:'close',
@@ -489,6 +544,8 @@ function open(from){
 
 function tally(){
   const done = answered.size;
+  const cur = document.querySelector('.layer.on');
+  if (cur) cur.style.setProperty('--done', totalQ ? (done/totalQ).toFixed(3) : 0);
   document.getElementById('progress').innerHTML = done === 0
     ? `Попереду <b>${totalQ}</b> ситуацій`
     : `Пройдено <b>${done}</b> з ${totalQ}`;

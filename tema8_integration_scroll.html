@@ -267,6 +267,61 @@ svg text{font-family:var(--sans)}
 .trace .t .bad,.bad{color:var(--refuse)}
 .trace .t .ok,.ok{color:var(--pass)}
 
+
+/* ───────── акценти ───────── */
+
+/* Застава заповнюється, коли ситуація пройдена */
+.gate{transition:background .34s cubic-bezier(.2,.7,.3,1), border-color .34s ease, transform .34s cubic-bezier(.2,.7,.3,1)}
+.node.cleared .gate{transform:rotate(45deg) scale(.86)}
+.node.stopped .gate{transform:rotate(45deg) scale(.86)}
+.node.here .gate{
+  animation:pulse 2.6s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 transparent}
+  50%{box-shadow:0 0 0 4px var(--passSoft)}
+}
+
+/* Лінія між заставами дотягується вниз у міру проходження */
+.node::before{transform-origin:top;transform:scaleY(0);transition:transform .5s cubic-bezier(.3,.7,.2,1) .06s}
+.node.cleared::before,.node.stopped::before,.node.here::before{transform:scaleY(1)}
+.node.cleared::before{background:var(--pass);opacity:.35}
+
+/* Нова ситуація зʼявляється відповіддю на дію читача */
+.node-inner{animation:enter .34s cubic-bezier(.2,.7,.3,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* Хід у рейці: тонка смуга під поточним шаром */
+.layer.on{position:relative}
+.layer.on::after{
+  content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+  background:var(--pass);opacity:.22;
+  transform:scaleX(var(--done,0));transform-origin:left;
+  transition:transform .5s cubic-bezier(.3,.7,.2,1);
+}
+
+/* Варіант відповіді відгукується на курсор */
+.opt{transition:border-color .16s ease, background .16s ease, padding-left .16s ease}
+.opt:hover:not(.off){padding-left:19px}
+.opt.yes,.opt.no{transition:border-color .2s ease, background .28s ease}
+
+/* Пояснення розкривається */
+.fb.show{animation:enter .3s cubic-bezier(.2,.7,.3,1) both}
+
+/* Цифри вирівнюються по колонках */
+.v,.n,.pt-n,.progress b,.tally b,td,th{font-variant-numeric:tabular-nums}
+
+/* Дані в картках підсвічуються при наведенні на рядок */
+.card .row{transition:background .16s ease}
+.card .row:hover{background:var(--sunken)}
+
+@media(prefers-reduced-motion:reduce){
+  .node::before{transform:scaleY(1);transition:none}
+  .node-inner,.fb.show{animation:none}
+  .node.here .gate{animation:none}
+  .layer.on::after{transition:none}
+}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -324,15 +379,15 @@ svg text{font-family:var(--sans)}
 <script>
 const NODES = [
   {
-    date:'Де ми', beat:'Сім тем — один агент',
-    body:'<p>За сім тем ви побудували всі компоненти агентної системи: валідацію виходів, виклик інструментів, семантичний пошук, памʼять, оцінювання, безпеку, оркестрацію. Кожен компонент працює окремо.</p><p>Ця тема ставить фінальне питання: <strong>як вони працюють разом як одна архітектура?</strong> Наявність правильних компонентів ще не означає наявності правильної архітектури. Контракт може бути коректним, retrieval — знаходити релевантні документи, інструмент — надійно виконувати операцію. Але якщо вони неправильно зʼєднані — система ненадійна.</p><p>Ви побачите архітектуру як два контури — робочий і контрольний — і простежите один сценарій через обидва.</p>'
+    date:'Місце теми в курсі', beat:'Сім тем — один агент',
+    body:'<p>За сім тем ви побудували всі компоненти агентної системи: валідацію виходів, виклик інструментів, семантичний пошук, памʼять, оцінювання, безпеку, оркестрацію, і кожен компонент працює окремо.</p><p>Ця тема ставить фінальне питання: <strong>як вони працюють разом як одна архітектура?</strong> Наявність правильних компонентів ще не означає наявності правильної архітектури. Контракт може бути коректним, retrieval — знаходити релевантні документи, інструмент — надійно виконувати операцію. Але якщо вони неправильно зʼєднані — система ненадійна.</p><p>Ви побачите архітектуру як два контури — робочий і контрольний — і простежите один сценарій через обидва.</p>'
   },
   {
-    date:'Візуал', beat:'Два контури агентної архітектури',
+    date:'Два контури системи', beat:'Два контури агентної архітектури',
     body:'<svg viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:inherit}.lb{font-size:11px;font-weight:600}.sm{font-size:9px;fill:var(--dim)}.hd{font-size:13px;font-weight:700}</style><rect x="30" y="60" width="620" height="180" rx="16" fill="none" stroke="var(--ink2)" stroke-width="2" stroke-dasharray="6"/><text class="hd" x="50" y="85" fill="var(--ink2)">Робочий контур</text><rect x="60" y="100" width="100" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="110" y="124" text-anchor="middle" fill="var(--ink2)">Вхід</text><line x1="160" y1="120" x2="185" y2="120" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="185" y="100" width="100" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="235" y="124" text-anchor="middle" fill="var(--ink2)">LLM</text><line x1="285" y1="120" x2="310" y2="120" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="310" y="100" width="120" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="370" y="124" text-anchor="middle" fill="var(--ink2)">Оркестратор</text><line x1="430" y1="120" x2="455" y2="120" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="455" y="100" width="100" height="40" rx="8" fill="var(--passSoft)" stroke="var(--pass)"/><text class="lb" x="505" y="124" text-anchor="middle" fill="var(--pass)">Інструменти</text><rect x="185" y="170" width="100" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="235" y="194" text-anchor="middle" fill="var(--ink2)">Retrieval</text><rect x="310" y="170" width="120" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="370" y="194" text-anchor="middle" fill="var(--ink2)">Памʼять</text><line x1="370" y1="140" x2="370" y2="170" stroke="var(--dim)" stroke-width="1" stroke-dasharray="3"/><line x1="235" y1="140" x2="235" y2="170" stroke="var(--dim)" stroke-width="1" stroke-dasharray="3"/><rect x="30" y="260" width="620" height="60" rx="12" fill="none" stroke="var(--refuse)" stroke-width="2" stroke-dasharray="6"/><text class="hd" x="50" y="282" fill="var(--refuse)">Контрольний контур</text><text class="lb" x="210" y="298" fill="var(--refuse)">Policy</text><text class="lb" x="310" y="298" fill="var(--refuse)">Evaluation</text><text class="lb" x="430" y="298" fill="var(--refuse)">Tracing</text><text class="lb" x="540" y="298" fill="var(--refuse)">Human-in-the-loop</text><line x1="340" y1="240" x2="340" y2="260" stroke="var(--refuse)" stroke-width="1.5" marker-end="url(#a8r)"/><text class="sm" x="340" y="30" text-anchor="middle">Робочий контур — що агент робить. Контрольний — що перевіряє, записує і обмежує.</text><defs><marker id="a8" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--dim)"/></marker><marker id="a8r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--refuse)"/></marker></defs></svg>'
   },
   {
-    date:'Принцип', beat:'Пʼять властивостей інтегрованої архітектури',
+    date:'Критерій інтеграції', beat:'Пʼять властивостей інтегрованої архітектури',
     body:'<p>Наявність компонентів в одному репозиторії — ще не інтеграція. Інтегрована архітектура має пʼять властивостей:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:170px">Явні контракти</td><td style="padding:6px 10px">Кожен компонент має визначений вхід і вихід. Retrieval повертає фрагменти з метаданими, інструмент — результат або типізовану помилку.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Визначений потік керування</td><td style="padding:6px 10px">Архітектура відповідає, хто визначає наступний крок — LLM чи детермінований код. У різних місцях по-різному.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Явний стан</td><td style="padding:6px 10px">Компоненти мають узгоджене уявлення про те, що вже відбулося. Неузгодженість → подвійний побічний ефект.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Наскрізні обмеження</td><td style="padding:6px 10px">Безпека, дозволи, бюджети застосовуються в контрольованих точках, а не реалізуються незалежно в кожному компоненті.</td></tr><tr><td style="padding:6px 10px;font-weight:600">Керована відмова</td><td style="padding:6px 10px">Система знає, що робити, коли retrieval не знайшов доказів, policy повернув DENY, інструмент завершився таймаутом.</td></tr></table>',
     spot:{
       type:'quiz', q:'Система має Pydantic-контракт, retrieval, інструменти, tracing і evaluation dataset. Але retrieval повертає документи без перевірки is_active. Чого бракує?',
@@ -346,7 +401,7 @@ const NODES = [
   },
   {
     date:'Happy path', beat:'Один сценарій через усі шари', crit:1,
-    body:'<p>Клієнт: <em>«Поверніть гроші за замовлення ORD-2024-7891, мене списали двічі.»</em></p><p>Сценарій проходить через обидва контури:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--ink2)">1</td><td style="padding:6px 10px;font-weight:600;width:140px">Вхід</td><td style="padding:6px 10px">Нормалізація запиту, визначення tenant і сесії</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">2</td><td style="padding:6px 10px;font-weight:600">LLM</td><td style="padding:6px 10px">Класифікація: payment_issue, high, should_escalate, check_payment → Pydantic-контракт</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">3</td><td style="padding:6px 10px;font-weight:600">Оркестратор</td><td style="padding:6px 10px">Перевірка пропозиції за правилами → дозволено → крок classify → verify</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--pass)">4</td><td style="padding:6px 10px;font-weight:600">Інструмент</td><td style="padding:6px 10px">check_payment_status(ORD-2024-7891) → підтверджено подвійне списання</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">5</td><td style="padding:6px 10px;font-weight:600">Retrieval</td><td style="padding:6px 10px">Знайдено чинну політику повернення v3.1 (pre-filter is_active=true)</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">6</td><td style="padding:6px 10px;font-weight:600">Policy</td><td style="padding:6px 10px">process_refund = DESTRUCTIVE → REQUIRE_APPROVAL</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">7</td><td style="padding:6px 10px;font-weight:600">Human</td><td style="padding:6px 10px">Оператор підтвердив → ідемпотентне виконання → облік ефекту</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">8</td><td style="padding:6px 10px;font-weight:600">Tracing</td><td style="padding:6px 10px">Повна траса: кожен крок, кожне рішення, кожен результат</td></tr></table><p>Кожен крок — компонент із попередніх тем. Тепер вони працюють разом, і між ними діють контракти.</p>',
+    body:'<p>Клієнт: <em>«Поверніть гроші за замовлення ORD-2024-7891, мене списали двічі.»</em></p><p>Сценарій проходить через обидва контури:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--ink2)">1</td><td style="padding:6px 10px;font-weight:600;width:140px">Вхід</td><td style="padding:6px 10px">Нормалізація запиту, визначення tenant і сесії</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">2</td><td style="padding:6px 10px;font-weight:600">LLM</td><td style="padding:6px 10px">Класифікація: payment_issue, high, should_escalate, check_payment → Pydantic-контракт</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">3</td><td style="padding:6px 10px;font-weight:600">Оркестратор</td><td style="padding:6px 10px">Перевірка пропозиції за правилами → дозволено → крок classify → verify</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--pass)">4</td><td style="padding:6px 10px;font-weight:600">Інструмент</td><td style="padding:6px 10px">check_payment_status(ORD-2024-7891) → підтверджено подвійне списання</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">5</td><td style="padding:6px 10px;font-weight:600">Retrieval</td><td style="padding:6px 10px">Знайдено чинну політику повернення v3.1 (pre-filter is_active=true)</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">6</td><td style="padding:6px 10px;font-weight:600">Policy</td><td style="padding:6px 10px">process_refund = DESTRUCTIVE → REQUIRE_APPROVAL</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">7</td><td style="padding:6px 10px;font-weight:600">Human</td><td style="padding:6px 10px">Оператор підтвердив → ідемпотентне виконання → облік ефекту</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">8</td><td style="padding:6px 10px;font-weight:600">Tracing</td><td style="padding:6px 10px">Повна траса: кожен крок, кожне рішення, кожен результат</td></tr></table><p>Кожен крок відповідає компоненту з попередніх тем, і тепер ці компоненти працюють разом, а між ними діють контракти.</p>',
     spot:{
       type:'predict', q:'На кроці 6 policy повернув REQUIRE_APPROVAL. Що відбувається з процесом?',
       opts:[
@@ -359,7 +414,7 @@ const NODES = [
   },
   {
     date:'Failure path', beat:'Що відбувається, коли щось не працює',
-    body:'<p>Той самий сценарій, але на кроці 4 інструмент повертає таймаут:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--pass)">1–3</td><td style="padding:6px 10px">Вхід, LLM, оркестратор — як у happy path</td><td style="padding:6px 10px;width:30px;color:var(--pass)">✓</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">4</td><td style="padding:6px 10px">check_payment_status → <strong>timeout 30s</strong></td><td style="padding:6px 10px;color:var(--refuse)">✗</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">5</td><td style="padding:6px 10px">Оркестратор: retry #1 (транзієнтна помилка) → timeout знову</td><td style="padding:6px 10px;color:var(--refuse)">✗</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">6</td><td style="padding:6px 10px">Оркестратор: бюджет retry вичерпано → стан: unresolved</td><td style="padding:6px 10px;color:var(--ink2)">⏸️</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">7</td><td style="padding:6px 10px">Відповідь клієнту: «Не вдалось перевірити статус. Заявку передано оператору.»</td><td style="padding:6px 10px;color:var(--pass)">✓</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">8</td><td style="padding:6px 10px">Tracing: повна траса включно з причиною ескалації</td><td style="padding:6px 10px;color:var(--pass)">✓</td></tr></table><p>Система не вдала вигляду «все зламалось». Вона коректно визначила, що не може завершити процес, зберегла стан, повідомила клієнта і передала оператору. Це керована відмова — пʼята властивість інтеграції.</p>',
+    body:'<p>Той самий сценарій, але на кроці 4 інструмент повертає таймаут:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--pass)">1–3</td><td style="padding:6px 10px">Вхід, LLM, оркестратор — як у happy path</td><td style="padding:6px 10px;width:30px;color:var(--pass)">✓</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">4</td><td style="padding:6px 10px">check_payment_status → <strong>timeout 30s</strong></td><td style="padding:6px 10px;color:var(--refuse)">✗</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">5</td><td style="padding:6px 10px">Оркестратор: retry #1 (транзієнтна помилка) → timeout знову</td><td style="padding:6px 10px;color:var(--refuse)">✗</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">6</td><td style="padding:6px 10px">Оркестратор: бюджет retry вичерпано → стан: unresolved</td><td style="padding:6px 10px;color:var(--ink2)">⏸️</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">7</td><td style="padding:6px 10px">Відповідь клієнту: «Не вдалось перевірити статус. Заявку передано оператору.»</td><td style="padding:6px 10px;color:var(--pass)">✓</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">8</td><td style="padding:6px 10px">Tracing: повна траса включно з причиною ескалації</td><td style="padding:6px 10px;color:var(--pass)">✓</td></tr></table><p>Система не вдавала, що все зламалося: вона коректно визначила, що не може завершити процес, зберегла стан, повідомила клієнта і передала оператору, і це керована відмова, пʼята властивість інтеграції.</p>',
     spot:{
       type:'quiz', q:'Чому failure path важливіший за happy path для оцінки архітектури?',
       opts:[
@@ -480,6 +535,8 @@ function open(from){
 
 function tally(){
   const done = answered.size;
+  const cur = document.querySelector('.layer.on');
+  if (cur) cur.style.setProperty('--done', totalQ ? (done/totalQ).toFixed(3) : 0);
   document.getElementById('progress').innerHTML = done === 0
     ? `Попереду <b>${totalQ}</b> ситуацій`
     : `Пройдено <b>${done}</b> з ${totalQ}`;
