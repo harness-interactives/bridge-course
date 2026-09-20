@@ -32,6 +32,21 @@ a.card:hover{border-color:var(--blue);transform:translateY(-2px)}
 .badge{margin-left:auto;flex-shrink:0;white-space:nowrap;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:999px}
 .badge.ready{background:var(--greenBg);color:var(--green)}
 .badge.soon{background:var(--blueBg);color:var(--blue)}
+.card.two{cursor:pointer}
+.card.two:hover{border-color:var(--blue);transform:translateY(-2px)}
+.badge.two{background:var(--blueBg);color:var(--blue)}
+.card .chev{display:inline-block;margin-left:6px;font-size:11px;color:var(--dim);transition:transform .2s}
+.card.two.open .chev{transform:rotate(90deg)}
+.parts{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.card.two.open .parts{display:block}
+.parts .why{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:14px}
+.parts .why b{color:var(--head)}
+.part{display:block;text-decoration:none;color:inherit;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:border-color .2s,background .2s}
+.part:hover{border-color:var(--blue);background:var(--blueBg)}
+.part .pk{font-family:var(--fmono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--blue);display:flex;gap:8px;margin-bottom:4px}
+.part .pk .pt{color:var(--dim);margin-left:auto}
+.part .pn{font-size:14px;color:var(--head);font-weight:600;line-height:1.35;margin-bottom:3px}
+.part .pd{font-size:12.5px;color:var(--text);line-height:1.5}
 footer{margin-top:44px;font-size:13px;color:var(--dim);border-top:1px solid var(--border);padding-top:18px}
 @media(max-width:620px){.wrap{padding:44px 16px 72px}h1{font-size:26px}}
 </style>
@@ -42,7 +57,7 @@ footer{margin-top:44px;font-size:13px;color:var(--dim);border-top:1px solid var(
   <div class="eye">Bridge Course · The Harness</div>
   <h1>Інтерактиви до восьми тем курсу</h1>
   <p class="lede">Кожна тема курсу має власний scroll-інтерактив: історія розгортається згори вниз, а наступний крок відкривається після відповіді на питання. Матеріал спирається на наскрізний приклад — агента служби підтримки, який класифікує звернення, перевіряє факти, діє і фіксує результат.</p>
-  <p class="note">Теми додаються в міру готовності. Відкрийте будь-яку картку з позначкою «готово», щоб пройти інтерактив.</p>
+  <p class="note">Більшість тем має один інтерактив. Теми з позначкою «2 частини» розібрані двома проходами — до читання конспекту і після нього; відкрийте таку картку, щоб побачити пояснення і обрати частину.</p>
 
   <div class="grid">
     <a class="card" href="tema1_pipeline_scroll.html">
@@ -51,17 +66,24 @@ footer{margin-top:44px;font-size:13px;color:var(--dim);border-top:1px solid var(
       <p>Один JSON від моделі проходить п'ять шарів перевірки — від синтаксису до дозволів агента — і зупиняється там, де вперше порушує контракт.</p>
     </a>
 
-    <a class="card" href="tema2_probe_scroll.html">
-      <div class="num"><span class="layer">Тема 2 · перед</span> <span class="lname">Інструменти і дозволи</span> <span class="badge ready">готово</span></div>
-      <h2>П'ять місць, де інтуїція розходиться з інженерією</h2>
-      <p>П'ять ситуацій із життя агента, який уміє діяти. Очевидна відповідь щоразу виявляється неточною, а розбір лишається конспекту.</p>
-    </a>
-
-    <a class="card" href="tema2_tool_call_scroll.html">
-      <div class="num"><span class="layer">Тема 2 · після</span> <span class="lname">Інструменти і дозволи</span> <span class="badge ready">готово</span></div>
-      <h2>validate_and_execute: від наміру до дії</h2>
-      <p>Один виклик інструменту проходить сім кроків контролю: бюджет, реєстр, схема, контекст, дозволи, ідемпотентне виконання і облік ефекту.</p>
-    </a>
+    <div class="card two" data-two>
+      <div class="num"><span class="layer">Тема 2</span> <span class="lname">Інструменти і дозволи</span> <span class="badge two">2 частини</span></div>
+      <h2>Виклик інструментів, дозволи та стійкі процеси</h2>
+      <p>Агент отримує право діяти в зовнішньому світі. Тема розібрана двома інтерактивами<span class="chev">›</span></p>
+      <div class="parts">
+        <div class="why">Тема містить кілька місць, де звичний інженерний досвід підказує неправильну відповідь: повторні спроби, семантика таймауту, зберігання стану процесу. <b>Перший інтерактив проходять до читання конспекту</b> — він ставить питання і дає побачити ці розходження на конкретних ситуаціях, після чого читання стає прицільним. <b>Другий проходять після читання</b> — він перевіряє, чи вдається застосувати сім шарів контролю разом, а не переказати кожен окремо. Обидва самодостатні: пройдений лише один із них теж дає результат.</div>
+        <a class="part" href="tema2_probe_scroll.html">
+          <div class="pk"><span>Перед читанням</span><span class="pt">7 хвилин</span></div>
+          <div class="pn">Виклик інструментів: п'ять ситуацій</div>
+          <div class="pd">П'ять ситуацій із роботи агента, у кожній очевидна відповідь виявляється неточною.</div>
+        </a>
+        <a class="part" href="tema2_tool_call_scroll.html">
+          <div class="pk"><span>Після читання</span><span class="pt">20 хвилин</span></div>
+          <div class="pn">validate_and_execute: від наміру до дії</div>
+          <div class="pd">Один виклик проходить сім кроків контролю: бюджет, реєстр, схема, контекст, дозволи, ідемпотентне виконання, облік ефекту.</div>
+        </a>
+      </div>
+    </div>
 
     <a class="card" href="tema3_search_scroll.html">
       <div class="num"><span class="layer">Тема 3</span> <span class="lname">Пошук і ембеддинги</span> <span class="badge ready">готово</span></div>
@@ -100,6 +122,24 @@ footer{margin-top:44px;font-size:13px;color:var(--dim);border-top:1px solid var(
 const t=document.getElementById('t');
 t.addEventListener('click',()=>{const d=document.documentElement.getAttribute('data-theme')==='dark';
 document.documentElement.setAttribute('data-theme',d?'light':'dark');t.textContent=d?'🌙':'☀️';});
+</script>
+<script>
+document.querySelectorAll('[data-two]').forEach(function(c){
+  c.setAttribute('role','button');
+  c.setAttribute('tabindex','0');
+  c.setAttribute('aria-expanded','false');
+  function toggle(){
+    var open = c.classList.toggle('open');
+    c.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  c.addEventListener('click', function(e){
+    if (e.target.closest('.part')) return;
+    toggle();
+  });
+  c.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+  });
+});
 </script>
 </body>
 </html>
