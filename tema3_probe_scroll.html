@@ -354,6 +354,23 @@ svg text{font-family:var(--sans)}
   .gate{transition:none}
 }
 
+
+/* ───────── знак теми ───────── */
+.mark{margin:22px 0 4px;width:100%}
+.mark svg{display:block;width:100%;height:auto;overflow:visible}
+.mark .st{stroke:var(--rule);stroke-width:1.4;fill:none}
+.mark .ac{stroke:var(--pass);stroke-width:1.6;fill:none}
+.mark .rf{stroke:var(--refuse);stroke-width:1.6;fill:none}
+.mark .tk{fill:var(--ink2)}
+.mark .tkA{fill:var(--pass)}
+.mark .tkR{fill:var(--refuse)}
+.mark .gh{fill:var(--rule)}
+.mark text{font-size:7px;fill:var(--dim);font-family:var(--mono)}
+@media(prefers-reduced-motion:reduce){.mark *{animation:none!important}}
+
+@keyframes m3w{0%{r:6;opacity:.65}70%{opacity:.12}100%{r:78;opacity:0}}
+@keyframes m3n{0%,100%{opacity:.35;r:3.2}50%{opacity:1;r:4.2}}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -377,6 +394,19 @@ svg text{font-family:var(--sans)}
   <div class="rail-theme">Тема 3 · перед конспектом</div>
   <h1>Ембеддинги і пошук: п'ять ситуацій перед читанням теми</h1>
   <div class="rail-sub">Агент шукає відповіді в документах компанії. У кожній із п'яти ситуацій пошук повертає текст, який стосується запиту і веде до неправильної відповіді.</div>
+<div class="mark" aria-hidden="true"><svg viewBox="0 0 220 132">
+  <g class="gh">
+    <circle cx="44" cy="30" r="2.4"/><circle cx="176" cy="40" r="2.4"/>
+    <circle cx="58" cy="104" r="2.4"/><circle cx="150" cy="100" r="2.4"/>
+    <circle cx="32" cy="70" r="2.4"/><circle cx="196" cy="84" r="2.4"/>
+  </g>
+  <circle class="ac" cx="110" cy="66" r="10" style="animation:m3w 6.5s ease-out infinite"/>
+  <circle class="ac" cx="110" cy="66" r="10" style="animation:m3w 6.5s ease-out infinite 1.6s"/>
+  <circle class="tk" cx="110" cy="66" r="3.4"/>
+  <circle class="tkA" cx="128" cy="58" r="3.2" style="animation:m3n 6.5s ease-in-out infinite"/>
+  <circle class="tkR" cx="134" cy="62" r="3.2" style="animation:m3n 6.5s ease-in-out infinite .5s"/>
+  <line class="st" x1="113" y1="65" x2="131" y2="60" style="stroke-dasharray:3 3"/>
+</svg></div>
   <div class="layers">
     <div class="layers-h">Шари Harness</div>
     <div class="layer done"><span class="g"></span>Контракт і валідація</div>

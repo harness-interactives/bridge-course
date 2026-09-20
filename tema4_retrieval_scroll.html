@@ -354,6 +354,22 @@ svg text{font-family:var(--sans)}
   .gate{transition:none}
 }
 
+
+/* ───────── знак теми ───────── */
+.mark{margin:22px 0 4px;width:100%}
+.mark svg{display:block;width:100%;height:auto;overflow:visible}
+.mark .st{stroke:var(--rule);stroke-width:1.4;fill:none}
+.mark .ac{stroke:var(--pass);stroke-width:1.6;fill:none}
+.mark .rf{stroke:var(--refuse);stroke-width:1.6;fill:none}
+.mark .tk{fill:var(--ink2)}
+.mark .tkA{fill:var(--pass)}
+.mark .tkR{fill:var(--refuse)}
+.mark .gh{fill:var(--rule)}
+.mark text{font-size:7px;fill:var(--dim);font-family:var(--mono)}
+@media(prefers-reduced-motion:reduce){.mark *{animation:none!important}}
+
+@keyframes m4r{0%{opacity:.2}18%,58%{opacity:1}86%,100%{opacity:.2}}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -377,6 +393,23 @@ svg text{font-family:var(--sans)}
   <div class="rail-theme">Тема 4 · інтерактив</div>
   <h1>Воронка пошуку: від корпусу до контексту</h1>
   <div class="rail-sub">Один запит. Пʼять кроків. 847 → 3 фрагменти.</div>
+<div class="mark" aria-hidden="true"><svg viewBox="0 0 220 132">
+  <g class="gh" style="animation:m4r 7s ease-in-out infinite">
+    <circle cx="30" cy="20" r="2.6"/><circle cx="54" cy="20" r="2.6"/><circle cx="78" cy="20" r="2.6"/><circle cx="102" cy="20" r="2.6"/>
+    <circle cx="126" cy="20" r="2.6"/><circle cx="150" cy="20" r="2.6"/><circle cx="174" cy="20" r="2.6"/><circle cx="198" cy="20" r="2.6"/>
+  </g>
+  <g class="gh" style="animation:m4r 7s ease-in-out infinite .5s">
+    <circle cx="62" cy="52" r="2.6"/><circle cx="90" cy="52" r="2.6"/><circle cx="118" cy="52" r="2.6"/>
+    <circle cx="146" cy="52" r="2.6"/><circle cx="174" cy="52" r="2.6"/>
+  </g>
+  <g class="gh" style="animation:m4r 7s ease-in-out infinite 1s">
+    <circle cx="86" cy="84" r="2.6"/><circle cx="118" cy="84" r="2.6"/><circle cx="150" cy="84" r="2.6"/>
+  </g>
+  <g style="animation:m4r 7s ease-in-out infinite 1.5s">
+    <circle class="tkA" cx="98" cy="114" r="3.4"/><circle class="tkA" cx="124" cy="114" r="3.4"/>
+  </g>
+  <path class="st" d="M20 32 L92 100 M200 32 L128 100" style="stroke-dasharray:2 4"/>
+</svg></div>
   <div class="layers">
     <div class="layers-h">Шари Harness</div>
     <div class="layer done"><span class="g"></span>Контракт і валідація</div>

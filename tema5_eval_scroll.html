@@ -354,6 +354,24 @@ svg text{font-family:var(--sans)}
   .gate{transition:none}
 }
 
+
+/* ───────── знак теми ───────── */
+.mark{margin:22px 0 4px;width:100%}
+.mark svg{display:block;width:100%;height:auto;overflow:visible}
+.mark .st{stroke:var(--rule);stroke-width:1.4;fill:none}
+.mark .ac{stroke:var(--pass);stroke-width:1.6;fill:none}
+.mark .rf{stroke:var(--refuse);stroke-width:1.6;fill:none}
+.mark .tk{fill:var(--ink2)}
+.mark .tkA{fill:var(--pass)}
+.mark .tkR{fill:var(--refuse)}
+.mark .gh{fill:var(--rule)}
+.mark text{font-size:7px;fill:var(--dim);font-family:var(--mono)}
+@media(prefers-reduced-motion:reduce){.mark *{animation:none!important}}
+
+@keyframes m5d{0%,28%{stroke-dashoffset:104}52%,82%{stroke-dashoffset:0}96%,100%{stroke-dashoffset:104}}
+@keyframes m5p{0%,26%{opacity:0;r:3}36%{opacity:1;r:5.5}60%{opacity:1;r:8}72%{opacity:0;r:9}100%{opacity:0}}
+@keyframes m5go{0%{transform:translateX(0);opacity:0}6%{opacity:1}82%{transform:translateX(180px);opacity:1}92%{transform:translateX(180px);opacity:0}100%{opacity:0}}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -377,6 +395,17 @@ svg text{font-family:var(--sans)}
   <div class="rail-theme">Тема 5 · інтерактив</div>
   <h1>Знайди точку відхилення</h1>
   <div class="rail-sub">Три кейси. Три траєкторії. Де все пішло не так?</div>
+<div class="mark" aria-hidden="true"><svg viewBox="0 0 220 132">
+  <path class="st" d="M20 28 H200"/><path class="st" d="M20 66 H200"/><path class="st" d="M20 104 H200"/>
+  <g class="gh">
+    <circle cx="20" cy="28" r="2.4"/><circle cx="65" cy="28" r="2.4"/><circle cx="110" cy="28" r="2.4"/><circle cx="155" cy="28" r="2.4"/><circle cx="200" cy="28" r="2.4"/>
+    <circle cx="20" cy="66" r="2.4"/><circle cx="65" cy="66" r="2.4"/><circle cx="110" cy="66" r="2.4"/><circle cx="155" cy="66" r="2.4"/><circle cx="200" cy="66" r="2.4"/>
+    <circle cx="20" cy="104" r="2.4"/><circle cx="65" cy="104" r="2.4"/><circle cx="110" cy="104" r="2.4"/><circle cx="155" cy="104" r="2.4"/><circle cx="200" cy="104" r="2.4"/>
+  </g>
+  <path class="rf" d="M110 66 L155 90 L200 90" style="stroke-dasharray:104;stroke-dashoffset:104;animation:m5d 7.5s ease-in-out infinite"/>
+  <circle class="tkR" cx="110" cy="66" r="5.5" fill="none" stroke="var(--refuse)" stroke-width="1.4" style="animation:m5p 7.5s ease-in-out infinite"/>
+  <circle class="tkA" cx="20" cy="28" r="3.4" style="animation:m5go 7.5s linear infinite"/>
+</svg></div>
   <div class="layers">
     <div class="layers-h">Шари Harness</div>
     <div class="layer done"><span class="g"></span>Контракт і валідація</div>

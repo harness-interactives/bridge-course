@@ -354,6 +354,22 @@ svg text{font-family:var(--sans)}
   .gate{transition:none}
 }
 
+
+/* ───────── знак теми ───────── */
+.mark{margin:22px 0 4px;width:100%}
+.mark svg{display:block;width:100%;height:auto;overflow:visible}
+.mark .st{stroke:var(--rule);stroke-width:1.4;fill:none}
+.mark .ac{stroke:var(--pass);stroke-width:1.6;fill:none}
+.mark .rf{stroke:var(--refuse);stroke-width:1.6;fill:none}
+.mark .tk{fill:var(--ink2)}
+.mark .tkA{fill:var(--pass)}
+.mark .tkR{fill:var(--refuse)}
+.mark .gh{fill:var(--rule)}
+.mark text{font-size:7px;fill:var(--dim);font-family:var(--mono)}
+@media(prefers-reduced-motion:reduce){.mark *{animation:none!important}}
+
+@keyframes m6a{0%{stroke-dashoffset:80;opacity:0}8%{opacity:.9}34%{stroke-dashoffset:0;opacity:.9}52%{opacity:0}100%{stroke-dashoffset:0;opacity:0}}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -377,6 +393,16 @@ svg text{font-family:var(--sans)}
   <div class="rail-theme">Тема 6 · перед конспектом</div>
   <h1>Межі безпечної поведінки: п'ять ситуацій перед читанням теми</h1>
   <div class="rail-sub">Компоненти, побудовані в попередніх темах, стають поверхнею атаки. У кожній із п'яти ситуацій захист виглядає достатнім і таким не є.</div>
+<div class="mark" aria-hidden="true"><svg viewBox="0 0 220 132">
+  <circle class="st" cx="110" cy="66" r="52" style="stroke-dasharray:3 4"/>
+  <circle class="st" cx="110" cy="66" r="36"/>
+  <circle class="ac" cx="110" cy="66" r="20"/>
+  <circle class="tk" cx="110" cy="66" r="7"/>
+  <path class="rf" d="M4 12 L58 48" style="stroke-dasharray:66;stroke-dashoffset:66;animation:m6a 7s ease-in-out infinite"/>
+  <path class="rf" d="M216 12 L162 48" style="stroke-dasharray:66;stroke-dashoffset:66;animation:m6a 7s ease-in-out infinite .8s"/>
+  <path class="rf" d="M4 120 L74 80" style="stroke-dasharray:80;stroke-dashoffset:80;animation:m6a 7s ease-in-out infinite 1.6s"/>
+  <path class="rf" d="M216 120 L146 80" style="stroke-dasharray:80;stroke-dashoffset:80;animation:m6a 7s ease-in-out infinite 2.4s"/>
+</svg></div>
   <div class="layers">
     <div class="layers-h">Шари Harness</div>
     <div class="layer done"><span class="g"></span>Контракт і валідація</div>

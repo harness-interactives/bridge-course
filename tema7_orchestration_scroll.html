@@ -354,6 +354,28 @@ svg text{font-family:var(--sans)}
   .gate{transition:none}
 }
 
+
+/* ───────── знак теми ───────── */
+.mark{margin:22px 0 4px;width:100%}
+.mark svg{display:block;width:100%;height:auto;overflow:visible}
+.mark .st{stroke:var(--rule);stroke-width:1.4;fill:none}
+.mark .ac{stroke:var(--pass);stroke-width:1.6;fill:none}
+.mark .rf{stroke:var(--refuse);stroke-width:1.6;fill:none}
+.mark .tk{fill:var(--ink2)}
+.mark .tkA{fill:var(--pass)}
+.mark .tkR{fill:var(--refuse)}
+.mark .gh{fill:var(--rule)}
+.mark text{font-size:7px;fill:var(--dim);font-family:var(--mono)}
+@media(prefers-reduced-motion:reduce){.mark *{animation:none!important}}
+
+@keyframes m7spin{
+  0%{transform:rotate(0deg)}   12%{transform:rotate(60deg)}
+  22%{transform:rotate(60deg)} 34%{transform:rotate(120deg)}
+  52%{transform:rotate(120deg)}64%{transform:rotate(180deg)}
+  74%{transform:rotate(240deg)}86%{transform:rotate(300deg)}
+  100%{transform:rotate(360deg)}}
+@keyframes m7h{0%,30%{opacity:0;r:6}38%{opacity:.9;r:8}48%{opacity:.9;r:11}56%{opacity:0;r:12}100%{opacity:0}}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -377,6 +399,17 @@ svg text{font-family:var(--sans)}
   <div class="rail-theme">Тема 7 · інтерактив</div>
   <h1>Стан, правила і зворотний звʼязок</h1>
   <div class="rail-sub">Від набору компонентів до керованого процесу.</div>
+<div class="mark" aria-hidden="true"><svg viewBox="0 0 220 132">
+  <circle class="st" cx="110" cy="66" r="44" style="stroke-dasharray:4 5"/>
+  <g class="gh">
+    <circle cx="110" cy="22" r="4"/><circle cx="148" cy="44" r="4"/><circle cx="148" cy="88" r="4"/>
+    <circle cx="110" cy="110" r="4"/><circle cx="72" cy="88" r="4"/><circle cx="72" cy="44" r="4"/>
+  </g>
+  <circle class="ac" cx="148" cy="44" r="8" style="animation:m7h 9s ease-in-out infinite"/>
+  <g style="transform-origin:110px 66px;animation:m7spin 9s cubic-bezier(.5,0,.5,1) infinite">
+    <circle class="tkA" cx="110" cy="22" r="4.6"/>
+  </g>
+</svg></div>
   <div class="layers">
     <div class="layers-h">Шари Harness</div>
     <div class="layer done"><span class="g"></span>Контракт і валідація</div>

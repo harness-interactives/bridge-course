@@ -354,6 +354,23 @@ svg text{font-family:var(--sans)}
   .gate{transition:none}
 }
 
+
+/* ───────── знак теми ───────── */
+.mark{margin:22px 0 4px;width:100%}
+.mark svg{display:block;width:100%;height:auto;overflow:visible}
+.mark .st{stroke:var(--rule);stroke-width:1.4;fill:none}
+.mark .ac{stroke:var(--pass);stroke-width:1.6;fill:none}
+.mark .rf{stroke:var(--refuse);stroke-width:1.6;fill:none}
+.mark .tk{fill:var(--ink2)}
+.mark .tkA{fill:var(--pass)}
+.mark .tkR{fill:var(--refuse)}
+.mark .gh{fill:var(--rule)}
+.mark text{font-size:7px;fill:var(--dim);font-family:var(--mono)}
+@media(prefers-reduced-motion:reduce){.mark *{animation:none!important}}
+
+@keyframes m8h{0%{stroke-dashoffset:250;opacity:.95}34%{stroke-dashoffset:0;opacity:.95}48%{opacity:0}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes m8f{0%,48%{stroke-dashoffset:250;opacity:0}52%{opacity:.95}86%{stroke-dashoffset:0;opacity:.95}96%{opacity:0}100%{opacity:0}}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -377,6 +394,14 @@ svg text{font-family:var(--sans)}
   <div class="rail-theme">Тема 8 · інтерактив</div>
   <h1>Від компонентів до архітектури</h1>
   <div class="rail-sub">Два контури. Один сценарій. Happy path і failure path.</div>
+<div class="mark" aria-hidden="true"><svg viewBox="0 0 220 132">
+  <path class="ac" d="M110 66 C110 22 62 22 62 66 C62 110 110 110 110 66" style="stroke-dasharray:250;stroke-dashoffset:250;animation:m8h 10s ease-in-out infinite"/>
+  <path class="rf" d="M110 66 C110 22 158 22 158 66 C158 110 110 110 110 66" style="stroke-dasharray:250;stroke-dashoffset:250;animation:m8f 10s ease-in-out infinite"/>
+  <path class="st" d="M110 66 C110 22 62 22 62 66 C62 110 110 110 110 66" opacity=".45"/>
+  <path class="st" d="M110 66 C110 22 158 22 158 66 C158 110 110 110 110 66" opacity=".45"/>
+  <circle class="tk" cx="110" cy="66" r="4.4"/>
+  <text x="46" y="128">happy</text><text x="140" y="128">failure</text>
+</svg></div>
   <div class="layers">
     <div class="layers-h">Шари Harness</div>
     <div class="layer done"><span class="g"></span>Контракт і валідація</div>

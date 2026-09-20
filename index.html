@@ -108,6 +108,24 @@ footer{margin-top:auto;padding-top:28px;font-size:13px;line-height:1.6;color:var
 .layer-meta,.part-time{font-variant-numeric:tabular-nums}
 @media(prefers-reduced-motion:reduce){.parts{animation:none}.g,.layer-head,.part{transition:none}}
 
+
+/* ───────── знак курсу ───────── */
+.mark{margin:26px 0 0}
+.mark svg{display:block;width:100%;height:auto;overflow:visible}
+.mark .st{stroke:var(--rule);stroke-width:1.4;fill:none}
+.mark .core{fill:var(--ink2)}
+.mark .ring{stroke:var(--pass);stroke-width:1.6;fill:none;opacity:0}
+.mark .ring:nth-of-type(1){animation:ring 9s ease-in-out infinite}
+.mark .ring:nth-of-type(2){animation:ring 9s ease-in-out infinite .5s}
+.mark .ring:nth-of-type(3){animation:ring 9s ease-in-out infinite 1s}
+.mark .ring:nth-of-type(4){animation:ring 9s ease-in-out infinite 1.5s}
+.mark .ring:nth-of-type(5){animation:ring 9s ease-in-out infinite 2s}
+.mark .ring:nth-of-type(6){animation:ring 9s ease-in-out infinite 2.5s}
+.mark .ring:nth-of-type(7){animation:ring 9s ease-in-out infinite 3s}
+.mark .ring:nth-of-type(8){animation:ring 9s ease-in-out infinite 3.5s}
+@keyframes ring{0%{opacity:0}14%{opacity:.85}62%{opacity:.85}78%{opacity:.1}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.mark *{animation:none!important;opacity:.5!important}}
+
 @media(max-width:900px){
   .page{display:block;max-width:none}
   .toggle{right:16px;top:14px}
@@ -137,6 +155,18 @@ footer{margin-top:auto;padding-top:28px;font-size:13px;line-height:1.6;color:var
     <p>Harness — шар керування, який перетворює модель на компонент продакшн-системи. Курс проходить його знизу вгору: контракт між моделлю і кодом, дозволи на дії, пошук у документах, пам'ять, оцінювання, безпека, оркестрація, інтеграція.</p>
     <p>Кожен інтерактив веде один сценарій крізь відповідний шар. Наступний крок відкривається після відповіді на питання, а наскрізний приклад спільний для всього курсу — агент служби підтримки, який класифікує звернення, перевіряє факти, діє і фіксує результат.</p>
   </div>
+  <div class="mark" aria-hidden="true"><svg viewBox="0 0 260 150">
+    <circle class="st" cx="130" cy="75" r="66" style="stroke-dasharray:3 5"/>
+    <circle class="ring" cx="130" cy="75" r="15"/>
+    <circle class="ring" cx="130" cy="75" r="22"/>
+    <circle class="ring" cx="130" cy="75" r="29"/>
+    <circle class="ring" cx="130" cy="75" r="36"/>
+    <circle class="ring" cx="130" cy="75" r="43"/>
+    <circle class="ring" cx="130" cy="75" r="50"/>
+    <circle class="ring" cx="130" cy="75" r="57"/>
+    <circle class="ring" cx="130" cy="75" r="64"/>
+    <circle class="core" cx="130" cy="75" r="7"/>
+  </svg></div>
     <footer>Шари 1, 2, 3 і 6 розібрані двома проходами — до читання конспекту і після нього. Відкрийте такий шар, щоб побачити пояснення і обрати частину.</footer>
 </div>
 <div class="body">
