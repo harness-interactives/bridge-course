@@ -93,17 +93,20 @@ footer{margin-top:auto;padding-top:28px;font-size:13px;line-height:1.6;color:var
 
 
 /* ───────── акценти ───────── */
-.g{transition:background .3s cubic-bezier(.2,.7,.3,1), border-color .3s ease, transform .3s cubic-bezier(.2,.7,.3,1)}
-.layer.open .g{transform:rotate(45deg) scale(.86)}
-.layer-head{transition:padding-left .18s ease}
-.layer-head:hover{padding-left:6px}
+.layer{position:relative}
+.layer-head{border-left:2px solid transparent;padding-left:0;transition:border-left-color .2s ease,padding-left .2s ease}
+.layer-head:hover,.layer.open .layer-head{border-left-color:var(--pass);padding-left:14px}
+.g{transition:background .32s cubic-bezier(.2,.7,.3,1), border-color .32s ease, transform .42s cubic-bezier(.34,1.4,.5,1)}
+.layer-head:hover .g,.layer.open .g{background:var(--pass);border-color:var(--pass)}
+.layer.open .g{transform:rotate(45deg)}
 .layer-t{transition:color .18s ease}
-.parts{animation:enter .32s cubic-bezier(.2,.7,.3,1) both}
-@keyframes enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.part{transition:background .16s ease,padding-left .16s ease}
-.part:hover{background:var(--sunken);padding-left:12px}
+.parts{animation:enter .42s cubic-bezier(.22,.8,.3,1) both;border-left:2px solid var(--pass);margin-left:14px;padding-left:28px}
+@keyframes enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.part{border-left:2px solid transparent;transition:background .18s ease,border-left-color .18s ease,padding-left .18s ease}
+.part:hover{background:var(--sunken);border-left-color:var(--ink);padding-left:14px}
+.masthead{border-top:3px solid var(--pass)}
 .layer-meta,.part-time{font-variant-numeric:tabular-nums}
-@media(prefers-reduced-motion:reduce){.parts{animation:none}}
+@media(prefers-reduced-motion:reduce){.parts{animation:none}.g,.layer-head,.part{transition:none}}
 
 @media(max-width:900px){
   .page{display:block;max-width:none}
