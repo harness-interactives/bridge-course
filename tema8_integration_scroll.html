@@ -6,20 +6,26 @@
 <title>Інтегрована архітектура — Тема 8</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f0f0f2;--card:#fafafa;--border:#dde0e6;--text:#2c2c2c;--dim:#6b7280;
+:root{--bg:#f0f0f2;--railBg:#e9e9ee;--card:#fafafa;--border:#dde0e6;--text:#2c2c2c;--dim:#6b7280;--head:#0f0f14;
 --green:#22863a;--greenBg:rgba(34,134,58,.08);--red:#cf222e;--redBg:rgba(207,34,46,.08);
 --blue:#0969da;--blueBg:rgba(9,105,218,.08);--gold:#9a6700;--goldBg:rgba(154,103,0,.08);
 --accent:#1a7f37;--font:'Segoe UI','Helvetica Neue',sans-serif}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;min-height:100vh}
 
-.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:linear-gradient(180deg,#e8e8ec 0%,#e2e2e8 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:32px 20px}
-.rail-icon{font-size:48px;margin-bottom:16px}
+.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:var(--railBg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:28px 18px;overflow-y:auto}
+.rail-icon{font-size:40px;margin-bottom:10px}
 .rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
-.rail h1{font-size:20px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:12px;color:#1a1a1a}
-.rail-sub{font-size:13px;color:var(--dim);text-align:center;line-height:1.5}
-.rail-progress{position:absolute;bottom:24px;font-size:12px;color:var(--dim)}
+.rail h1{font-size:19px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:10px;color:var(--head)}
+.rail-sub{font-size:12.5px;color:var(--dim);text-align:center;line-height:1.5;margin-bottom:20px}
+.stack{width:100%;border-top:1px solid var(--border);padding-top:14px;margin-top:18px}
+.stack-title{font-size:10px;text-transform:uppercase;letter-spacing:1.6px;color:var(--dim);margin-bottom:8px;text-align:center}
+.stack-item{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim);padding:3px 6px;border-radius:6px;line-height:1.35}
+.stack-item.now{background:var(--greenBg);color:var(--green);font-weight:700}
+.stack-item .mark{font-size:11px;opacity:.55}
+.stack-item .here{margin-left:auto;font-size:9.5px;letter-spacing:1px}
+.rail-progress{margin-top:16px;font-size:12px;color:var(--dim)}
 
-.main{margin-left:260px;max-width:860px;padding:40px 24px 120px}
+.main{margin-left:max(260px, calc(50% - 300px));max-width:860px;padding:40px 24px 120px}
 
 .node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
 .node.locked{opacity:.25;pointer-events:none}
@@ -65,11 +71,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .risk-write{background:var(--goldBg);color:var(--gold)}
 .risk-dest{background:var(--redBg);color:var(--red)}
 
-@media(max-width:800px){.rail{display:none}.main{margin-left:0;padding:24px 16px 80px}}
+@media(max-width:800px){.rail{display:none}.main{margin-left:0 !important;padding:24px 16px 80px}}
 
 
 /* ─── DARK THEME ─── */
-[data-theme="dark"]{--bg:#181d28;--card:#212838;--border:#333d52;--text:#c9d1d9;--dim:#8b949e;
+[data-theme="dark"]{--railBg:#11161d;--bg:#181d28;--card:#212838;--border:#333d52;--text:#c9d1d9;--dim:#8b949e;--head:#ffffff;
 --green:#3fb950;--greenBg:rgba(63,185,80,.10);--red:#f85149;--redBg:rgba(248,81,73,.10);
 --blue:#58a6ff;--blueBg:rgba(88,166,255,.10);--gold:#d29922;--goldBg:rgba(210,153,34,.10);
 --accent:#7ee787}
@@ -89,20 +95,31 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 [data-theme="dark"] .spot-fb.fail{border-color:rgba(248,81,73,.25)}
 
 /* ─── TOGGLE BUTTON ─── */
-.theme-toggle{position:absolute;top:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--dim);cursor:pointer;z-index:20;display:flex;align-items:center;gap:6px;transition:background .2s,border-color .2s}
-.theme-toggle:hover{border-color:var(--blue)}
-@media(max-width:800px){.theme-toggle{position:fixed;top:12px;right:12px}}
+.toggle{position:fixed;top:16px;right:20px;z-index:20;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;line-height:1}
+.toggle:hover{border-color:var(--blue)}
+@media(max-width:800px){.toggle{position:fixed;top:12px;right:12px}}
 
 </style>
 </head>
 <body>
-<button class="theme-toggle" onclick="toggleTheme()"><span id="themeIcon">🌙</span> <span id="themeLabel">Темна</span></button>
+<button class="toggle" id="themeToggle" aria-label="Змінити тему" onclick="toggleTheme()">🌙</button>
 
 <div class="rail">
   <div class="rail-icon">🏗️</div>
   <div class="rail-eye">Тема 8 · Інтерактив</div>
   <h1>Від компонентів до архітектури</h1>
   <div class="rail-sub">Два контури. Один сценарій.<br>Happy path і failure path.</div>
+  <div class="stack">
+    <div class="stack-title">Шари Harness</div>
+    <div class="stack-item"><span class="mark">░</span>Контракт і валідація</div>
+    <div class="stack-item"><span class="mark">░</span>Інструменти і дозволи</div>
+    <div class="stack-item"><span class="mark">░</span>Пошук і ембеддинги</div>
+    <div class="stack-item"><span class="mark">░</span>Retrieval і пам'ять</div>
+    <div class="stack-item"><span class="mark">░</span>Оцінювання якості</div>
+    <div class="stack-item"><span class="mark">░</span>Безпека і межі</div>
+    <div class="stack-item"><span class="mark">░</span>Оркестрація і трасування</div>
+    <div class="stack-item now"><span class="mark">█</span>Інтеграція контурів<span class="here">ВИ ТУТ</span></div>
+  </div>
   <div class="rail-progress" id="progress">0 / 0</div>
 </div>
 
@@ -113,18 +130,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 function toggleTheme(){
   const html=document.documentElement;
   const isDark=html.getAttribute('data-theme')==='dark';
-  if(isDark){html.removeAttribute('data-theme');localStorage.setItem('theme','light');
-    document.getElementById('themeIcon').textContent='🌙';document.getElementById('themeLabel').textContent='Темна';
-  }else{html.setAttribute('data-theme','dark');localStorage.setItem('theme','dark');
-    document.getElementById('themeIcon').textContent='☀️';document.getElementById('themeLabel').textContent='Світла';
-  }
+  if(isDark){html.removeAttribute('data-theme');localStorage.setItem('theme','light');}
+  else{html.setAttribute('data-theme','dark');localStorage.setItem('theme','dark');}
+  const b=document.getElementById('themeToggle');
+  if(b) b.textContent = isDark ? '🌙' : '☀️';
 }
 (function(){
   const saved=localStorage.getItem('theme');
-  if(saved==='dark'){document.documentElement.setAttribute('data-theme','dark');
+  if(saved==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
     document.addEventListener('DOMContentLoaded',function(){
-      var i=document.getElementById('themeIcon');if(i)i.textContent='☀️';
-      var l=document.getElementById('themeLabel');if(l)l.textContent='Світла';
+      const b=document.getElementById('themeToggle');
+      if(b) b.textContent='☀️';
     });
   }
 })();
