@@ -1,159 +1,260 @@
 <!DOCTYPE html>
-<html lang="uk" data-theme="light">
+<html lang="uk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Перед конспектом — Тема 1</title>
+<title>Перед конспектом — Тема 1 · Bridge Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+
 :root{
---bg:#f0f0f2;--card:#fafafa;--railBg:#e9e9ee;--border:#d5d5dc;--text:#1c1c22;--dim:#6b6b78;--head:#0f0f14;
---green:#1a7f37;--greenBg:rgba(26,127,55,.10);--red:#c1291f;--redBg:rgba(193,41,31,.10);
---blue:#0a5cc4;--blueBg:rgba(10,92,196,.10);--gold:#9a6700;--goldBg:rgba(154,103,0,.12);
---accent:#1a7f37;--mono:#f2f2f5;
---font:'Segoe UI','Helvetica Neue',sans-serif;--fmono:'Fira Code','Cascadia Code',Consolas,monospace}
-[data-theme="dark"]{
---bg:#0d1117;--card:#161b22;--railBg:#101820;--border:#30363d;--text:#c9d1d9;--dim:#8b949e;--head:#ffffff;
---green:#3fb950;--greenBg:rgba(63,185,80,.12);--red:#f85149;--redBg:rgba(248,81,73,.12);
---blue:#58a6ff;--blueBg:rgba(88,166,255,.12);--gold:#d29922;--goldBg:rgba(210,153,34,.12);
---accent:#7ee787;--mono:#0d1117}
-body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;transition:background .25s,color .25s}
+  --paper:#e8eaec;
+  --surface:#f7f8f9;
+  --sunken:#dfe2e5;
+  --ink:#14181c;
+  --ink2:#454d55;
+  --dim:#767e86;
+  --rule:#c6cbd1;
+  --hair:#d6dadf;
+  --pass:#1d6b52;
+  --passSoft:#e0ebe6;
+  --refuse:#9c3a22;
+  --refuseSoft:#f2e3de;
+  --sans:'Commissioner',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+html[data-theme="dark"]{
+  --paper:#0e1114;
+  --surface:#171b1f;
+  --sunken:#0a0d10;
+  --ink:#e9ecee;
+  --ink2:#b3bbc2;
+  --dim:#7c858d;
+  --rule:#2c3238;
+  --hair:#22272c;
+  --pass:#5aa98b;
+  --passSoft:#14241e;
+  --refuse:#cf7355;
+  --refuseSoft:#26170f;
+}
 
-/* ─── RAIL ─── */
-.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:var(--railBg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:28px 18px;overflow-y:auto}
-.rail-icon{font-size:40px;margin-bottom:10px}
-.rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
-.rail h1{font-size:19px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:10px;color:var(--head)}
-.rail-sub{font-size:12.5px;color:var(--dim);text-align:center;line-height:1.5;margin-bottom:20px}
-.stack{width:100%;border-top:1px solid var(--border);padding-top:14px}
-.stack-title{font-size:10px;text-transform:uppercase;letter-spacing:1.6px;color:var(--dim);margin-bottom:8px;text-align:center}
-.stack-item{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim);padding:3px 6px;border-radius:6px;line-height:1.35}
-.stack-item .mark{font-size:11px;opacity:.55}
-.stack-item.now{background:var(--greenBg);color:var(--green);font-weight:700}
-.stack-item.now .mark{opacity:1}
-.stack-item .here{margin-left:auto;font-size:9.5px;letter-spacing:1px}
-.rail-progress{margin-top:16px;font-size:12px;color:var(--dim)}
-.toggle{position:fixed;top:16px;right:20px;z-index:20;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;line-height:1}
+html,body{background:var(--paper)}
+body{
+  font-family:var(--sans);
+  font-weight:400;
+  font-size:15.5px;
+  line-height:1.72;
+  color:var(--ink2);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+code,.mono{font-family:var(--mono);font-size:.88em;font-weight:500;color:var(--ink)}
+code{background:var(--sunken);padding:1px 5px;border:1px solid var(--hair)}
 
-/* ─── MAIN ─── */
-.main{margin-left:max(260px, calc(50% - 300px));max-width:860px;padding:40px 28px 120px}
-.node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
-.node.locked{opacity:.25;pointer-events:none}
-.node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
-.node .dot.red{background:var(--red)}.node .dot.blue{background:var(--blue)}.node .dot.gold{background:var(--gold)}
-.node-date{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px}
-.node-beat{font-size:18px;font-weight:700;color:var(--head);margin-bottom:12px}
-.node-body{font-size:14px;color:var(--text);line-height:1.7}
-.node-body p{margin-bottom:10px}
-.node-body strong{color:var(--head)}
-code{font-family:var(--fmono);font-size:12.5px;background:var(--mono);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+/* ───────── rail ───────── */
+.rail{
+  position:fixed;left:0;top:0;width:264px;height:100vh;
+  background:var(--surface);border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;
+  padding:36px 26px 24px;overflow-y:auto;z-index:10;
+}
+.rail-theme{font-size:12.5px;color:var(--dim);letter-spacing:.02em;margin-bottom:6px}
+.rail h1{
+  font-family:var(--sans);font-weight:600;font-size:20px;line-height:1.28;
+  color:var(--ink);letter-spacing:-.011em;margin-bottom:10px;
+}
+.rail-sub{font-size:13px;line-height:1.6;color:var(--dim);margin-bottom:26px}
 
-/* ─── BLOCKS ─── */
-.quote{border-left:3px solid var(--blue);background:var(--blueBg);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:14px;line-height:1.6}
-.callcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0}
-.callcard .cc-head{font-family:var(--fmono);font-size:13px;color:var(--head);font-weight:700;margin-bottom:8px}
-.callcard .cc-row{display:flex;gap:10px;font-size:13px;padding:3px 0;border-top:1px solid var(--border)}
-.callcard .cc-row:first-of-type{border-top:none}
-.callcard .cc-key{font-family:var(--fmono);font-size:12.5px;color:var(--dim);min-width:110px}
-.callcard .cc-val{font-family:var(--fmono);font-size:12.5px;color:var(--head)}
-.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
-.tbl th{text-align:left;background:var(--card);color:var(--head);font-weight:700;padding:8px 10px;border:1px solid var(--border);font-size:12.5px}
-.tbl td{padding:8px 10px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
-.tbl td code{font-size:12px}
-.tbl-wrap{overflow-x:auto}
-.log{background:var(--mono);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:var(--fmono);font-size:12.5px;line-height:1.75;overflow-x:auto;white-space:pre;color:var(--text)}
-.log .ok{color:var(--green)}.log .bad{color:var(--red)}.log .note{color:var(--dim)}.log .hl{color:var(--blue)}
-.risk-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700;margin-right:6px;white-space:nowrap}
-.risk-read{background:var(--greenBg);color:var(--green)}
-.risk-write{background:var(--blueBg);color:var(--blue)}
-.risk-dest{background:var(--goldBg);color:var(--gold)}
-.risk-irr{background:var(--redBg);color:var(--red)}
-.callout{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:12px 16px;margin:12px 0;font-size:13.5px;line-height:1.65}
-.callout .co-title{font-weight:700;color:var(--head);margin-bottom:4px}
-.states{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
-.state{border:1px solid var(--border);background:var(--card);border-radius:999px;padding:5px 12px;font-family:var(--fmono);font-size:12px;color:var(--text)}
-.state.term{border-color:var(--green);color:var(--green)}
-.state.pause{border-color:var(--gold);color:var(--gold)}
-.state.fail{border-color:var(--red);color:var(--red)}
-.ladder{margin:12px 0}
-.ladder .lv{display:flex;gap:12px;align-items:flex-start;padding:9px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--card);font-size:13px}
-.ladder .lv-n{font-family:var(--fmono);font-weight:700;color:var(--blue);min-width:64px}
+.layers{padding-top:20px;border-top:1px solid var(--hair)}
+.layers-h{font-size:11.5px;color:var(--dim);margin-bottom:9px}
+.layer{
+  display:flex;align-items:baseline;gap:9px;
+  font-size:12.5px;line-height:1.45;color:var(--dim);
+  padding:3px 0;
+}
+.layer .g{
+  flex:none;width:9px;height:9px;border:1px solid var(--rule);
+  transform:translateY(1px);
+}
+.layer.on{color:var(--ink);font-weight:600}
+.layer.on .g{background:var(--pass);border-color:var(--pass)}
+.layer.done .g{background:var(--rule);border-color:var(--rule)}
 
-/* ─── SPOT ─── */
-.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none}
+.progress{margin-top:auto;padding-top:24px;font-size:12.5px;color:var(--dim)}
+.progress b{color:var(--ink);font-weight:600}
+
+.toggle{
+  position:fixed;top:20px;right:24px;z-index:20;
+  background:var(--surface);border:1px solid var(--rule);color:var(--ink2);
+  font-family:var(--sans);font-size:12.5px;font-weight:500;
+  padding:6px 13px;cursor:pointer;line-height:1.4;
+}
+.toggle:hover{border-color:var(--ink2);color:var(--ink)}
+.toggle:focus-visible{outline:2px solid var(--pass);outline-offset:2px}
+
+/* ───────── column ───────── */
+.main{
+  margin-left:max(264px, calc(50% - 300px));
+  max-width:772px;padding:56px 32px 140px;
+}
+
+/* ───────── brief ───────── */
+.brief{border-top:2px solid var(--ink);padding-top:22px;margin-bottom:64px}
+.brief-k{font-size:12.5px;color:var(--dim);margin-bottom:10px}
+.brief h2{
+  font-weight:600;font-size:25px;line-height:1.26;letter-spacing:-.016em;
+  color:var(--ink);margin-bottom:16px;max-width:28ch;
+}
+.brief p{margin-bottom:13px;max-width:66ch}
+.brief-rows{margin-top:22px;border-top:1px solid var(--hair)}
+.brief-row{display:grid;grid-template-columns:152px 1fr;gap:20px;padding:11px 0;border-bottom:1px solid var(--hair)}
+.brief-row dt{font-size:13px;color:var(--dim);line-height:1.6}
+.brief-row dd{font-size:14px;line-height:1.62}
+
+/* ───────── gates ───────── */
+.node{position:relative;padding:0 0 52px 54px}
+.node::before{
+  content:'';position:absolute;left:7px;top:22px;bottom:-4px;
+  width:1px;background:var(--hair);
+}
+.node:last-child::before{display:none}
+.gate{
+  position:absolute;left:0;top:7px;width:15px;height:15px;
+  border:1px solid var(--rule);background:var(--paper);
+}
+.node.here .gate{border:2px solid var(--ink);background:var(--paper)}
+.node.cleared .gate{background:var(--pass);border-color:var(--pass)}
+.node.stopped .gate{border:2px solid var(--refuse);background:var(--refuseSoft)}
+.node.shut .gate{border-style:dashed;background:transparent}
+
+.node-k{font-size:12.5px;color:var(--dim);margin-bottom:3px}
+.node-beat{
+  font-weight:600;font-size:19.5px;line-height:1.3;letter-spacing:-.013em;
+  color:var(--ink);margin-bottom:14px;
+}
+.node-body{max-width:66ch}
+.node-body p{margin-bottom:13px}
+.node-body strong{color:var(--ink);font-weight:600}
+.node-body em{font-style:italic;color:var(--ink2)}
+
+.node.shut .node-beat{color:var(--dim)}
+.shut-note{font-size:13.5px;color:var(--dim);padding:10px 0 0}
+
+/* ───────── content blocks ───────── */
+.quote{
+  border-left:2px solid var(--rule);padding:4px 0 4px 18px;margin:16px 0;
+  font-size:15px;line-height:1.66;color:var(--ink2);
+}
+.card{border:1px solid var(--rule);background:var(--surface);margin:18px 0}
+.card-h{
+  font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--dim);
+  padding:9px 15px;border-bottom:1px solid var(--hair);
+}
+.row{display:flex;gap:16px;padding:8px 15px;border-bottom:1px solid var(--hair);font-size:14px}
+.row:last-child{border-bottom:none}
+.row .k{flex:none;width:156px;color:var(--dim);font-size:13px}
+.row .v{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ink);word-break:break-word}
+
+.trace{border:1px solid var(--rule);background:var(--surface);margin:18px 0}
+.trace .t{display:flex;gap:16px;padding:8px 15px;border-bottom:1px solid var(--hair);font-size:14px}
+.trace .t:last-child{border-bottom:none}
+.trace .t .n{flex:none;width:auto;min-width:46px;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+.trace .t .bad{color:var(--refuse)}
+
+.tbl-wrap{overflow-x:auto;margin:18px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 14px 9px 0;border-bottom:1px solid var(--hair);vertical-align:top}
+th{font-weight:600;font-size:12.5px;color:var(--dim);border-bottom:1px solid var(--rule)}
+td:last-child,th:last-child{padding-right:0}
+
+.aside{border-left:2px solid var(--pass);padding:2px 0 2px 18px;margin:18px 0}
+.aside-h{font-weight:600;color:var(--ink);font-size:14.5px;margin-bottom:5px}
+.aside p{font-size:14.5px;line-height:1.66;margin:0}
+
+/* ───────── spot ───────── */
+.spot{display:none;margin-top:22px;border-top:1px solid var(--rule);padding-top:20px}
 .spot.open{display:block}
-.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px}
-.spot-q{font-size:15px;font-weight:600;color:var(--head);margin-bottom:14px}
-.spot-opts{display:flex;flex-direction:column;gap:8px}
-.spot-opt{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;color:var(--text)}
-.spot-opt:hover{border-color:var(--blue)}
-.spot-opt.correct{border-color:var(--green);background:var(--greenBg)}
-.spot-opt.wrong{border-color:var(--red);background:var(--redBg)}
-.spot-opt.disabled{pointer-events:none;opacity:.65}
-.spot-fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
-.spot-fb.show{display:block}
-.spot-fb.pass{background:var(--greenBg);border:1px solid var(--green)}
-.spot-fb.fail{background:var(--redBg);border:1px solid var(--red)}
+.spot-k{font-size:12.5px;color:var(--dim);margin-bottom:5px}
+.spot-q{font-weight:600;font-size:16.5px;line-height:1.42;color:var(--ink);margin-bottom:15px;max-width:60ch}
+.opt{
+  display:block;width:100%;text-align:left;
+  font-family:var(--sans);font-size:14.5px;line-height:1.55;color:var(--ink2);
+  background:var(--surface);border:1px solid var(--rule);
+  padding:11px 15px;margin-bottom:7px;cursor:pointer;
+}
+.opt:hover{border-color:var(--ink2)}
+.opt:focus-visible{outline:2px solid var(--pass);outline-offset:1px}
+.opt.off{cursor:default;opacity:.62}
+.opt.off:hover{border-color:var(--rule)}
+.opt.yes{border-color:var(--pass);border-left-width:3px;background:var(--passSoft);color:var(--ink);opacity:1}
+.opt.no{border-color:var(--refuse);border-left-width:3px;background:var(--refuseSoft);color:var(--ink);opacity:1}
+.fb{display:none;margin-top:14px;padding-left:18px;border-left:2px solid var(--rule);font-size:14.5px;line-height:1.68}
+.fb.show{display:block}
+.fb.ok{border-left-color:var(--pass)}
+.fb.err{border-left-color:var(--refuse)}
+.fb-v{font-weight:600;color:var(--ink);margin-bottom:4px;font-size:14px}
 
-/* ─── TAKEAWAYS ─── */
-.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0}
-.takeaway-card .tk-icon{font-size:24px;margin-bottom:6px}
-.takeaway-card .tk-title{font-size:15px;font-weight:700;color:var(--head);margin-bottom:6px}
-.takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
-.brief{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px 28px;margin-bottom:8px}
-.brief .br-eye{font-family:var(--fmono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
-.brief h2{font-size:19px;color:var(--head);margin-bottom:12px;line-height:1.35}
-.brief p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:12px}
-.brief .br-grid{display:grid;grid-template-columns:150px 1fr;gap:10px 18px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
-.brief .br-k{font-family:var(--fmono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);padding-top:2px}
-.brief .br-v{font-size:13.5px;color:var(--text);line-height:1.6}
-@media(max-width:640px){.brief .br-grid{grid-template-columns:1fr;gap:4px 0}.brief .br-k{margin-top:8px}}
-.finish-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
-.finish-card h2{font-size:22px;color:var(--head);margin-bottom:8px}
-.finish-card p{font-size:14px;color:var(--dim)}
-.score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
-@media(max-width:800px){.rail{display:none}.main{margin-left:0 !important;padding:24px 16px 80px}}
+/* ───────── close ───────── */
+.pt{padding:16px 0;border-bottom:1px solid var(--hair);display:grid;grid-template-columns:28px 1fr;gap:16px}
+.pt:first-of-type{border-top:1px solid var(--rule)}
+.pt-n{font-family:var(--mono);font-size:13px;color:var(--dim);padding-top:2px}
+.pt-t{font-weight:600;color:var(--ink);font-size:15.5px;line-height:1.4;margin-bottom:4px}
+.pt-b{font-size:14.5px;line-height:1.64}
+.close{margin-top:34px;border-top:2px solid var(--ink);padding-top:20px}
+.close h2{font-weight:600;font-size:19px;color:var(--ink);letter-spacing:-.012em;margin-bottom:8px}
+.close p{max-width:64ch;margin-bottom:10px}
+.tally{font-size:14px;color:var(--dim)}
+.tally b{color:var(--ink);font-weight:600}
+
+@media(max-width:860px){
+  .rail{position:static;width:auto;height:auto;border-right:none;border-bottom:1px solid var(--rule);padding:26px 20px}
+  .layers{margin-top:20px}
+  .main{margin-left:0;max-width:none;padding:32px 20px 100px}
+  .toggle{top:14px;right:16px}
+  .row{flex-direction:column;gap:2px}
+  .row .k{width:auto}
+  .brief-row{grid-template-columns:1fr;gap:2px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 
-<button class="toggle" id="themeToggle" aria-label="Змінити тему">🌙</button>
+<button class="toggle" id="themeToggle" aria-label="Змінити оформлення">Темне</button>
 
 <div class="rail">
-  <div class="rail-icon">🧭</div>
-  <div class="rail-eye">Тема 1 · Перед конспектом</div>
-  <h1>Контракти і валідація: п'ять ситуацій перед читанням теми</h1>
-  <div class="rail-sub">Агент підтримки повертає структуроване рішення, і код має вирішити, виконувати його чи відхилити. У кожній із п'яти ситуацій очевидна відповідь виявляється неточною.</div>
-  <div class="stack">
-    <div class="stack-title">Шари Harness</div>
-    <div class="stack-item now"><span class="mark">█</span>Контракт і валідація<span class="here">ВИ ТУТ</span></div>
-    <div class="stack-item"><span class="mark">░</span>Інструменти і дозволи</div>
-    <div class="stack-item"><span class="mark">░</span>Пошук і ембеддинги</div>
-    <div class="stack-item"><span class="mark">░</span>Retrieval і пам'ять</div>
-    <div class="stack-item"><span class="mark">░</span>Оцінювання якості</div>
-    <div class="stack-item"><span class="mark">░</span>Безпека і межі</div>
-    <div class="stack-item"><span class="mark">░</span>Оркестрація і трасування</div>
-    <div class="stack-item"><span class="mark">░</span>Інтеграція контурів</div>
+  <div class="rail-theme">Тема 1 · перед конспектом</div>
+  <h1>Контракти і валідація: п'ять ситуацій</h1>
+  <div class="rail-sub">Агент підтримки повертає структуроване рішення, і код вирішує, виконувати його чи відхилити.</div>
+  <div class="layers">
+    <div class="layers-h">Шари Harness</div>
+    <div class="layer on"><span class="g"></span>Контракт і валідація</div>
+    <div class="layer"><span class="g"></span>Інструменти і дозволи</div>
+    <div class="layer"><span class="g"></span>Пошук і ембеддинги</div>
+    <div class="layer"><span class="g"></span>Retrieval і пам'ять</div>
+    <div class="layer"><span class="g"></span>Оцінювання якості</div>
+    <div class="layer"><span class="g"></span>Безпека і межі</div>
+    <div class="layer"><span class="g"></span>Оркестрація і трасування</div>
+    <div class="layer"><span class="g"></span>Інтеграція контурів</div>
   </div>
-  <div class="rail-progress" id="progress">0 / 0</div>
+  <div class="progress" id="progress"></div>
 </div>
 
 <div class="main">
   <div class="brief">
-    <div class="br-eye">Навіщо цей прохід</div>
+    <div class="brief-k">Навіщо цей прохід</div>
     <h2>Тема 1 читається інакше, коли питання поставлені заздалегідь</h2>
     <p>Валідація даних — щоденна інженерна робота, і саме тому тема має власну складність: звичні уявлення про неї переносяться на відповідь моделі не повністю. Спроба відповісти до читання покращує засвоєння навіть тоді, коли відповідь виявилася неправильною.</p>
-    <p>Цей прохід ставить п'ять питань про те, що відбувається між відповіддю моделі та виконаною дією. Кожне взяте з місця, де очевидна відповідь розходиться з інженерною практикою.</p>
-    <div class="br-grid">
-      <div class="br-k">Що робите</div>
-      <div class="br-v">Ведете одну відповідь агента підтримки крізь п'ять ситуацій і в кожній обираєте один варіант із чотирьох.</div>
-      <div class="br-k">Що отримуєте</div>
-      <div class="br-v">П'ять відкритих питань, з якими заходите в конспект, і мапу того, де ваша поточна інтуїція розходиться з практикою.</div>
-      <div class="br-k">Скільки часу</div>
-      <div class="br-v">Близько семи хвилин.</div>
-      <div class="br-k">Про помилки</div>
-      <div class="br-v">Помилки тут очікувані. Пояснення після кожної відповіді називає суть розбіжності і вказує розділ, повний розбір лишається конспекту.</div>
-    </div>
+    <p>Прохід ставить п'ять питань про те, що відбувається між відповіддю моделі та виконаною дією. Кожне взяте з місця, де очевидна відповідь розходиться з інженерною практикою.</p>
+    <dl class="brief-rows">
+      <div class="brief-row"><dt>Що робите</dt><dd>Ведете одну відповідь агента підтримки крізь п'ять ситуацій і в кожній обираєте один варіант із чотирьох.</dd></div>
+      <div class="brief-row"><dt>Що отримуєте</dt><dd>П'ять відкритих питань, з якими заходите в конспект, і мапу того, де ваша поточна інтуїція розходиться з практикою.</dd></div>
+      <div class="brief-row"><dt>Скільки часу</dt><dd>Близько семи хвилин.</dd></div>
+      <div class="brief-row"><dt>Про помилки</dt><dd>Помилки тут очікувані. Пояснення після кожної відповіді називає суть розбіжності і вказує розділ, повний розбір лишається конспекту.</dd></div>
+    </dl>
   </div>
   <div id="timeline"></div>
 </div>
@@ -167,12 +268,12 @@ const NODES = [
 <p>Наскрізний приклад курсу — агент служби підтримки. Він читає звернення клієнта, класифікує його і пропонує наступну дію. Ось звернення:</p>
 <div class="quote">Я оплатив замовлення ORD-12345, гроші списалися двічі, але статус досі «не оплачено». Поверніть зайве списання.</div>
 <p>Модель повертає рішення у структурованому вигляді:</p>
-<div class="callcard">
-  <div class="cc-head">відповідь моделі · JSON</div>
-  <div class="cc-row"><span class="cc-key">category</span><span class="cc-val">billing_problem</span></div>
-  <div class="cc-row"><span class="cc-key">priority</span><span class="cc-val">low</span></div>
-  <div class="cc-row"><span class="cc-key">should_escalate</span><span class="cc-val">"yes"</span></div>
-  <div class="cc-row"><span class="cc-key">recommended_action</span><span class="cc-val">reply_with_template</span></div>
+<div class="card">
+  <div class="card-h">відповідь моделі · JSON</div>
+  <div class="row"><span class="k">category</span><span class="v">billing_problem</span></div>
+  <div class="row"><span class="k">priority</span><span class="v">low</span></div>
+  <div class="row"><span class="k">should_escalate</span><span class="v">"yes"</span></div>
+  <div class="row"><span class="k">recommended_action</span><span class="v">reply_with_template</span></div>
 </div>
 <p>Далі цей об'єкт потрапляє в код, і код має вирішити, виконувати запропоновану дію чи відхилити її. Питання теми звучить так: скільки перевірок стоїть між цією відповіддю і виконаною дією, і що саме перевіряє кожна.</p>`
   },
@@ -180,13 +281,13 @@ const NODES = [
   {
     date:'Ситуація 1', beat:'Відповідь, яку розібрав парсер',
     body:`<p>Перше, що робить код із відповіддю моделі, — розбирає її як JSON. Розбір проходить без помилок: дужки закриті, коми на місці, рядки в подвійних лапках.</p>
-<div class="log">
-  <div class="lv"><span class="lv-n">1</span>відповідь отримано, 4 поля</div>
-  <div class="lv"><span class="lv-n">2</span>розбір JSON виконано без помилок</div>
+<div class="trace">
+  <div class="t"><span class="n">1</span>відповідь отримано, 4 поля</div>
+  <div class="t"><span class="n">2</span>розбір JSON виконано без помилок</div>
 </div>
 <p>Команда вважає цей крок достатнім і передає отриманий словник далі — у функцію, яка виконує дію.</p>`,
     spot:{
-      type:'probe', q:'Що пропустив цей крок?',
+      k:'Як гадаєте?', q:'Що пропустив цей крок?',
       opts:[
         ['Нічого: JSON розібрано, структура коректна',0],
         ['Усе, що стосується змісту полів і їх значень',1],
@@ -200,16 +301,16 @@ const NODES = [
   {
     date:'Ситуація 2', beat:'Контракт, який усе прийняв',
     body:`<p>Команда додала контракт: модель даних із переліком дозволених значень для кожного поля. Категорію виправлено на <code>payment_issue</code>, решту полів залишено без змін.</p>
-<div class="callcard">
-  <div class="cc-head">перевірка за контрактом</div>
-  <div class="cc-row"><span class="cc-key">category</span><span class="cc-val">payment_issue → прийнято</span></div>
-  <div class="cc-row"><span class="cc-key">priority</span><span class="cc-val">low → прийнято</span></div>
-  <div class="cc-row"><span class="cc-key">should_escalate</span><span class="cc-val">"yes" → прийнято як true</span></div>
-  <div class="cc-row"><span class="cc-key">recommended_action</span><span class="cc-val">reply_with_template → прийнято</span></div>
+<div class="card">
+  <div class="card-h">перевірка за контрактом</div>
+  <div class="row"><span class="k">category</span><span class="v">payment_issue → прийнято</span></div>
+  <div class="row"><span class="k">priority</span><span class="v">low → прийнято</span></div>
+  <div class="row"><span class="k">should_escalate</span><span class="v">"yes" → прийнято як true</span></div>
+  <div class="row"><span class="k">recommended_action</span><span class="v">reply_with_template → прийнято</span></div>
 </div>
 <p>Поле <code>should_escalate</code> оголошене логічним типом, а модель надіслала туди рядок. Перевірка завершилася успішно, помилки в журналі немає.</p>`,
     spot:{
-      type:'probe', q:'Чому рядок пройшов перевірку логічного поля?',
+      k:'Як гадаєте?', q:'Чому рядок пройшов перевірку логічного поля?',
       opts:[
         ['Контракт помилково оголосив поле рядком замість логічного типу',0],
         ['Бібліотека за замовчуванням приводить сумісні значення до типу',1],
@@ -223,17 +324,17 @@ const NODES = [
   {
     date:'Ситуація 3', beat:'Рішення, яке пройшло контракт',
     body:`<p>Контракт налаштовано строго, приведення типів вимкнено. Модель повертає відповідь, у якій кожне поле бездоганне:</p>
-<div class="callcard">
-  <div class="cc-head">відповідь моделі · після виправлень</div>
-  <div class="cc-row"><span class="cc-key">category</span><span class="cc-val">payment_issue</span></div>
-  <div class="cc-row"><span class="cc-key">priority</span><span class="cc-val">low</span></div>
-  <div class="cc-row"><span class="cc-key">should_escalate</span><span class="cc-val">true</span></div>
-  <div class="cc-row"><span class="cc-key">recommended_action</span><span class="cc-val">reply_with_template</span></div>
+<div class="card">
+  <div class="card-h">відповідь моделі · після виправлень</div>
+  <div class="row"><span class="k">category</span><span class="v">payment_issue</span></div>
+  <div class="row"><span class="k">priority</span><span class="v">low</span></div>
+  <div class="row"><span class="k">should_escalate</span><span class="v">true</span></div>
+  <div class="row"><span class="k">recommended_action</span><span class="v">reply_with_template</span></div>
 </div>
 <p>Кожне значення входить у перелік дозволених, типи збігаються, обов'язкові поля на місці, зайвих полів немає. Перевірка за контрактом проходить повністю.</p>
 <p>Нагадаю зміст звернення: клієнт повідомляє про подвійне списання коштів.</p>`,
     spot:{
-      type:'probe', q:'Що не так із цим рішенням?',
+      k:'Як гадаєте?', q:'Що не так із цим рішенням?',
       opts:[
         ['Нічого: контракт пройдено, рішення можна виконувати',0],
         ['Низький пріоритет суперечить фінансовій скарзі та ескалації',1],
@@ -248,13 +349,13 @@ const NODES = [
     date:'Ситуація 4', beat:'Від рішення до дії',
     body:`<p>Усі перевірки позаду, рішення визнано коректним. Залишилося виконати дію, назва якої лежить у полі <code>recommended_action</code>.</p>
 <p>Розробник міркує так: перелік дозволених значень цього поля вже закріплений у контракті, отже назва гарантовано належить до чотирьох відомих. Тому можна просто знайти функцію з такою назвою серед функцій модуля і викликати її.</p>
-<div class="log">
-  <div class="lv"><span class="lv-n">1</span>рішення пройшло всі перевірки</div>
-  <div class="lv"><span class="lv-n">2</span>функція шукається за назвою з поля відповіді</div>
-  <div class="lv"><span class="lv-n">3</span>виклик знайденої функції</div>
+<div class="trace">
+  <div class="t"><span class="n">1</span>рішення пройшло всі перевірки</div>
+  <div class="t"><span class="n">2</span>функція шукається за назвою з поля відповіді</div>
+  <div class="t"><span class="n">3</span>виклик знайденої функції</div>
 </div>`,
     spot:{
-      type:'probe', q:'Чому такий спосіб виконання небезпечний?',
+      k:'Як гадаєте?', q:'Чому такий спосіб виконання небезпечний?',
       opts:[
         ['Він повільніший за прямий виклик і навантажує інтерпретатор',0],
         ['Простір імен модуля ширший за перелік дозволених дій',1],
@@ -268,14 +369,14 @@ const NODES = [
   {
     date:'Ситуація 5', beat:'Що робити після невдалої перевірки',
     body:`<p>Частина відповідей моделі перевірку не проходить. Команда вирішує, що причина у випадковості генерації, і додає три повторні спроби: якщо перевірка не пройшла, той самий запит надсилається моделі знову.</p>
-<div class="log">
-  <div class="lv"><span class="lv-n">спроба 1</span><span class="bad">перевірка не пройдена: priority = "urgent"</span></div>
-  <div class="lv"><span class="lv-n">спроба 2</span><span class="bad">перевірка не пройдена: priority = "urgent"</span></div>
-  <div class="lv"><span class="lv-n">спроба 3</span><span class="bad">перевірка не пройдена: priority = "critical"</span></div>
+<div class="trace">
+  <div class="t"><span class="n">спроба 1</span><span class="bad">перевірка не пройдена: priority = "urgent"</span></div>
+  <div class="t"><span class="n">спроба 2</span><span class="bad">перевірка не пройдена: priority = "urgent"</span></div>
+  <div class="t"><span class="n">спроба 3</span><span class="bad">перевірка не пройдена: priority = "critical"</span></div>
 </div>
 <p>Частота відмов знизилася незначно, а середній час обробки звернення зріс утричі.</p>`,
     spot:{
-      type:'probe', q:'Чому повтори майже не допомогли?',
+      k:'Як гадаєте?', q:'Чому повтори майже не допомогли?',
       opts:[
         ['Трьох спроб замало, потрібно щонайменше пʼять',0],
         ['Модель не дізналася, що саме було неправильно',1],
@@ -290,90 +391,114 @@ const NODES = [
     date:'Далі', beat:'З чим іти в конспект',
     body:`<p>П\'ять ситуацій вище ставлять п\'ять питань, на які тема дає розгорнуті відповіді, і читання буде прицільнішим, якщо тримати ці питання відкритими.</p>`,
     spot:{
-      type:'takeaways',
-      finishTitle:'Питання для читання теми',
-      finishText:'Розбіжність між очевидною відповіддю і правильною виникає в кожній із п\'яти ситуацій закономірно, і конспект знімає її по черзі в п\'ятьох розділах.',
+      type:'close',
+      title:'Питання для читання теми',
+      text:'Розбіжність між очевидною відповіддю і правильною виникає в кожній із п\'яти ситуацій закономірно, і конспект знімає її по черзі в п\'ятьох розділах.',
       items:[
-        ['①','Скільки перевірок стоїть між відповіддю і дією','Розбір JSON відповідає на одне вузьке питання. Порахуйте, скільки шарів іде за ним і який клас помилок закриває кожен.'],
-        ['②','Де перевірка типів буває поблажливою','Приведення сумісних значень працює за замовчуванням і не лишає слідів у журналі. Знайдіть перемикач, який його вимикає.'],
-        ['③','Структурна коректність і змістова правильність','Рішення проходить контракт і залишається неправильним по суті. Простежте, який шар перевіряє залежності між полями і зв\'язок із текстом звернення.'],
-        ['④','Чому вихід моделі є пропозицією','Зверніть увагу на різницю між переліком значень у контракті та реєстром дозволених дій у момент виконання.'],
-        ['⑤','Реакції на невдалу перевірку','Їх кілька, вони розв\'язують різні задачі. Зверніть увагу, чим завершується обробка, коли жодна не спрацювала.']
+        ['1','Скільки перевірок стоїть між відповіддю і дією','Розбір JSON відповідає на одне вузьке питання. Порахуйте, скільки шарів іде за ним і який клас помилок закриває кожен.'],
+        ['2','Де перевірка типів буває поблажливою','Приведення сумісних значень працює за замовчуванням і не лишає слідів у журналі. Знайдіть перемикач, який його вимикає.'],
+        ['3','Структурна коректність і змістова правильність','Рішення проходить контракт і залишається неправильним по суті. Простежте, який шар перевіряє залежності між полями і зв\'язок із текстом звернення.'],
+        ['4','Чому вихід моделі є пропозицією','Зверніть увагу на різницю між переліком значень у контракті та реєстром дозволених дій у момент виконання.'],
+        ['5','Реакції на невдалу перевірку','Їх кілька, вони розв\'язують різні задачі. Зверніть увагу, чим завершується обробка, коли жодна не спрацювала.']
       ]
     }
   }
 
 ];
-
-
-
-// ─── THEME ───
+const root = document.documentElement;
 const tgl = document.getElementById('themeToggle');
-tgl.addEventListener('click', () => {
-  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
-  tgl.textContent = dark ? '🌙' : '☀️';
-});
+function setTheme(dark){
+  if (dark) root.setAttribute('data-theme','dark'); else root.removeAttribute('data-theme');
+  tgl.textContent = dark ? 'Світле' : 'Темне';
+  try { localStorage.setItem('bc-theme', dark ? 'dark' : 'light'); } catch(e) {}
+}
+try { if (localStorage.getItem('bc-theme') === 'dark') setTheme(true); } catch(e) {}
+tgl.addEventListener('click', () => setTheme(root.getAttribute('data-theme') !== 'dark'));
 
-// ─── ENGINE ───
-let answered = new Set(), score = 0, totalQ = 0;
+let answered = new Map(), totalQ = 0;
+NODES.forEach(n => { if (n.spot && n.spot.type !== 'close') totalQ++; });
 
-function renderTimeline() {
-  const tl = document.getElementById('timeline');
-  let html = '';
-  NODES.forEach((n, i) => {
-    const locked = i > 0 ? ' locked' : '';
-    const dotClass = n.crit ? 'red' : (n.scene2 ? 'blue' : '');
-    html += `<div class="node${locked}" id="node${i}"><div class="dot ${dotClass}"></div><div class="node-date">${n.date}</div><div class="node-beat">${n.beat}</div><div class="node-body">${n.body}</div>${n.spot ? renderSpot(n.spot, i) : ''}</div>`;
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+function render(){
+  document.getElementById('timeline').innerHTML = NODES.map((n,i) =>
+    `<div class="node ${i===0?'here':'shut'}" id="n${i}">
+      <div class="gate"></div>
+      <div class="node-k">${n.date}</div>
+      <div class="node-beat">${n.beat}</div>
+      <div class="node-inner">${i===0 ? body(n,i) : shut(n)}</div>
+    </div>`).join('');
+  tally();
+  open(0);
+}
+
+function body(n,i){ return `<div class="node-body">${n.body||''}</div>${n.spot ? spot(n.spot,i) : ''}`; }
+function shut(n){ return `<div class="shut-note">${n.shutNote || 'Відкриється після відповіді на питання вище.'}</div>`; }
+
+function spot(s,i){
+  if (s.type === 'close'){
+    return `<div class="spot open">` +
+      s.items.map(([num,t,b]) => `<div class="pt"><div class="pt-n">${num}</div><div><div class="pt-t">${t}</div><div class="pt-b">${b}</div></div></div>`).join('') +
+      `<div class="close"><h2>${s.title}</h2><p>${s.text}</p><div class="tally" id="tally"></div></div></div>`;
+  }
+  return `<div class="spot open">
+    <div class="spot-k">${s.k || 'Як гадаєте?'}</div>
+    <div class="spot-q">${s.q}</div>
+    <div>${s.opts.map(([t],oi) => `<button class="opt" type="button" onclick="pick(${i},${oi})">${esc(t)}</button>`).join('')}</div>
+    <div class="fb" id="fb${i}"><div class="fb-v" id="fv${i}"></div>${s.fb}</div>
+  </div>`;
+}
+
+function pick(i, oi){
+  if (answered.has(i)) return;
+  const s = NODES[i].spot, right = !!s.opts[oi][1];
+  answered.set(i, right);
+  const node = document.getElementById('n'+i);
+  node.querySelectorAll('.opt').forEach((b,k) => {
+    b.classList.add('off');
+    if (s.opts[k][1]) b.classList.add('yes');
+    if (k === oi && !right) b.classList.add('no');
   });
-  tl.innerHTML = html;
-  updateProgress();
-  const first = document.querySelector('#node0 .spot');
-  if (first) first.classList.add('open');
-  unlockNext(0);
+  const fb = document.getElementById('fb'+i);
+  fb.classList.add('show', right ? 'ok' : 'err');
+  document.getElementById('fv'+i).textContent = right ? 'Так, саме тут.' : 'Тут і ховається нюанс.';
+  node.classList.remove('here');
+  node.classList.add(right ? 'cleared' : 'stopped');
+  open(i);
+  tally();
 }
 
-function renderSpot(s, ni) {
-  if (s.type === 'takeaways') {
-    const ft = s.finishTitle || 'validate_and_execute пройдено';
-    const fx = s.finishText || 'Сім кроків контролю ведуть tool call від наміру моделі до виконаної дії або чесної відмови.';
-    return `<div class="spot open" id="spot${ni}">${s.items.map(([icon,title,body]) => `<div class="takeaway-card"><div class="tk-icon">${icon}</div><div class="tk-title">${title}</div><div class="tk-body">${body}</div></div>`).join('')}<div class="finish-card" style="margin-top:24px"><h2>${ft}</h2><div class="score-bar" id="scoreDisplay"></div><p>${fx}</p></div></div>`;
-  }
-  totalQ++;
-  const tag = s.type === 'predict' ? 'Що далі?' : (s.type === 'probe' ? 'Як гадаєте?' : 'Перевірте себе');
-  return `<div class="spot" id="spot${ni}"><div class="spot-tag">${tag}</div><div class="spot-q">${s.q}</div><div class="spot-opts">${s.opts.map(([text, correct], oi) => `<div class="spot-opt" onclick="answer(${ni},${oi},${correct})">${text}</div>`).join('')}</div><div class="spot-fb" id="fb${ni}">${s.fb}</div></div>`;
-}
-
-function answer(ni, oi, correct) {
-  if (answered.has(ni)) return;
-  answered.add(ni);
-  const spot = document.getElementById('spot'+ni);
-  const opts = spot.querySelectorAll('.spot-opt');
-  opts.forEach((o,i) => { o.classList.add('disabled'); if (i === oi) o.classList.add(correct ? 'correct' : 'wrong'); if (NODES[ni].spot.opts[i][1]) o.classList.add('correct'); });
-  if (correct) score++;
-  const fb = document.getElementById('fb'+ni);
-  fb.classList.add('show', correct ? 'pass' : 'fail');
-  unlockNext(ni);
-  updateProgress();
-  const sd = document.getElementById('scoreDisplay');
-  if (sd) sd.textContent = score + ' / ' + totalQ;
-}
-
-function unlockNext(fromIdx) {
-  let next = fromIdx + 1;
-  while (next < NODES.length) {
-    const node = document.getElementById('node'+next);
+function open(from){
+  let k = from + 1;
+  while (k < NODES.length){
+    const node = document.getElementById('n'+k);
     if (!node) break;
-    node.classList.remove('locked');
-    const spot = document.getElementById('spot'+next);
-    if (spot && !spot.classList.contains('open')) spot.classList.add('open');
-    if (NODES[next].spot && NODES[next].spot.type !== 'takeaways' && !answered.has(next)) break;
-    next++;
+    if (node.classList.contains('shut')){
+      node.classList.remove('shut');
+      node.classList.add('here');
+      node.querySelector('.node-inner').innerHTML = body(NODES[k], k);
+    }
+    const s = NODES[k].spot;
+    if (s && s.type !== 'close' && !answered.has(k)) break;
+    if (s && s.type === 'close'){ node.classList.remove('here'); node.classList.add('cleared'); }
+    k++;
   }
 }
 
-function updateProgress() { document.getElementById('progress').textContent = answered.size + ' / ' + totalQ; }
-renderTimeline();
+function tally(){
+  const done = answered.size;
+  document.getElementById('progress').innerHTML = done === 0
+    ? `Попереду <b>${totalQ}</b> ситуацій`
+    : `Пройдено <b>${done}</b> з ${totalQ}`;
+  const t = document.getElementById('tally');
+  if (t){
+    const right = [...answered.values()].filter(Boolean).length;
+    t.innerHTML = `Збіглося з практикою одразу: <b>${right}</b> з ${totalQ}.`;
+  }
+}
+
+render();
+
 </script>
 </body>
 </html>

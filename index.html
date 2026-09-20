@@ -1,184 +1,312 @@
 <!DOCTYPE html>
-<html lang="uk" data-theme="light">
+<html lang="uk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bridge Course — інтерактиви</title>
+<title>Інтерактиви Bridge Course · The Harness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
---bg:#f0f0f2;--card:#fafafa;--border:#d5d5dc;--text:#1c1c22;--dim:#6b6b78;--head:#0f0f14;
---green:#1a7f37;--greenBg:rgba(26,127,55,.10);--blue:#0a5cc4;--blueBg:rgba(10,92,196,.10);
---font:'Segoe UI','Helvetica Neue',sans-serif;--fmono:'Fira Code','Cascadia Code',Consolas,monospace}
-[data-theme="dark"]{
---bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#8b949e;--head:#ffffff;
---green:#3fb950;--greenBg:rgba(63,185,80,.12);--blue:#58a6ff;--blueBg:rgba(88,166,255,.12)}
-body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;transition:background .25s,color .25s}
-.toggle{position:fixed;top:16px;right:20px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;line-height:1}
-.wrap{max-width:960px;margin:0 auto;padding:64px 24px 96px}
-.eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:10px}
-h1{font-size:32px;line-height:1.25;color:var(--head);margin-bottom:12px}
-.lede{font-size:15.5px;color:var(--text);max-width:660px;margin-bottom:8px}
-.note{font-size:13.5px;color:var(--dim);max-width:660px;margin-bottom:36px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:border-color .2s,transform .2s}
-a.card:hover{border-color:var(--blue);transform:translateY(-2px)}
-.card .num{font-family:var(--fmono);font-size:11px;color:var(--dim);letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:8px;min-height:22px;align-items:flex-start}
-.card .layer{color:var(--head);font-weight:700;white-space:nowrap;padding-top:2px}
-.card .lname{line-height:1.4;padding-top:2px}
-.card h2{font-size:16.5px;color:var(--head);margin-bottom:6px;line-height:1.35}
-.card p{font-size:13.5px;color:var(--text);line-height:1.55}
-.card.soon{opacity:.62}
-.badge{margin-left:auto;flex-shrink:0;white-space:nowrap;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:999px}
-.badge.ready{background:var(--greenBg);color:var(--green)}
-.badge.soon{background:var(--blueBg);color:var(--blue)}
-.card.two{cursor:pointer}
-.card.two:hover{border-color:var(--blue);transform:translateY(-2px)}
-.badge.two{background:var(--blueBg);color:var(--blue)}
-.card .chev{display:inline-block;margin-left:6px;font-size:11px;color:var(--dim);transition:transform .2s}
-.card.two.open .chev{transform:rotate(90deg)}
-.parts{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
-.card.two.open .parts{display:block}
-.parts .why{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:14px}
-.parts .why b{color:var(--head)}
-.part{display:block;text-decoration:none;color:inherit;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:border-color .2s,background .2s}
-.part:hover{border-color:var(--blue);background:var(--blueBg)}
-.part .pk{font-family:var(--fmono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--blue);display:flex;gap:8px;margin-bottom:4px}
-.part .pk .pt{color:var(--dim);margin-left:auto}
-.part .pn{font-size:14px;color:var(--head);font-weight:600;line-height:1.35;margin-bottom:3px}
-.part .pd{font-size:12.5px;color:var(--text);line-height:1.5}
-footer{margin-top:44px;font-size:13px;color:var(--dim);border-top:1px solid var(--border);padding-top:18px}
-@media(max-width:620px){.wrap{padding:44px 16px 72px}h1{font-size:26px}}
+  --paper:#e8eaec;--surface:#f7f8f9;--sunken:#dfe2e5;
+  --ink:#14181c;--ink2:#454d55;--dim:#767e86;
+  --rule:#c6cbd1;--hair:#d6dadf;
+  --pass:#1d6b52;--passSoft:#e0ebe6;
+  --sans:'Commissioner',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+html[data-theme="dark"]{
+  --paper:#0e1114;--surface:#171b1f;--sunken:#0a0d10;
+  --ink:#e9ecee;--ink2:#b3bbc2;--dim:#7c858d;
+  --rule:#2c3238;--hair:#22272c;
+  --pass:#5aa98b;--passSoft:#14241e;
+}
+html,body{background:var(--paper)}
+body{font-family:var(--sans);font-size:15.5px;line-height:1.72;color:var(--ink2);-webkit-font-smoothing:antialiased}
+
+.toggle{
+  position:fixed;top:20px;right:24px;z-index:20;
+  background:var(--surface);border:1px solid var(--rule);color:var(--ink2);
+  font-family:var(--sans);font-size:12.5px;font-weight:500;padding:6px 13px;cursor:pointer;
+}
+.toggle:hover{border-color:var(--ink2);color:var(--ink)}
+.toggle:focus-visible{outline:2px solid var(--pass);outline-offset:2px}
+
+.wrap{max-width:844px;margin:0 auto;padding:72px 32px 120px}
+
+.masthead{border-top:2px solid var(--ink);padding-top:24px;margin-bottom:56px}
+.masthead .course{font-size:12.5px;color:var(--dim);margin-bottom:12px}
+.masthead h1{
+  font-weight:600;font-size:34px;line-height:1.16;letter-spacing:-.022em;
+  color:var(--ink);margin-bottom:18px;max-width:20ch;
+}
+.masthead p{max-width:64ch;margin-bottom:12px}
+.masthead p:last-child{margin-bottom:0}
+
+.stack{border-top:1px solid var(--rule)}
+
+.layer{border-bottom:1px solid var(--hair)}
+.layer-head{
+  display:grid;grid-template-columns:24px 1fr auto;gap:18px;align-items:baseline;
+  width:100%;text-align:left;background:none;border:none;
+  font-family:var(--sans);color:inherit;padding:22px 0;
+}
+a.layer-head{text-decoration:none;display:grid}
+button.layer-head{cursor:pointer}
+.layer-head:hover .layer-t{color:var(--pass)}
+.layer-head:focus-visible{outline:2px solid var(--pass);outline-offset:3px}
+.g{display:block;width:13px;height:13px;border:1px solid var(--rule);transform:translateY(2px)}
+.layer-head:hover .g,.layer.open .g{background:var(--pass);border-color:var(--pass)}
+.layer-n{display:block;font-size:12.5px;color:var(--dim);margin-bottom:4px}
+.layer-t{display:block;font-weight:600;font-size:20px;line-height:1.3;letter-spacing:-.014em;color:var(--ink);margin-bottom:6px}
+.layer-d{display:block;font-size:14.5px;line-height:1.62;max-width:60ch}
+.layer-meta{display:block;font-size:12.5px;color:var(--dim);white-space:nowrap;padding-top:2px}
+
+.parts{display:none;padding:0 0 22px 42px}
+.layer.open .parts{display:block}
+.why{
+  font-size:14.5px;line-height:1.68;max-width:62ch;
+  border-left:2px solid var(--rule);padding-left:18px;margin-bottom:18px;
+}
+.why b{color:var(--ink);font-weight:600}
+.part{
+  display:grid;grid-template-columns:1fr auto;gap:20px;align-items:baseline;
+  text-decoration:none;color:inherit;
+  border-top:1px solid var(--hair);padding:14px 0;
+}
+.part:hover .part-t{color:var(--pass)}
+.part:focus-visible{outline:2px solid var(--pass);outline-offset:3px}
+.part-k{display:block;font-size:12.5px;color:var(--dim);margin-bottom:3px}
+.part-t{display:block;font-weight:600;font-size:16px;line-height:1.35;color:var(--ink);margin-bottom:4px}
+.part-d{display:block;font-size:14px;line-height:1.58;max-width:56ch}
+.part-time{display:block;font-size:12.5px;color:var(--dim);white-space:nowrap}
+
+footer{margin-top:52px;border-top:1px solid var(--rule);padding-top:20px;font-size:13.5px;color:var(--dim);max-width:62ch}
+
+@media(max-width:700px){
+  .wrap{padding:44px 20px 80px}
+  .masthead h1{font-size:27px}
+  .layer-head{grid-template-columns:20px 1fr;gap:14px}
+  .layer-meta{grid-column:2;padding-top:6px}
+  .parts{padding-left:0}
+  .part{grid-template-columns:1fr}
+  .part-time{padding-top:4px}
+  .toggle{top:14px;right:16px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<button class="toggle" id="t" aria-label="Змінити тему">🌙</button>
+
+<button class="toggle" id="themeToggle" aria-label="Змінити оформлення">Темне</button>
+
 <div class="wrap">
-  <div class="eye">Bridge Course · The Harness</div>
-  <h1>Інтерактиви до восьми тем курсу</h1>
-  <p class="lede">Кожна тема курсу має власний scroll-інтерактив: історія розгортається згори вниз, а наступний крок відкривається після відповіді на питання. Матеріал спирається на наскрізний приклад — агента служби підтримки, який класифікує звернення, перевіряє факти, діє і фіксує результат.</p>
-  <p class="note">Більшість тем має один інтерактив. Теми з позначкою «2 частини» розібрані двома проходами — до читання конспекту і після нього; відкрийте таку картку, щоб побачити пояснення і обрати частину.</p>
 
-  <div class="grid">
-    <div class="card two" data-two>
-      <div class="num"><span class="layer">Тема 1</span> <span class="lname">Контракт і валідація</span> <span class="badge two">2 частини</span></div>
-      <h2>Структуровані виходи, контракти та межі валідації</h2>
-      <p>Відповідь моделі стає об'єктом, з яким працює код. Тема розібрана двома інтерактивами<span class="chev">›</span></p>
-      <div class="parts">
-        <div class="why">Валідація даних — щоденна інженерна робота, і саме тому тема має власну складність: звичні уявлення переносяться на відповідь моделі не повністю. <b>Перший інтерактив проходять до читання конспекту</b> — він ставить питання про те, що відбувається між відповіддю моделі та виконаною дією, і дає побачити розходження на конкретних ситуаціях. <b>Другий проходять після читання</b> — він веде один JSON крізь усі п'ять шарів перевірки і показує, де саме той зупиняється. Обидва самодостатні: пройдений лише один із них теж дає результат.</div>
-        <a class="part" href="tema1_probe_scroll.html">
-          <div class="pk"><span>Перед читанням</span><span class="pt">7 хвилин</span></div>
-          <div class="pn">Контракти і валідація: п'ять ситуацій</div>
-          <div class="pd">Одна відповідь агента підтримки проходить п'ять ситуацій, і в кожній очевидна відповідь виявляється неточною.</div>
-        </a>
-        <a class="part" href="tema1_pipeline_scroll.html">
-          <div class="pk"><span>Після читання</span><span class="pt">15 хвилин</span></div>
-          <div class="pn">Pipeline валідації LLM-виходів</div>
-          <div class="pd">Один JSON від моделі проходить п'ять шарів перевірки — від синтаксису до дозволів агента — і зупиняється там, де вперше порушує контракт.</div>
-        </a>
-      </div>
-    </div>
-
-    <div class="card two" data-two>
-      <div class="num"><span class="layer">Тема 2</span> <span class="lname">Інструменти і дозволи</span> <span class="badge two">2 частини</span></div>
-      <h2>Виклик інструментів, дозволи та стійкі процеси</h2>
-      <p>Агент отримує право діяти в зовнішньому світі. Тема розібрана двома інтерактивами<span class="chev">›</span></p>
-      <div class="parts">
-        <div class="why">Тема містить кілька місць, де звичний інженерний досвід підказує неправильну відповідь: повторні спроби, семантика таймауту, зберігання стану процесу. <b>Перший інтерактив проходять до читання конспекту</b> — він ставить питання і дає побачити ці розходження на конкретних ситуаціях, після чого читання стає прицільним. <b>Другий проходять після читання</b> — він перевіряє, чи вдається застосувати сім шарів контролю разом, а не переказати кожен окремо. Обидва самодостатні: пройдений лише один із них теж дає результат.</div>
-        <a class="part" href="tema2_probe_scroll.html">
-          <div class="pk"><span>Перед читанням</span><span class="pt">7 хвилин</span></div>
-          <div class="pn">Виклик інструментів: п'ять ситуацій</div>
-          <div class="pd">П'ять ситуацій із роботи агента, у кожній очевидна відповідь виявляється неточною.</div>
-        </a>
-        <a class="part" href="tema2_tool_call_scroll.html">
-          <div class="pk"><span>Після читання</span><span class="pt">20 хвилин</span></div>
-          <div class="pn">validate_and_execute: від наміру до дії</div>
-          <div class="pd">Один виклик проходить сім кроків контролю: бюджет, реєстр, схема, контекст, дозволи, ідемпотентне виконання, облік ефекту.</div>
-        </a>
-      </div>
-    </div>
-
-    <div class="card two" data-two>
-      <div class="num"><span class="layer">Тема 3</span> <span class="lname">Пошук і ембеддинги</span> <span class="badge two">2 частини</span></div>
-      <h2>Від тексту до векторів: токенізація, ембеддинги та подібність</h2>
-      <p>Агент шукає відповіді в документах компанії. Тема розібрана двома інтерактивами<span class="chev">›</span></p>
-      <div class="parts">
-        <div class="why">Помилка семантичного пошуку виглядає інакше за помилки попередніх тем: система повертає текст, який стосується запиту і звучить правдоподібно, а відповідь на його основі виявляється неправильною. <b>Перший інтерактив проходять до читання конспекту</b> — п'ять запитів до бази знань показують, що оцінка подібності вимірює і чого вона не бачить. <b>Другий проходять після читання</b> — він розбирає пари фрагментів із реальними значеннями близькості. Обидва самодостатні: пройдений лише один із них теж дає результат.</div>
-        <a class="part" href="tema3_probe_scroll.html">
-          <div class="pk"><span>Перед читанням</span><span class="pt">7 хвилин</span></div>
-          <div class="pn">Ембеддинги і пошук: п'ять ситуацій</div>
-          <div class="pd">П'ять запитів до бази знань агента, і в кожному знайдений текст веде до неправильної відповіді.</div>
-        </a>
-        <a class="part" href="tema3_search_scroll.html">
-          <div class="pk"><span>Після читання</span><span class="pt">15 хвилин</span></div>
-          <div class="pn">Що бачить ембеддинг</div>
-          <div class="pd">Пари фрагментів із реальними значеннями близькості показують, чому схожі за змістом тексти отримують різні оцінки.</div>
-        </a>
-      </div>
-    </div>
-
-    <a class="card" href="tema4_retrieval_scroll.html">
-      <div class="num"><span class="layer">Тема 4</span> <span class="lname">Retrieval і пам'ять</span> <span class="badge ready">готово</span></div>
-      <h2>Воронка пошуку</h2>
-      <p>Корпус звужується від сотень документів до трьох фрагментів у відповіді, і кожен етап воронки відсіює свою частину.</p></a>
-
-    <a class="card" href="tema5_eval_scroll.html">
-      <div class="num"><span class="layer">Тема 5</span> <span class="lname">Оцінювання якості</span> <span class="badge ready">готово</span></div>
-      <h2>Знайди точку відхилення</h2>
-      <p>Три кейси-розслідування: за трасою виконання потрібно визначити крок, на якому агент відхилився від очікуваної поведінки.</p></a>
-
-    <div class="card two" data-two>
-      <div class="num"><span class="layer">Тема 6</span> <span class="lname">Безпека і межі</span> <span class="badge two">2 частини</span></div>
-      <h2>Межі безпечної поведінки автономних AI-систем</h2>
-      <p>Компоненти попередніх тем розглядаються як поверхня атаки. Тема розібрана двома інтерактивами<span class="chev">›</span></p>
-      <div class="parts">
-        <div class="why">Звичні уявлення про безпеку побудовані навколо периметра: перевіряємо ввід користувача, довіряємо власним сервісам. Автономний агент цю межу розмиває, і саме тут інтуїція підводить найчастіше. <b>Перший інтерактив проходять до читання конспекту</b> — п'ять ситуацій, у кожній захист виглядає достатнім і таким не є. <b>Другий проходять після читання</b> — він розкладає систему по компонентах і веде від кожного до загроз та захисту. Обидва самодостатні: пройдений лише один із них теж дає результат.</div>
-        <a class="part" href="tema6_probe_scroll.html">
-          <div class="pk"><span>Перед читанням</span><span class="pt">7 хвилин</span></div>
-          <div class="pn">Межі безпечної поведінки: п'ять ситуацій</div>
-          <div class="pd">Документ із власної бази знань, відповідь власного інструменту, запис у пам'яті, субагенти і потік погоджень.</div>
-        </a>
-        <a class="part" href="tema6_safety_scroll.html">
-          <div class="pk"><span>Після читання</span><span class="pt">15 хвилин</span></div>
-          <div class="pn">Карта загроз Harness</div>
-          <div class="pd">Шість компонентів системи, загрози до кожного і захисні механізми, які їх закривають.</div>
-        </a>
-      </div>
-    </div>
-
-    <a class="card" href="tema7_orchestration_scroll.html">
-      <div class="num"><span class="layer">Тема 7</span> <span class="lname">Оркестрація і трасування</span> <span class="badge ready">готово</span></div>
-      <h2>Стан, правила і зворотний зв'язок</h2>
-      <p>Автомат станів агента, петля evaluator-optimizer і траса виконання, за якою відновлюється хід ухвалення рішень.</p></a>
-
-    <a class="card" href="tema8_integration_scroll.html">
-      <div class="num"><span class="layer">Тема 8</span> <span class="lname">Інтеграція контурів</span> <span class="badge ready">готово</span></div>
-      <h2>Два контури: happy path і failure path</h2>
-      <p>Наскрізний сценарій проходить обидва шляхи — успішне завершення і збій із відновленням стану після таймауту.</p></a>
+  <div class="masthead">
+    <div class="course">Bridge Course · AI Engineering Foundations</div>
+    <h1>Вісім шарів harness, кожен у роботі</h1>
+    <p>Harness — шар керування, який перетворює модель на компонент продакшн-системи. Курс проходить його знизу вгору: контракт між моделлю і кодом, дозволи на дії, пошук у документах, пам'ять, оцінювання, безпека, оркестрація, інтеграція.</p>
+    <p>Кожен інтерактив веде один сценарій крізь відповідний шар. Наступний крок відкривається після відповіді на питання, а наскрізний приклад спільний для всього курсу — агент служби підтримки, який класифікує звернення, перевіряє факти, діє і фіксує результат.</p>
   </div>
 
-  <footer>Bridge Course — восьмитижнева дисципліна для розробників, які входять у програму з автономних AI-систем.</footer>
+  <div class="stack">
+
+    <div class="layer" id="l1">
+      <button class="layer-head" type="button" aria-expanded="false" aria-controls="p1">
+        <span class="g"></span>
+        <span>
+          <span class="layer-n">Шар 1</span>
+          <span class="layer-t">Контракт і валідація</span>
+          <span class="layer-d">Відповідь моделі стає об'єктом, з яким працює код, і проходить п'ять шарів перевірки дорогою до дії.</span>
+        </span>
+        <span class="layer-meta">дві частини</span>
+      </button>
+      <div class="parts" id="p1">
+        <div class="why">Валідація даних — щоденна інженерна робота, і саме тому тема має власну складність: звичні уявлення переносяться на відповідь моделі не повністю. <b>Перший прохід — до читання конспекту:</b> він ставить питання про те, що відбувається між відповіддю моделі та виконаною дією. <b>Другий — після:</b> він веде один JSON крізь усі п'ять шарів і показує, де саме той зупиняється. Обидва самодостатні.</div>
+        <a class="part" href="tema1_probe_scroll.html">
+          <span>
+            <span class="part-k">Перед читанням</span>
+            <span class="part-t">Контракти і валідація: п'ять ситуацій</span>
+            <span class="part-d">Одна відповідь агента проходить п'ять ситуацій, і в кожній очевидна відповідь виявляється неточною.</span>
+          </span>
+          <span class="part-time">7 хвилин</span>
+        </a>
+        <a class="part" href="tema1_pipeline_scroll.html">
+          <span>
+            <span class="part-k">Після читання</span>
+            <span class="part-t">Pipeline валідації LLM-виходів</span>
+            <span class="part-d">Один JSON проходить п'ять шарів перевірки і зупиняється там, де вперше порушує контракт.</span>
+          </span>
+          <span class="part-time">15 хвилин</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="layer" id="l2">
+      <button class="layer-head" type="button" aria-expanded="false" aria-controls="p2">
+        <span class="g"></span>
+        <span>
+          <span class="layer-n">Шар 2</span>
+          <span class="layer-t">Інструменти і дозволи</span>
+          <span class="layer-d">Агент отримує право діяти в зовнішньому світі, і ціна помилки змінюється: виконане повернення коштів відхилити неможливо.</span>
+        </span>
+        <span class="layer-meta">дві частини</span>
+      </button>
+      <div class="parts" id="p2">
+        <div class="why">Тема містить кілька місць, де звичний інженерний досвід підказує неправильну відповідь: повторні спроби, семантика таймауту, зберігання стану процесу. <b>Перший прохід — до читання конспекту:</b> він дає побачити ці розходження на конкретних ситуаціях. <b>Другий — після:</b> він перевіряє, чи вдається застосувати сім шарів контролю разом. Обидва самодостатні.</div>
+        <a class="part" href="tema2_probe_scroll.html">
+          <span>
+            <span class="part-k">Перед читанням</span>
+            <span class="part-t">Виклик інструментів: п'ять ситуацій</span>
+            <span class="part-d">Виклик без покриття, таймаут, повтори, доба очікування і запит на підтвердження з двома кнопками.</span>
+          </span>
+          <span class="part-time">7 хвилин</span>
+        </a>
+        <a class="part" href="tema2_tool_call_scroll.html">
+          <span>
+            <span class="part-k">Після читання</span>
+            <span class="part-t">validate_and_execute: від наміру до дії</span>
+            <span class="part-d">Один виклик проходить сім кроків контролю: бюджет, реєстр, схема, контекст, дозволи, виконання, облік.</span>
+          </span>
+          <span class="part-time">20 хвилин</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="layer" id="l3">
+      <button class="layer-head" type="button" aria-expanded="false" aria-controls="p3">
+        <span class="g"></span>
+        <span>
+          <span class="layer-n">Шар 3</span>
+          <span class="layer-t">Пошук і ембеддинги</span>
+          <span class="layer-d">Документи компанії стають векторами, і пошук починає повертати тексти, які стосуються запиту й ведуть до неправильної відповіді.</span>
+        </span>
+        <span class="layer-meta">дві частини</span>
+      </button>
+      <div class="parts" id="p3">
+        <div class="why">Помилка семантичного пошуку виглядає інакше за помилки попередніх тем: знайдений текст стосується запиту і звучить правдоподібно. <b>Перший прохід — до читання конспекту:</b> п'ять запитів показують, що оцінка подібності вимірює і чого вона не бачить. <b>Другий — після:</b> він розбирає пари фрагментів із реальними значеннями близькості. Обидва самодостатні.</div>
+        <a class="part" href="tema3_probe_scroll.html">
+          <span>
+            <span class="part-k">Перед читанням</span>
+            <span class="part-t">Ембеддинги і пошук: п'ять ситуацій</span>
+            <span class="part-d">Заперечення, архівна версія політики, розірване правило, бюджет токенів і вибір конфігурації.</span>
+          </span>
+          <span class="part-time">7 хвилин</span>
+        </a>
+        <a class="part" href="tema3_search_scroll.html">
+          <span>
+            <span class="part-k">Після читання</span>
+            <span class="part-t">Що бачить ембеддинг</span>
+            <span class="part-d">Пари фрагментів із реальними значеннями близькості і чотири межі семантичної подібності.</span>
+          </span>
+          <span class="part-time">15 хвилин</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="layer">
+      <a class="layer-head" href="tema4_retrieval_scroll.html">
+        <span class="g"></span>
+        <span>
+          <span class="layer-n">Шар 4</span>
+          <span class="layer-t">Retrieval і пам'ять</span>
+          <span class="layer-d">Корпус із 847 фрагментів звужується до трьох, які потраплять у контекст моделі. Кожен крок воронки зменшує набір і змінює його склад.</span>
+        </span>
+        <span class="layer-meta">15 хвилин</span>
+      </a>
+    </div>
+
+    <div class="layer">
+      <a class="layer-head" href="tema5_eval_scroll.html">
+        <span class="g"></span>
+        <span>
+          <span class="layer-n">Шар 5</span>
+          <span class="layer-t">Оцінювання якості</span>
+          <span class="layer-d">Три завершені траєкторії агента, у кожній відповідь правильна. Потрібно знайти крок, на якому процес уперше відхилився.</span>
+        </span>
+        <span class="layer-meta">15 хвилин</span>
+      </a>
+    </div>
+
+    <div class="layer" id="l6">
+      <button class="layer-head" type="button" aria-expanded="false" aria-controls="p6">
+        <span class="g"></span>
+        <span>
+          <span class="layer-n">Шар 6</span>
+          <span class="layer-t">Безпека і межі</span>
+          <span class="layer-d">Ті самі компоненти, які будували попередні теми, розглядаються як поверхня атаки.</span>
+        </span>
+        <span class="layer-meta">дві частини</span>
+      </button>
+      <div class="parts" id="p6">
+        <div class="why">Звичні уявлення про безпеку побудовані навколо периметра: перевіряємо ввід користувача, довіряємо власним сервісам. Автономний агент цю межу розмиває, і саме тут інтуїція підводить найчастіше. <b>Перший прохід — до читання конспекту:</b> п'ять ситуацій, у кожній захист виглядає достатнім і таким не є. <b>Другий — після:</b> він веде від кожного компонента до загроз і захисту. Обидва самодостатні.</div>
+        <a class="part" href="tema6_probe_scroll.html">
+          <span>
+            <span class="part-k">Перед читанням</span>
+            <span class="part-t">Межі безпечної поведінки: п'ять ситуацій</span>
+            <span class="part-d">Документ із власної бази знань, відповідь власного інструменту, запис у пам'яті, субагенти і потік погоджень.</span>
+          </span>
+          <span class="part-time">7 хвилин</span>
+        </a>
+        <a class="part" href="tema6_safety_scroll.html">
+          <span>
+            <span class="part-k">Після читання</span>
+            <span class="part-t">Карта загроз Harness</span>
+            <span class="part-d">Шість компонентів системи, загрози до кожного і захисні механізми, які їх закривають.</span>
+          </span>
+          <span class="part-time">15 хвилин</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="layer">
+      <a class="layer-head" href="tema7_orchestration_scroll.html">
+        <span class="g"></span>
+        <span>
+          <span class="layer-n">Шар 7</span>
+          <span class="layer-t">Оркестрація і трасування</span>
+          <span class="layer-d">Стан визначає, що дозволено, правила вирішують, що робити далі, трасування показує, що сталося насправді.</span>
+        </span>
+        <span class="layer-meta">15 хвилин</span>
+      </a>
+    </div>
+
+    <div class="layer">
+      <a class="layer-head" href="tema8_integration_scroll.html">
+        <span class="g"></span>
+        <span>
+          <span class="layer-n">Шар 8</span>
+          <span class="layer-t">Інтеграція контурів</span>
+          <span class="layer-d">Одне звернення проходить систему двома шляхами: коли все спрацювало і коли зовнішня система відмовила.</span>
+        </span>
+        <span class="layer-meta">15 хвилин</span>
+      </a>
+    </div>
+
+  </div>
+
+  <footer>Шари 1, 2, 3 і 6 розібрані двома проходами — до читання конспекту і після нього. Відкрийте такий шар, щоб побачити пояснення і обрати частину.</footer>
+
 </div>
+
 <script>
-const t=document.getElementById('t');
-t.addEventListener('click',()=>{const d=document.documentElement.getAttribute('data-theme')==='dark';
-document.documentElement.setAttribute('data-theme',d?'light':'dark');t.textContent=d?'🌙':'☀️';});
-</script>
-<script>
-document.querySelectorAll('[data-two]').forEach(function(c){
-  c.setAttribute('role','button');
-  c.setAttribute('tabindex','0');
-  c.setAttribute('aria-expanded','false');
-  function toggle(){
-    var open = c.classList.toggle('open');
-    c.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  c.addEventListener('click', function(e){
-    if (e.target.closest('.part')) return;
-    toggle();
-  });
-  c.addEventListener('keydown', function(e){
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+const root = document.documentElement;
+const tgl = document.getElementById('themeToggle');
+function setTheme(dark){
+  if (dark) root.setAttribute('data-theme','dark'); else root.removeAttribute('data-theme');
+  tgl.textContent = dark ? 'Світле' : 'Темне';
+  try { localStorage.setItem('bc-theme', dark ? 'dark' : 'light'); } catch(e) {}
+}
+try { if (localStorage.getItem('bc-theme') === 'dark') setTheme(true); } catch(e) {}
+tgl.addEventListener('click', () => setTheme(root.getAttribute('data-theme') !== 'dark'));
+
+document.querySelectorAll('button.layer-head').forEach(b => {
+  b.addEventListener('click', () => {
+    const layer = b.closest('.layer');
+    const open = layer.classList.toggle('open');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
 });
 </script>
