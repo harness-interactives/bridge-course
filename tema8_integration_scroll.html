@@ -3,179 +3,325 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Інтегрована архітектура — Тема 8</title>
+<title>Інтегрована архітектура — Тема 8 · Bridge Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f0f0f2;--railBg:#e9e9ee;--card:#fafafa;--border:#dde0e6;--text:#2c2c2c;--dim:#6b7280;--head:#0f0f14;
---green:#22863a;--greenBg:rgba(34,134,58,.08);--red:#cf222e;--redBg:rgba(207,34,46,.08);
---blue:#0969da;--blueBg:rgba(9,105,218,.08);--gold:#9a6700;--goldBg:rgba(154,103,0,.08);
---accent:#1a7f37;--font:'Segoe UI','Helvetica Neue',sans-serif;--fmono:'Fira Code','Cascadia Code',Consolas,monospace}
-body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;min-height:100vh}
 
+:root{
+  --paper:#e8eaec;
+  --surface:#f7f8f9;
+  --sunken:#dfe2e5;
+  --ink:#14181c;
+  --ink2:#454d55;
+  --dim:#767e86;
+  --rule:#c6cbd1;
+  --hair:#d6dadf;
+  --pass:#1d6b52;
+  --passSoft:#e0ebe6;
+  --refuse:#9c3a22;
+  --refuseSoft:#f2e3de;
+  --sans:'Commissioner',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+html[data-theme="dark"]{
+  --paper:#0e1114;
+  --surface:#171b1f;
+  --sunken:#0a0d10;
+  --ink:#e9ecee;
+  --ink2:#b3bbc2;
+  --dim:#7c858d;
+  --rule:#2c3238;
+  --hair:#22272c;
+  --pass:#5aa98b;
+  --passSoft:#14241e;
+  --refuse:#cf7355;
+  --refuseSoft:#26170f;
+}
+
+html,body{background:var(--paper)}
+body{
+  font-family:var(--sans);
+  font-weight:400;
+  font-size:16.5px;
+  line-height:1.7;
+  color:var(--ink2);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+code,.mono{font-family:var(--mono);font-size:.88em;font-weight:500;color:var(--ink)}
+code{background:var(--sunken);padding:1px 5px;border:1px solid var(--hair)}
+
+/* ───────── rail ───────── */
 .page{display:flex;max-width:1340px;margin:0 auto;align-items:flex-start}
-.rail{position:sticky;top:0;flex:none;width:298px;height:100vh;background:var(--railBg);border-right:1px solid var(--border);border-left:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:28px 18px;overflow-y:auto}
-.rail-icon{font-size:40px;margin-bottom:10px}
-.rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
-.rail h1{font-size:19px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:10px;color:var(--head)}
-.rail-sub{font-size:12.5px;color:var(--dim);text-align:center;line-height:1.5;margin-bottom:20px}
-.stack{width:100%;border-top:1px solid var(--border);padding-top:14px;margin-top:18px}
-.stack-title{font-size:10px;text-transform:uppercase;letter-spacing:1.6px;color:var(--dim);margin-bottom:8px;text-align:center}
-.stack-item{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim);padding:3px 6px;border-radius:6px;line-height:1.35}
-.stack-item.now{background:var(--greenBg);color:var(--green);font-weight:700}
-.stack-item .mark{font-size:11px;opacity:.55}
-.stack-item .here{margin-left:auto;font-size:9.5px;letter-spacing:1px}
-.rail-progress{margin-top:16px;font-size:12px;color:var(--dim)}
+.rail{
+  position:sticky;top:0;flex:none;width:298px;height:100vh;
+  background:var(--surface);border-right:1px solid var(--rule);border-left:1px solid var(--rule);
+  display:flex;flex-direction:column;
+  padding:40px 30px 28px;overflow-y:auto;
+}
+.rail-theme{font-size:12.5px;color:var(--dim);letter-spacing:.02em;margin-bottom:6px}
+.rail h1{
+  font-family:var(--sans);font-weight:600;font-size:21px;line-height:1.28;
+  color:var(--ink);letter-spacing:-.011em;margin-bottom:10px;
+}
+.rail-sub{font-size:13px;line-height:1.6;color:var(--dim);margin-bottom:26px}
 
-.main{flex:1;min-width:0;max-width:1042px;padding:44px 52px 120px 56px;border-right:1px solid var(--border)}
+.layers{padding-top:20px;border-top:1px solid var(--hair)}
+.layers-h{font-size:11.5px;color:var(--dim);margin-bottom:9px}
+.layer{
+  display:flex;align-items:baseline;gap:9px;
+  font-size:12.5px;line-height:1.45;color:var(--dim);
+  padding:3px 0;
+}
+.layer .g{
+  flex:none;width:9px;height:9px;border:1px solid var(--rule);
+  transform:translateY(1px);
+}
+.layer.on{color:var(--ink);font-weight:600}
+.layer.on .g{background:var(--pass);border-color:var(--pass)}
+.layer.done .g{background:var(--rule);border-color:var(--rule)}
 
-.node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
-.node.locked{opacity:.25;pointer-events:none}
-.node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
-.node .dot.red{background:var(--red)}
-.node .dot.blue{background:var(--blue)}
-.node .dot.gold{background:var(--gold)}
-.node-date{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px}
-.node-beat{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:12px}
-.node-body{font-size:14px;color:var(--text);line-height:1.7}
-.node-body p{margin-bottom:10px}
+.progress{margin-top:auto;padding-top:24px;font-size:12.5px;color:var(--dim)}
+.progress b{color:var(--ink);font-weight:600}
 
-.codeblock{background:#f6f6f8;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'Fira Code','Cascadia Code',monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;color:#24292f;white-space:pre}
-.kw{color:#cf222e}.fn{color:#8250df}.str{color:#0a3069}.cm{color:#6e7781}.tp{color:#0550ae}
+.toggle{
+  position:fixed;top:20px;right:calc(max(0px,(100vw - 1340px)/2) + 26px);z-index:20;
+  background:var(--surface);border:1px solid var(--rule);color:var(--ink2);
+  font-family:var(--sans);font-size:12.5px;font-weight:500;
+  padding:6px 13px;cursor:pointer;line-height:1.4;
+}
+.toggle:hover{border-color:var(--ink2);color:var(--ink)}
+.toggle:focus-visible{outline:2px solid var(--pass);outline-offset:2px}
 
-.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+/* ───────── column ───────── */
+.main{flex:1;min-width:0;max-width:1042px;padding:56px 56px 140px 64px;border-right:1px solid var(--rule)}
+
+/* ───────── brief ───────── */
+.brief{border-top:2px solid var(--ink);padding-top:22px;margin-bottom:64px}
+.brief-k{font-size:12.5px;color:var(--dim);margin-bottom:10px}
+.brief h2{
+  font-weight:600;font-size:27px;line-height:1.26;letter-spacing:-.016em;
+  color:var(--ink);margin-bottom:16px;max-width:28ch;
+}
+.brief p{margin-bottom:14px;max-width:70ch}
+.brief-rows{margin-top:22px;border-top:1px solid var(--hair)}
+.brief-row{display:grid;grid-template-columns:152px 1fr;gap:20px;padding:11px 0;border-bottom:1px solid var(--hair)}
+.brief-row dt{font-size:13px;color:var(--dim);line-height:1.6}
+.brief-row dd{font-size:14px;line-height:1.62}
+
+/* ───────── gates ───────── */
+.node{position:relative;padding:0 0 52px 54px}
+.node::before{
+  content:'';position:absolute;left:7px;top:22px;bottom:-4px;
+  width:1px;background:var(--hair);
+}
+.node:last-child::before{display:none}
+.gate{
+  position:absolute;left:0;top:7px;width:15px;height:15px;
+  border:1px solid var(--rule);background:var(--paper);
+}
+.node.here .gate{border:2px solid var(--ink);background:var(--paper)}
+.node.cleared .gate{background:var(--pass);border-color:var(--pass)}
+.node.stopped .gate{border:2px solid var(--refuse);background:var(--refuseSoft)}
+.node.shut .gate{border-style:dashed;background:transparent}
+
+.node-k{font-size:12.5px;color:var(--dim);margin-bottom:3px}
+.node-beat{
+  font-weight:600;font-size:21px;line-height:1.3;letter-spacing:-.013em;
+  color:var(--ink);margin-bottom:14px;
+}
+.node-body{max-width:70ch}
+.node-body p{margin-bottom:13px}
+.node-body strong{color:var(--ink);font-weight:600}
+.node-body em{font-style:italic;color:var(--ink2)}
+
+.node.shut .node-beat{color:var(--dim)}
+.shut-note{font-size:13.5px;color:var(--dim);padding:10px 0 0}
+
+/* ───────── content blocks ───────── */
+.quote{
+  border-left:2px solid var(--rule);padding:4px 0 4px 18px;margin:16px 0;
+  font-size:15px;line-height:1.66;color:var(--ink2);
+}
+.card{border:1px solid var(--rule);background:var(--surface);margin:18px 0}
+.card-h{
+  font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--dim);
+  padding:9px 15px;border-bottom:1px solid var(--hair);
+}
+.row{display:flex;gap:16px;padding:8px 15px;border-bottom:1px solid var(--hair);font-size:14px}
+.row:last-child{border-bottom:none}
+.row .k{flex:none;width:156px;color:var(--dim);font-size:13px}
+.row .v{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ink);word-break:break-word}
+
+.trace{border:1px solid var(--rule);background:var(--surface);margin:18px 0}
+.trace .t{display:flex;gap:16px;padding:8px 15px;border-bottom:1px solid var(--hair);font-size:14px}
+.trace .t:last-child{border-bottom:none}
+.trace .t .n{flex:none;width:auto;min-width:46px;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+.trace .t .bad{color:var(--refuse)}
+
+.tbl-wrap{overflow-x:auto;margin:18px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 14px 9px 0;border-bottom:1px solid var(--hair);vertical-align:top}
+th{font-weight:600;font-size:12.5px;color:var(--dim);border-bottom:1px solid var(--rule)}
+td:last-child,th:last-child{padding-right:0}
+
+.aside{border-left:2px solid var(--pass);padding:2px 0 2px 18px;margin:18px 0}
+.aside-h{font-weight:600;color:var(--ink);font-size:14.5px;margin-bottom:5px}
+.aside p{font-size:14.5px;line-height:1.66;margin:0}
+
+/* ───────── spot ───────── */
+.spot{display:none;margin-top:22px;border-top:1px solid var(--rule);padding-top:20px}
 .spot.open{display:block}
-.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px;font-weight:600}
-.spot-q{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:14px}
-.spot-opts{display:flex;flex-direction:column;gap:8px}
-.spot-opt{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;text-align:left;color:var(--text)}
-.spot-opt:hover{border-color:var(--blue);box-shadow:0 0 0 2px rgba(9,105,218,.12)}
-.spot-opt.correct{border-color:var(--green);background:var(--greenBg)}
-.spot-opt.wrong{border-color:var(--red);background:var(--redBg)}
-.spot-opt.disabled{pointer-events:none;opacity:.6}
-.spot-fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
-.spot-fb.show{display:block}
-.spot-fb.pass{background:var(--greenBg);border:1px solid rgba(34,134,58,.2)}
-.spot-fb.fail{background:var(--redBg);border:1px solid rgba(207,34,46,.2)}
+.spot-k{font-size:12.5px;color:var(--dim);margin-bottom:5px}
+.spot-q{font-weight:600;font-size:17.5px;line-height:1.42;color:var(--ink);margin-bottom:15px;max-width:60ch}
+.opt{
+  display:block;width:100%;text-align:left;
+  font-family:var(--sans);font-size:14.5px;line-height:1.55;color:var(--ink2);
+  background:var(--surface);border:1px solid var(--rule);
+  padding:11px 15px;margin-bottom:7px;cursor:pointer;
+}
+.opt:hover{border-color:var(--ink2)}
+.opt:focus-visible{outline:2px solid var(--pass);outline-offset:1px}
+.opt.off{cursor:default;opacity:.62}
+.opt.off:hover{border-color:var(--rule)}
+.opt.yes{border-color:var(--pass);border-left-width:3px;background:var(--passSoft);color:var(--ink);opacity:1}
+.opt.no{border-color:var(--refuse);border-left-width:3px;background:var(--refuseSoft);color:var(--ink);opacity:1}
+.fb{display:none;margin-top:14px;padding-left:18px;border-left:2px solid var(--rule);font-size:14.5px;line-height:1.68}
+.fb.show{display:block}
+.fb.ok{border-left-color:var(--pass)}
+.fb.err{border-left-color:var(--refuse)}
+.fb-v{font-weight:600;color:var(--ink);margin-bottom:4px;font-size:14px}
 
-.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.takeaway-card .tk-icon{font-size:24px;margin-bottom:6px}
-.takeaway-card .tk-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:6px}
-.takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
-
-.brief{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px 28px;margin-bottom:8px}
-.brief .br-eye{font-family:var(--fmono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
-.brief h2{font-size:19px;color:var(--head);margin-bottom:12px;line-height:1.35}
-.brief p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:12px}
-.brief .br-grid{display:grid;grid-template-columns:150px 1fr;gap:10px 18px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
-.brief .br-k{font-family:var(--fmono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);padding-top:2px}
-.brief .br-v{font-size:13.5px;color:var(--text);line-height:1.6}
-@media(max-width:640px){.brief .br-grid{grid-template-columns:1fr;gap:4px 0}.brief .br-k{margin-top:8px}}
-.finish-card{background:linear-gradient(135deg,#f0f0f2,#e8eaef);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
-.finish-card h2{font-size:22px;color:#1a1a1a;margin-bottom:8px}
-.finish-card p{font-size:14px;color:var(--dim)}
-.score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
-
-.risk-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;margin:0 2px}
-.risk-read{background:var(--greenBg);color:var(--green)}
-.risk-write{background:var(--goldBg);color:var(--gold)}
-.risk-dest{background:var(--redBg);color:var(--red)}
-
-@media(max-width:900px){.page{display:block;max-width:none}.toggle{right:16px}.rail{position:static;width:auto;height:auto;border:none;border-bottom:1px solid var(--border)}.main{max-width:none;border-right:none;padding:24px 16px 80px}}
+/* ───────── close ───────── */
+.pt{padding:16px 0;border-bottom:1px solid var(--hair);display:grid;grid-template-columns:28px 1fr;gap:16px}
+.pt:first-of-type{border-top:1px solid var(--rule)}
+.pt-n{font-family:var(--mono);font-size:13px;color:var(--dim);padding-top:2px}
+.pt-t{font-weight:600;color:var(--ink);font-size:15.5px;line-height:1.4;margin-bottom:4px}
+.pt-b{font-size:14.5px;line-height:1.64}
+.close{margin-top:34px;border-top:2px solid var(--ink);padding-top:20px}
+.close h2{font-weight:600;font-size:19px;color:var(--ink);letter-spacing:-.012em;margin-bottom:8px}
+.close p{max-width:64ch;margin-bottom:10px}
+.tally{font-size:14px;color:var(--dim)}
+.tally b{color:var(--ink);font-weight:600}
 
 
-/* ─── DARK THEME ─── */
-[data-theme="dark"]{--railBg:#11161d;--bg:#181d28;--card:#212838;--border:#333d52;--text:#c9d1d9;--dim:#8b949e;--head:#ffffff;
---green:#3fb950;--greenBg:rgba(63,185,80,.10);--red:#f85149;--redBg:rgba(248,81,73,.10);
---blue:#58a6ff;--blueBg:rgba(88,166,255,.10);--gold:#d29922;--goldBg:rgba(210,153,34,.10);
---accent:#7ee787}
-[data-theme="dark"] body{background:linear-gradient(180deg,#181d28 0%,#1c2230 60%,#202840 100%);background-attachment:fixed}
-[data-theme="dark"] .rail{background:linear-gradient(180deg,#151a26 0%,#1c2436 100%)}
-[data-theme="dark"] .rail h1,[data-theme="dark"] .node-beat,[data-theme="dark"] .spot-q,
-[data-theme="dark"] .takeaway-card .tk-title,[data-theme="dark"] .finish-card h2{color:#e2e8f0}
-[data-theme="dark"] .codeblock{background:#0e1219;color:#c9d1d9}
-[data-theme="dark"] .kw{color:#ff7b72}[data-theme="dark"] .fn{color:#d2a8ff}
-[data-theme="dark"] .str{color:#a5d6ff}[data-theme="dark"] .cm{color:#8b949e}[data-theme="dark"] .tp{color:#79c0ff}
-[data-theme="dark"] .spot-opt{background:#181d28}
-[data-theme="dark"] .spot-opt:hover{box-shadow:0 0 0 2px rgba(88,166,255,.15)}
-[data-theme="dark"] .spot{box-shadow:0 1px 3px rgba(0,0,0,.2)}
-[data-theme="dark"] .takeaway-card{box-shadow:0 1px 3px rgba(0,0,0,.2)}
-[data-theme="dark"] .finish-card{background:linear-gradient(135deg,#212838,#263044)}
-[data-theme="dark"] .spot-fb.pass{border-color:rgba(63,185,80,.25)}
-[data-theme="dark"] .spot-fb.fail{border-color:rgba(248,81,73,.25)}
+/* ───────── SVG-візуали ───────── */
+svg{max-width:100%;height:auto;display:block;margin:20px 0}
+svg text{font-family:var(--sans)}
+.lb{font-size:11px;fill:var(--ink2)}
+.rl{font-size:11px;font-weight:600;fill:var(--ink)}
+.hd{font-size:13px;font-weight:600;fill:var(--ink)}
+.sm,.rs,.ed{font-size:10px;fill:var(--dim)}
+.rs,.ed{font-size:9px}
+.sub{font-size:11px;fill:var(--dim)}
+.dim{font-size:10px;fill:var(--dim)}
+.dist{font-size:10px;fill:var(--dim);font-style:italic}
+.num{font-size:22px;font-weight:600;fill:var(--ink)}
+.at{font-size:10px;font-weight:600;fill:var(--refuse)}
+.inv{font-size:10px;font-style:italic;fill:var(--refuse)}
+.nd{rx:0;ry:0;stroke-width:1.5}
+.bx{rx:0;ry:0;stroke-width:1.5}
 
-/* ─── TOGGLE BUTTON ─── */
-.toggle{position:fixed;top:16px;right:calc(max(0px,(100vw - 1340px)/2) + 26px);z-index:20;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:999px;width:38px;height:38px;font-size:16px;cursor:pointer;line-height:1}
-.toggle:hover{border-color:var(--blue)}
-@media(max-width:800px){.toggle{position:fixed;top:12px;right:12px}}
+/* ───────── код автора ───────── */
+.codeblock{
+  background:var(--surface);border:1px solid var(--rule);
+  padding:15px 17px;margin:18px 0;
+  font-family:var(--mono);font-size:13px;line-height:1.66;
+  color:var(--ink2);white-space:pre;overflow-x:auto;
+}
+.codeblock .kw{color:var(--refuse)}
+.codeblock .str{color:var(--pass)}
+.codeblock .tp{color:var(--ink);font-weight:500}
+.codeblock .fn{color:var(--ink);font-weight:500}
+.codeblock .cm{color:var(--dim)}
 
+/* ───────── стани процесу ───────── */
+.states{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0}
+.state{
+  border:1px solid var(--rule);background:var(--surface);
+  padding:4px 11px;font-family:var(--mono);font-size:12px;color:var(--ink2);
+}
+.state.pause{border-color:var(--ink2);color:var(--ink)}
+.state.term{border-color:var(--pass);color:var(--pass)}
+.state.fail{border-color:var(--refuse);color:var(--refuse)}
+
+/* ───────── мітки класу ризику ───────── */
+.risk-tag{
+  display:inline-block;padding:1px 7px;margin:0 2px;
+  font-family:var(--mono);font-size:11.5px;font-weight:500;
+  border:1px solid currentColor;
+}
+.risk-read{color:var(--pass)}
+.risk-write{color:var(--ink2)}
+.risk-dest,.risk-irr{color:var(--refuse)}
+
+/* ───────── драбинка ───────── */
+.ladder{margin:18px 0;border-top:1px solid var(--hair)}
+
+/* ───────── модифікатори траси ───────── */
+.trace .t .hl{color:var(--ink);font-weight:600}
+.trace .t .note{color:var(--dim)}
+.trace .t .bad,.bad{color:var(--refuse)}
+.trace .t .ok,.ok{color:var(--pass)}
+
+@media(max-width:900px){
+  .page{display:block;max-width:none}
+  .toggle{right:16px;top:14px}
+  .rail{position:static;width:auto;height:auto;border:none;border-bottom:1px solid var(--rule);padding:26px 20px}
+  .progress{margin-top:16px;padding-top:0}
+  .main{max-width:none;border-right:none;padding:32px 20px 100px}
+  .toggle{top:14px;right:16px}
+  .row{flex-direction:column;gap:2px}
+  .row .k{width:auto}
+  .brief-row{grid-template-columns:1fr;gap:2px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<button class="toggle" id="themeToggle" aria-label="Змінити тему" onclick="toggleTheme()">🌙</button>
+
+<button class="toggle" id="themeToggle" aria-label="Змінити оформлення">Темне</button>
 
 <div class="page">
 <div class="rail">
-  <div class="rail-icon">🏗️</div>
-  <div class="rail-eye">Тема 8 · Інтерактив</div>
+  <div class="rail-theme">Тема 8 · інтерактив</div>
   <h1>Від компонентів до архітектури</h1>
-  <div class="rail-sub">Два контури. Один сценарій.<br>Happy path і failure path.</div>
-  <div class="stack">
-    <div class="stack-title">Шари Harness</div>
-    <div class="stack-item"><span class="mark">░</span>Контракт і валідація</div>
-    <div class="stack-item"><span class="mark">░</span>Інструменти і дозволи</div>
-    <div class="stack-item"><span class="mark">░</span>Пошук і ембеддинги</div>
-    <div class="stack-item"><span class="mark">░</span>Retrieval і пам'ять</div>
-    <div class="stack-item"><span class="mark">░</span>Оцінювання якості</div>
-    <div class="stack-item"><span class="mark">░</span>Безпека і межі</div>
-    <div class="stack-item"><span class="mark">░</span>Оркестрація і трасування</div>
-    <div class="stack-item now"><span class="mark">█</span>Інтеграція контурів<span class="here">ВИ ТУТ</span></div>
+  <div class="rail-sub">Два контури. Один сценарій. Happy path і failure path.</div>
+  <div class="layers">
+    <div class="layers-h">Шари Harness</div>
+    <div class="layer done"><span class="g"></span>Контракт і валідація</div>
+    <div class="layer done"><span class="g"></span>Інструменти і дозволи</div>
+    <div class="layer done"><span class="g"></span>Пошук і ембеддинги</div>
+    <div class="layer done"><span class="g"></span>Retrieval і пам'ять</div>
+    <div class="layer done"><span class="g"></span>Оцінювання якості</div>
+    <div class="layer done"><span class="g"></span>Безпека і межі</div>
+    <div class="layer done"><span class="g"></span>Оркестрація і трасування</div>
+    <div class="layer on"><span class="g"></span>Інтеграція контурів</div>
   </div>
-  <div class="rail-progress" id="progress">0 / 0</div>
+  <div class="progress" id="progress"></div>
 </div>
 
 <div class="main">
   <div class="brief">
-    <div class="br-eye">Навіщо цей прохід</div>
+    <div class="brief-k">Навіщо цей прохід</div>
     <h2>Один сценарій повернення коштів у двох контурах</h2>
     <p>Конспект показує референсну архітектуру, наскрізний сценарій, артефакти готовності та вимоги до фінального проєкту. Наявність компонентів в одному репозиторії ще не є інтеграцією, і різницю видно лише тоді, коли сценарій проходить систему цілком.</p>
     <p>Цей прохід веде одне звернення двома шляхами: коли все спрацювало і коли зовнішня система відмовила.</p>
-    <div class="br-grid">
-      <div class="br-k">Що робите</div>
-      <div class="br-v">Проводите сценарій обома контурами і визначаєте, що відбувається зі станом, трасою й аудитом на кожному переході.</div>
-      <div class="br-k">Що отримуєте</div>
-      <div class="br-v">Критерій зрілості архітектури: систему оцінюють за тим, як вона поводиться при відмові.</div>
-      <div class="br-k">Скільки часу</div>
-      <div class="br-v">Близько п'ятнадцяти хвилин.</div>
-      <div class="br-k">Якщо не виходить</div>
-      <div class="br-v">Перехід, на якому відповідь дається важко, вказує розділ конспекту, до якого варто повернутися.</div>
-    </div>
+    <dl class="brief-rows">
+      <div class="brief-row"><dt>Що робите</dt><dd>Проводите сценарій обома контурами і визначаєте, що відбувається зі станом, трасою й аудитом на кожному переході.</dd></div>
+      <div class="brief-row"><dt>Що отримуєте</dt><dd>Критерій зрілості архітектури: систему оцінюють за тим, як вона поводиться при відмові.</dd></div>
+      <div class="brief-row"><dt>Скільки часу</dt><dd>Близько п'ятнадцяти хвилин.</dd></div>
+      <div class="brief-row"><dt>Якщо не виходить</dt><dd>Перехід, на якому відповідь дається важко, вказує розділ конспекту, до якого варто повернутися.</dd></div>
+    </dl>
   </div>
   <div id="timeline"></div>
 </div>
 </div>
 
-
 <script>
-
-function toggleTheme(){
-  const html=document.documentElement;
-  const isDark=html.getAttribute('data-theme')==='dark';
-  if(isDark){html.removeAttribute('data-theme');localStorage.setItem('theme','light');}
-  else{html.setAttribute('data-theme','dark');localStorage.setItem('theme','dark');}
-  const b=document.getElementById('themeToggle');
-  if(b) b.textContent = isDark ? '🌙' : '☀️';
-}
-(function(){
-  const saved=localStorage.getItem('theme');
-  if(saved==='dark'){
-    document.documentElement.setAttribute('data-theme','dark');
-    document.addEventListener('DOMContentLoaded',function(){
-      const b=document.getElementById('themeToggle');
-      if(b) b.textContent='☀️';
-    });
-  }
-})();
-
 const NODES = [
   {
     date:'Де ми', beat:'Сім тем — один агент',
@@ -183,11 +329,11 @@ const NODES = [
   },
   {
     date:'Візуал', beat:'Два контури агентної архітектури',
-    body:'<svg viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:Segoe UI,sans-serif}.lb{font-size:11px;font-weight:600}.sm{font-size:9px;fill:var(--dim,#6b7280)}.hd{font-size:13px;font-weight:700}</style><rect x="30" y="60" width="620" height="180" rx="16" fill="none" stroke="#0969da" stroke-width="2" stroke-dasharray="6"/><text class="hd" x="50" y="85" fill="#0969da">Робочий контур</text><rect x="60" y="100" width="100" height="40" rx="8" fill="var(--blueBg,rgba(9,105,218,.08))" stroke="#0969da"/><text class="lb" x="110" y="124" text-anchor="middle" fill="#0969da">Вхід</text><line x1="160" y1="120" x2="185" y2="120" stroke="var(--dim,#6b7280)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="185" y="100" width="100" height="40" rx="8" fill="var(--blueBg,rgba(9,105,218,.08))" stroke="#0969da"/><text class="lb" x="235" y="124" text-anchor="middle" fill="#0969da">LLM</text><line x1="285" y1="120" x2="310" y2="120" stroke="var(--dim,#6b7280)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="310" y="100" width="120" height="40" rx="8" fill="var(--goldBg,rgba(154,103,0,.08))" stroke="#d29922"/><text class="lb" x="370" y="124" text-anchor="middle" fill="#d29922">Оркестратор</text><line x1="430" y1="120" x2="455" y2="120" stroke="var(--dim,#6b7280)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="455" y="100" width="100" height="40" rx="8" fill="var(--greenBg,rgba(34,134,58,.08))" stroke="#22863a"/><text class="lb" x="505" y="124" text-anchor="middle" fill="#22863a">Інструменти</text><rect x="185" y="170" width="100" height="40" rx="8" fill="var(--blueBg,rgba(9,105,218,.08))" stroke="#0969da"/><text class="lb" x="235" y="194" text-anchor="middle" fill="#0969da">Retrieval</text><rect x="310" y="170" width="120" height="40" rx="8" fill="var(--blueBg,rgba(9,105,218,.08))" stroke="#0969da"/><text class="lb" x="370" y="194" text-anchor="middle" fill="#0969da">Памʼять</text><line x1="370" y1="140" x2="370" y2="170" stroke="var(--dim,#6b7280)" stroke-width="1" stroke-dasharray="3"/><line x1="235" y1="140" x2="235" y2="170" stroke="var(--dim,#6b7280)" stroke-width="1" stroke-dasharray="3"/><rect x="30" y="260" width="620" height="60" rx="12" fill="none" stroke="#cf222e" stroke-width="2" stroke-dasharray="6"/><text class="hd" x="50" y="282" fill="#cf222e">Контрольний контур</text><text class="lb" x="210" y="298" fill="#cf222e">Policy</text><text class="lb" x="310" y="298" fill="#cf222e">Evaluation</text><text class="lb" x="430" y="298" fill="#cf222e">Tracing</text><text class="lb" x="540" y="298" fill="#cf222e">Human-in-the-loop</text><line x1="340" y1="240" x2="340" y2="260" stroke="#cf222e" stroke-width="1.5" marker-end="url(#a8r)"/><text class="sm" x="340" y="30" text-anchor="middle">Робочий контур — що агент робить. Контрольний — що перевіряє, записує і обмежує.</text><defs><marker id="a8" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--dim,#6b7280)"/></marker><marker id="a8r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#cf222e"/></marker></defs></svg>'
+    body:'<svg viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:inherit}.lb{font-size:11px;font-weight:600}.sm{font-size:9px;fill:var(--dim)}.hd{font-size:13px;font-weight:700}</style><rect x="30" y="60" width="620" height="180" rx="16" fill="none" stroke="var(--ink2)" stroke-width="2" stroke-dasharray="6"/><text class="hd" x="50" y="85" fill="var(--ink2)">Робочий контур</text><rect x="60" y="100" width="100" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="110" y="124" text-anchor="middle" fill="var(--ink2)">Вхід</text><line x1="160" y1="120" x2="185" y2="120" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="185" y="100" width="100" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="235" y="124" text-anchor="middle" fill="var(--ink2)">LLM</text><line x1="285" y1="120" x2="310" y2="120" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="310" y="100" width="120" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="370" y="124" text-anchor="middle" fill="var(--ink2)">Оркестратор</text><line x1="430" y1="120" x2="455" y2="120" stroke="var(--dim)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="455" y="100" width="100" height="40" rx="8" fill="var(--passSoft)" stroke="var(--pass)"/><text class="lb" x="505" y="124" text-anchor="middle" fill="var(--pass)">Інструменти</text><rect x="185" y="170" width="100" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="235" y="194" text-anchor="middle" fill="var(--ink2)">Retrieval</text><rect x="310" y="170" width="120" height="40" rx="8" fill="var(--surface)" stroke="var(--ink2)"/><text class="lb" x="370" y="194" text-anchor="middle" fill="var(--ink2)">Памʼять</text><line x1="370" y1="140" x2="370" y2="170" stroke="var(--dim)" stroke-width="1" stroke-dasharray="3"/><line x1="235" y1="140" x2="235" y2="170" stroke="var(--dim)" stroke-width="1" stroke-dasharray="3"/><rect x="30" y="260" width="620" height="60" rx="12" fill="none" stroke="var(--refuse)" stroke-width="2" stroke-dasharray="6"/><text class="hd" x="50" y="282" fill="var(--refuse)">Контрольний контур</text><text class="lb" x="210" y="298" fill="var(--refuse)">Policy</text><text class="lb" x="310" y="298" fill="var(--refuse)">Evaluation</text><text class="lb" x="430" y="298" fill="var(--refuse)">Tracing</text><text class="lb" x="540" y="298" fill="var(--refuse)">Human-in-the-loop</text><line x1="340" y1="240" x2="340" y2="260" stroke="var(--refuse)" stroke-width="1.5" marker-end="url(#a8r)"/><text class="sm" x="340" y="30" text-anchor="middle">Робочий контур — що агент робить. Контрольний — що перевіряє, записує і обмежує.</text><defs><marker id="a8" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--dim)"/></marker><marker id="a8r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--refuse)"/></marker></defs></svg>'
   },
   {
     date:'Принцип', beat:'Пʼять властивостей інтегрованої архітектури',
-    body:'<p>Наявність компонентів в одному репозиторії — ще не інтеграція. Інтегрована архітектура має пʼять властивостей:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;width:170px">Явні контракти</td><td style="padding:6px 10px">Кожен компонент має визначений вхід і вихід. Retrieval повертає фрагменти з метаданими, інструмент — результат або типізовану помилку.</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Визначений потік керування</td><td style="padding:6px 10px">Архітектура відповідає, хто визначає наступний крок — LLM чи детермінований код. У різних місцях по-різному.</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Явний стан</td><td style="padding:6px 10px">Компоненти мають узгоджене уявлення про те, що вже відбулося. Неузгодженість → подвійний побічний ефект.</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Наскрізні обмеження</td><td style="padding:6px 10px">Безпека, дозволи, бюджети застосовуються в контрольованих точках, а не реалізуються незалежно в кожному компоненті.</td></tr><tr><td style="padding:6px 10px;font-weight:600">Керована відмова</td><td style="padding:6px 10px">Система знає, що робити, коли retrieval не знайшов доказів, policy повернув DENY, інструмент завершився таймаутом.</td></tr></table>',
+    body:'<p>Наявність компонентів в одному репозиторії — ще не інтеграція. Інтегрована архітектура має пʼять властивостей:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:170px">Явні контракти</td><td style="padding:6px 10px">Кожен компонент має визначений вхід і вихід. Retrieval повертає фрагменти з метаданими, інструмент — результат або типізовану помилку.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Визначений потік керування</td><td style="padding:6px 10px">Архітектура відповідає, хто визначає наступний крок — LLM чи детермінований код. У різних місцях по-різному.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Явний стан</td><td style="padding:6px 10px">Компоненти мають узгоджене уявлення про те, що вже відбулося. Неузгодженість → подвійний побічний ефект.</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Наскрізні обмеження</td><td style="padding:6px 10px">Безпека, дозволи, бюджети застосовуються в контрольованих точках, а не реалізуються незалежно в кожному компоненті.</td></tr><tr><td style="padding:6px 10px;font-weight:600">Керована відмова</td><td style="padding:6px 10px">Система знає, що робити, коли retrieval не знайшов доказів, policy повернув DENY, інструмент завершився таймаутом.</td></tr></table>',
     spot:{
       type:'quiz', q:'Система має Pydantic-контракт, retrieval, інструменти, tracing і evaluation dataset. Але retrieval повертає документи без перевірки is_active. Чого бракує?',
       opts:[
@@ -200,7 +346,7 @@ const NODES = [
   },
   {
     date:'Happy path', beat:'Один сценарій через усі шари', crit:1,
-    body:'<p>Клієнт: <em>«Поверніть гроші за замовлення ORD-2024-7891, мене списали двічі.»</em></p><p>Сценарій проходить через обидва контури:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--blue)">1</td><td style="padding:6px 10px;font-weight:600;width:140px">Вхід</td><td style="padding:6px 10px">Нормалізація запиту, визначення tenant і сесії</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--blue)">2</td><td style="padding:6px 10px;font-weight:600">LLM</td><td style="padding:6px 10px">Класифікація: payment_issue, high, should_escalate, check_payment → Pydantic-контракт</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--gold)">3</td><td style="padding:6px 10px;font-weight:600">Оркестратор</td><td style="padding:6px 10px">Перевірка пропозиції за правилами → дозволено → крок classify → verify</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--green)">4</td><td style="padding:6px 10px;font-weight:600">Інструмент</td><td style="padding:6px 10px">check_payment_status(ORD-2024-7891) → підтверджено подвійне списання</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--blue)">5</td><td style="padding:6px 10px;font-weight:600">Retrieval</td><td style="padding:6px 10px">Знайдено чинну політику повернення v3.1 (pre-filter is_active=true)</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--red)">6</td><td style="padding:6px 10px;font-weight:600">Policy</td><td style="padding:6px 10px">process_refund = DESTRUCTIVE → REQUIRE_APPROVAL</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--red)">7</td><td style="padding:6px 10px;font-weight:600">Human</td><td style="padding:6px 10px">Оператор підтвердив → ідемпотентне виконання → облік ефекту</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--red)">8</td><td style="padding:6px 10px;font-weight:600">Tracing</td><td style="padding:6px 10px">Повна траса: кожен крок, кожне рішення, кожен результат</td></tr></table><p>Кожен крок — компонент із попередніх тем. Тепер вони працюють разом, і між ними діють контракти.</p>',
+    body:'<p>Клієнт: <em>«Поверніть гроші за замовлення ORD-2024-7891, мене списали двічі.»</em></p><p>Сценарій проходить через обидва контури:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--ink2)">1</td><td style="padding:6px 10px;font-weight:600;width:140px">Вхід</td><td style="padding:6px 10px">Нормалізація запиту, визначення tenant і сесії</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">2</td><td style="padding:6px 10px;font-weight:600">LLM</td><td style="padding:6px 10px">Класифікація: payment_issue, high, should_escalate, check_payment → Pydantic-контракт</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">3</td><td style="padding:6px 10px;font-weight:600">Оркестратор</td><td style="padding:6px 10px">Перевірка пропозиції за правилами → дозволено → крок classify → verify</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--pass)">4</td><td style="padding:6px 10px;font-weight:600">Інструмент</td><td style="padding:6px 10px">check_payment_status(ORD-2024-7891) → підтверджено подвійне списання</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">5</td><td style="padding:6px 10px;font-weight:600">Retrieval</td><td style="padding:6px 10px">Знайдено чинну політику повернення v3.1 (pre-filter is_active=true)</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">6</td><td style="padding:6px 10px;font-weight:600">Policy</td><td style="padding:6px 10px">process_refund = DESTRUCTIVE → REQUIRE_APPROVAL</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">7</td><td style="padding:6px 10px;font-weight:600">Human</td><td style="padding:6px 10px">Оператор підтвердив → ідемпотентне виконання → облік ефекту</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">8</td><td style="padding:6px 10px;font-weight:600">Tracing</td><td style="padding:6px 10px">Повна траса: кожен крок, кожне рішення, кожен результат</td></tr></table><p>Кожен крок — компонент із попередніх тем. Тепер вони працюють разом, і між ними діють контракти.</p>',
     spot:{
       type:'predict', q:'На кроці 6 policy повернув REQUIRE_APPROVAL. Що відбувається з процесом?',
       opts:[
@@ -213,7 +359,7 @@ const NODES = [
   },
   {
     date:'Failure path', beat:'Що відбувається, коли щось не працює',
-    body:'<p>Той самий сценарій, але на кроці 4 інструмент повертає таймаут:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--green)">1–3</td><td style="padding:6px 10px">Вхід, LLM, оркестратор — як у happy path</td><td style="padding:6px 10px;width:30px;color:var(--green)">✓</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--red)">4</td><td style="padding:6px 10px">check_payment_status → <strong>timeout 30s</strong></td><td style="padding:6px 10px;color:var(--red)">✗</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--gold)">5</td><td style="padding:6px 10px">Оркестратор: retry #1 (транзієнтна помилка) → timeout знову</td><td style="padding:6px 10px;color:var(--red)">✗</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--gold)">6</td><td style="padding:6px 10px">Оркестратор: бюджет retry вичерпано → стан: unresolved</td><td style="padding:6px 10px;color:var(--gold)">⏸️</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--blue)">7</td><td style="padding:6px 10px">Відповідь клієнту: «Не вдалось перевірити статус. Заявку передано оператору.»</td><td style="padding:6px 10px;color:var(--green)">✓</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--red)">8</td><td style="padding:6px 10px">Tracing: повна траса включно з причиною ескалації</td><td style="padding:6px 10px;color:var(--green)">✓</td></tr></table><p>Система не вдала вигляду «все зламалось». Вона коректно визначила, що не може завершити процес, зберегла стан, повідомила клієнта і передала оператору. Це керована відмова — пʼята властивість інтеграції.</p>',
+    body:'<p>Той самий сценарій, але на кроці 4 інструмент повертає таймаут:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--pass)">1–3</td><td style="padding:6px 10px">Вхід, LLM, оркестратор — як у happy path</td><td style="padding:6px 10px;width:30px;color:var(--pass)">✓</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">4</td><td style="padding:6px 10px">check_payment_status → <strong>timeout 30s</strong></td><td style="padding:6px 10px;color:var(--refuse)">✗</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">5</td><td style="padding:6px 10px">Оркестратор: retry #1 (транзієнтна помилка) → timeout знову</td><td style="padding:6px 10px;color:var(--refuse)">✗</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">6</td><td style="padding:6px 10px">Оркестратор: бюджет retry вичерпано → стан: unresolved</td><td style="padding:6px 10px;color:var(--ink2)">⏸️</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;color:var(--ink2)">7</td><td style="padding:6px 10px">Відповідь клієнту: «Не вдалось перевірити статус. Заявку передано оператору.»</td><td style="padding:6px 10px;color:var(--pass)">✓</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--refuse)">8</td><td style="padding:6px 10px">Tracing: повна траса включно з причиною ескалації</td><td style="padding:6px 10px;color:var(--pass)">✓</td></tr></table><p>Система не вдала вигляду «все зламалось». Вона коректно визначила, що не може завершити процес, зберегла стан, повідомила клієнта і передала оператору. Це керована відмова — пʼята властивість інтеграції.</p>',
     spot:{
       type:'quiz', q:'Чому failure path важливіший за happy path для оцінки архітектури?',
       opts:[
@@ -226,7 +372,7 @@ const NODES = [
   },
   {
     date:'Артефакти', beat:'Що залишається після проєкту',
-    body:'<p>Фінальний проєкт — це evidence package, який доводить, що система працює:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;width:180px">Архітектурна схема</td><td style="padding:6px 10px">Компоненти, межі, контракти, джерела істини, потоки даних</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Потік станів</td><td style="padding:6px 10px">Автомат із переходами, інваріантами і точками ескалації</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Реєстр ризиків</td><td style="padding:6px 10px">Що може піти не так, яка ймовірність, який вплив, який residual risk</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Evaluation plan</td><td style="padding:6px 10px">Які сценарії перевіряються, якими способами, які критерії прийнятності</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Обмеження і out of scope</td><td style="padding:6px 10px">Що свідомо залишено за межами MVP і де проходитиме межа в повнішій реалізації</td></tr><tr><td style="padding:6px 10px;font-weight:600">README</td><td style="padding:6px 10px">Відтворювані інструкції: як запустити, як перевірити happy path і failure path</td></tr></table>',
+    body:'<p>Фінальний проєкт — це evidence package, який доводить, що система працює:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600;width:180px">Архітектурна схема</td><td style="padding:6px 10px">Компоненти, межі, контракти, джерела істини, потоки даних</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Потік станів</td><td style="padding:6px 10px">Автомат із переходами, інваріантами і точками ескалації</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Реєстр ризиків</td><td style="padding:6px 10px">Що може піти не так, яка ймовірність, який вплив, який residual risk</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Evaluation plan</td><td style="padding:6px 10px">Які сценарії перевіряються, якими способами, які критерії прийнятності</td></tr><tr style="border-bottom:1px solid var(--rule)"><td style="padding:6px 10px;font-weight:600">Обмеження і out of scope</td><td style="padding:6px 10px">Що свідомо залишено за межами MVP і де проходитиме межа в повнішій реалізації</td></tr><tr><td style="padding:6px 10px;font-weight:600">README</td><td style="padding:6px 10px">Відтворювані інструкції: як запустити, як перевірити happy path і failure path</td></tr></table>',
     spot:{
       type:'quiz', q:'Проєкт використовує тестовий адаптер платіжної системи замість реального API. Це недолік?',
       opts:[
@@ -242,63 +388,110 @@ const NODES = [
     body:'',
     spot:{type:'takeaways', items:[
       ['🏗️','Інтеграція — це звʼязки між компонентами, а не їхня кількість','Контракти, межі відповідальності, джерела істини, узгоджений стан і керована відмова — пʼять властивостей, які відрізняють архітектуру від набору компонентів.'],
-      ['🔴','Failure path показує справжню архітектуру','Happy path може працювати випадково. Failure path вимагає бюджетів, стану, ескалації і коректної комунікації з клієнтом.'],
-      ['📦','Evidence package доводить, що система працює','Архітектурна схема, реєстр ризиків, evaluation plan, трасування обох сценаріїв і README з відтворюваними інструкціями.']
+      ['1','Failure path показує справжню архітектуру','Happy path може працювати випадково. Failure path вимагає бюджетів, стану, ескалації і коректної комунікації з клієнтом.'],
+      ['2','Evidence package доводить, що система працює','Архітектурна схема, реєстр ризиків, evaluation plan, трасування обох сценаріїв і README з відтворюваними інструкціями.']
     ]}
   }
 ];
 
-let answered = new Set(), score = 0, totalQ = 0;
-function renderTimeline() {
-  const tl = document.getElementById('timeline');
-  let html = '';
-  NODES.forEach((n, i) => {
-    const locked = i > 0 ? ' locked' : '';
-    const dotClass = n.crit ? 'red' : (n.scene2 ? 'blue' : '');
-    html += `<div class="node${locked}" id="node${i}"><div class="dot ${dotClass}"></div><div class="node-date">${n.date}</div><div class="node-beat">${n.beat}</div><div class="node-body">${n.body}</div>${n.spot ? renderSpot(n.spot, i) : ''}</div>`;
+const root = document.documentElement;
+const tgl = document.getElementById('themeToggle');
+function setTheme(dark){
+  if (dark) root.setAttribute('data-theme','dark'); else root.removeAttribute('data-theme');
+  tgl.textContent = dark ? 'Світле' : 'Темне';
+  try { localStorage.setItem('bc-theme', dark ? 'dark' : 'light'); } catch(e) {}
+}
+try { if (localStorage.getItem('bc-theme') === 'dark') setTheme(true); } catch(e) {}
+tgl.addEventListener('click', () => setTheme(root.getAttribute('data-theme') !== 'dark'));
+
+let answered = new Map(), totalQ = 0;
+NODES.forEach(n => { if (n.spot && n.spot.type !== 'close' && n.spot.type !== 'takeaways') totalQ++; });
+
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+function render(){
+  document.getElementById('timeline').innerHTML = NODES.map((n,i) =>
+    `<div class="node ${i===0?'here':'shut'}" id="n${i}">
+      <div class="gate"></div>
+      <div class="node-k">${n.date}</div>
+      <div class="node-beat">${n.beat}</div>
+      <div class="node-inner">${i===0 ? body(n,i) : shut(n)}</div>
+    </div>`).join('');
+  tally();
+  open(0);
+}
+
+function body(n,i){ return `<div class="node-body">${n.body||''}</div>${n.spot ? spot(n.spot,i) : ''}`; }
+function shut(n){ return `<div class="shut-note">${n.shutNote || 'Відкриється після відповіді на питання вище.'}</div>`; }
+
+const LABEL = {predict:'Що далі?', quiz:'Перевірте себе', probe:'Як гадаєте?'};
+
+function spot(s,i){
+  if (s.type === 'close' || s.type === 'takeaways'){
+    const title = s.title || s.finishTitle || 'Прохід завершено';
+    const text  = s.text  || s.finishText  || '';
+    return `<div class="spot open">` +
+      s.items.map(([ic,t,b],k) => `<div class="pt"><div class="pt-n">${/^[0-9]+$/.test(String(ic)) ? ic : (k+1)}</div><div><div class="pt-t">${t}</div><div class="pt-b">${b}</div></div></div>`).join('') +
+      `<div class="close"><h2>${title}</h2>${text ? `<p>${text}</p>` : ''}<div class="tally" id="tally"></div></div></div>`;
+  }
+  return `<div class="spot open">
+    <div class="spot-k">${s.k || LABEL[s.type] || 'Перевірте себе'}</div>
+    <div class="spot-q">${s.q}</div>
+    <div>${s.opts.map(([t],oi) => `<button class="opt" type="button" onclick="pick(${i},${oi})">${esc(t)}</button>`).join('')}</div>
+    <div class="fb" id="fb${i}"><div class="fb-v" id="fv${i}"></div>${s.fb}</div>
+  </div>`;
+}
+
+function pick(i, oi){
+  if (answered.has(i)) return;
+  const s = NODES[i].spot, right = !!s.opts[oi][1];
+  answered.set(i, right);
+  const node = document.getElementById('n'+i);
+  node.querySelectorAll('.opt').forEach((b,k) => {
+    b.classList.add('off');
+    if (s.opts[k][1]) b.classList.add('yes');
+    if (k === oi && !right) b.classList.add('no');
   });
-  tl.innerHTML = html;
-  updateProgress();
-  const first = document.querySelector('#node0 .spot');
-  if (first) first.classList.add('open');
-  unlockNext(0);
+  const fb = document.getElementById('fb'+i);
+  fb.classList.add('show', right ? 'ok' : 'err');
+  document.getElementById('fv'+i).textContent = right ? 'Так, саме тут.' : 'Тут і ховається нюанс.';
+  node.classList.remove('here');
+  node.classList.add(right ? 'cleared' : 'stopped');
+  open(i);
+  tally();
 }
-function renderSpot(s, ni) {
-  if (s.type === 'takeaways') {
-    return `<div class="spot open" id="spot${ni}">${s.items.map(([icon,title,body]) => `<div class="takeaway-card"><div class="tk-icon">${icon}</div><div class="tk-title">${title}</div><div class="tk-body">${body}</div></div>`).join('')}<div class="finish-card" style="margin-top:24px"><h2>validate_and_execute пройдено</h2><div class="score-bar" id="scoreDisplay"></div><p>Один рядок коду. Сім рівнів захисту від наміру моделі до виконання дії.</p></div></div>`;
-  }
-  totalQ++;
-  const tag = s.type === 'predict' ? 'Що далі?' : 'Перевірте себе';
-  return `<div class="spot" id="spot${ni}"><div class="spot-tag">${tag}</div><div class="spot-q">${s.q}</div><div class="spot-opts">${s.opts.map(([text, correct], oi) => `<div class="spot-opt" onclick="answer(${ni},${oi},${correct})">${text}</div>`).join('')}</div><div class="spot-fb" id="fb${ni}">${s.fb}</div></div>`;
-}
-function answer(ni, oi, correct) {
-  if (answered.has(ni)) return;
-  answered.add(ni);
-  const spot = document.getElementById('spot'+ni);
-  const opts = spot.querySelectorAll('.spot-opt');
-  opts.forEach((o,i) => { o.classList.add('disabled'); if (i === oi) o.classList.add(correct ? 'correct' : 'wrong'); if (NODES[ni].spot.opts[i][1]) o.classList.add('correct'); });
-  if (correct) score++;
-  const fb = document.getElementById('fb'+ni);
-  fb.classList.add('show', correct ? 'pass' : 'fail');
-  unlockNext(ni);
-  updateProgress();
-  const sd = document.getElementById('scoreDisplay');
-  if (sd) sd.textContent = score + ' / ' + totalQ;
-}
-function unlockNext(fromIdx) {
-  let next = fromIdx + 1;
-  while (next < NODES.length) {
-    const node = document.getElementById('node'+next);
+
+function open(from){
+  let k = from + 1;
+  while (k < NODES.length){
+    const node = document.getElementById('n'+k);
     if (!node) break;
-    node.classList.remove('locked');
-    const spot = document.getElementById('spot'+next);
-    if (spot && !spot.classList.contains('open')) spot.classList.add('open');
-    if (NODES[next].spot && NODES[next].spot.type !== 'takeaways' && !answered.has(next)) break;
-    next++;
+    if (node.classList.contains('shut')){
+      node.classList.remove('shut');
+      node.classList.add('here');
+      node.querySelector('.node-inner').innerHTML = body(NODES[k], k);
+    }
+    const s = NODES[k].spot;
+    if (s && s.type !== 'close' && s.type !== 'takeaways' && !answered.has(k)) break;
+    if (s && (s.type === 'close' || s.type === 'takeaways')){ node.classList.remove('here'); node.classList.add('cleared'); }
+    k++;
   }
 }
-function updateProgress() { document.getElementById('progress').textContent = answered.size + ' / ' + totalQ; }
-renderTimeline();
+
+function tally(){
+  const done = answered.size;
+  document.getElementById('progress').innerHTML = done === 0
+    ? `Попереду <b>${totalQ}</b> ситуацій`
+    : `Пройдено <b>${done}</b> з ${totalQ}`;
+  const t = document.getElementById('tally');
+  if (t){
+    const right = [...answered.values()].filter(Boolean).length;
+    t.innerHTML = `Збіглося з практикою одразу: <b>${right}</b> з ${totalQ}.`;
+  }
+}
+
+render();
+
 </script>
 </body>
 </html>
