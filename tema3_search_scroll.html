@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Що бачить ембеддинг — Тема 3</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f0f0f2;--card:#fafafa;--border:#dde0e6;--text:#2c2c2c;--dim:#6b7280;
+--green:#22863a;--greenBg:rgba(34,134,58,.08);--red:#cf222e;--redBg:rgba(207,34,46,.08);
+--blue:#0969da;--blueBg:rgba(9,105,218,.08);--gold:#9a6700;--goldBg:rgba(154,103,0,.08);
+--accent:#1a7f37;--font:'Segoe UI','Helvetica Neue',sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;min-height:100vh}
+
+.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:linear-gradient(180deg,#e8e8ec 0%,#e2e2e8 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:32px 20px}
+.rail-icon{font-size:48px;margin-bottom:16px}
+.rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
+.rail h1{font-size:20px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:12px;color:#1a1a1a}
+.rail-sub{font-size:13px;color:var(--dim);text-align:center;line-height:1.5}
+.rail-progress{position:absolute;bottom:24px;font-size:12px;color:var(--dim)}
+
+.main{margin-left:260px;max-width:860px;padding:40px 24px 120px}
+
+.node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
+.node.locked{opacity:.25;pointer-events:none}
+.node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
+.node .dot.red{background:var(--red)}
+.node .dot.blue{background:var(--blue)}
+.node .dot.gold{background:var(--gold)}
+.node-date{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px}
+.node-beat{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:12px}
+.node-body{font-size:14px;color:var(--text);line-height:1.7}
+.node-body p{margin-bottom:10px}
+
+.codeblock{background:#f6f6f8;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'Fira Code','Cascadia Code',monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;color:#24292f;white-space:pre}
+.kw{color:#cf222e}.fn{color:#8250df}.str{color:#0a3069}.cm{color:#6e7781}.tp{color:#0550ae}
+
+.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.spot.open{display:block}
+.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px;font-weight:600}
+.spot-q{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:14px}
+.spot-opts{display:flex;flex-direction:column;gap:8px}
+.spot-opt{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;text-align:left;color:var(--text)}
+.spot-opt:hover{border-color:var(--blue);box-shadow:0 0 0 2px rgba(9,105,218,.12)}
+.spot-opt.correct{border-color:var(--green);background:var(--greenBg)}
+.spot-opt.wrong{border-color:var(--red);background:var(--redBg)}
+.spot-opt.disabled{pointer-events:none;opacity:.6}
+.spot-fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
+.spot-fb.show{display:block}
+.spot-fb.pass{background:var(--greenBg);border:1px solid rgba(34,134,58,.2)}
+.spot-fb.fail{background:var(--redBg);border:1px solid rgba(207,34,46,.2)}
+
+.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.takeaway-card .tk-icon{font-size:24px;margin-bottom:6px}
+.takeaway-card .tk-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:6px}
+.takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
+
+.finish-card{background:linear-gradient(135deg,#f0f0f2,#e8eaef);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
+.finish-card h2{font-size:22px;color:#1a1a1a;margin-bottom:8px}
+.finish-card p{font-size:14px;color:var(--dim)}
+.score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
+
+.risk-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;margin:0 2px}
+.risk-read{background:var(--greenBg);color:var(--green)}
+.risk-write{background:var(--goldBg);color:var(--gold)}
+.risk-dest{background:var(--redBg);color:var(--red)}
+
+@media(max-width:800px){.rail{display:none}.main{margin-left:0;padding:24px 16px 80px}}
+
+
+/* ─── DARK THEME ─── */
+[data-theme="dark"]{--bg:#181d28;--card:#212838;--border:#333d52;--text:#c9d1d9;--dim:#8b949e;
+--green:#3fb950;--greenBg:rgba(63,185,80,.10);--red:#f85149;--redBg:rgba(248,81,73,.10);
+--blue:#58a6ff;--blueBg:rgba(88,166,255,.10);--gold:#d29922;--goldBg:rgba(210,153,34,.10);
+--accent:#7ee787}
+[data-theme="dark"] body{background:linear-gradient(180deg,#181d28 0%,#1c2230 60%,#202840 100%);background-attachment:fixed}
+[data-theme="dark"] .rail{background:linear-gradient(180deg,#151a26 0%,#1c2436 100%)}
+[data-theme="dark"] .rail h1,[data-theme="dark"] .node-beat,[data-theme="dark"] .spot-q,
+[data-theme="dark"] .takeaway-card .tk-title,[data-theme="dark"] .finish-card h2{color:#e2e8f0}
+[data-theme="dark"] .codeblock{background:#0e1219;color:#c9d1d9}
+[data-theme="dark"] .kw{color:#ff7b72}[data-theme="dark"] .fn{color:#d2a8ff}
+[data-theme="dark"] .str{color:#a5d6ff}[data-theme="dark"] .cm{color:#8b949e}[data-theme="dark"] .tp{color:#79c0ff}
+[data-theme="dark"] .spot-opt{background:#181d28}
+[data-theme="dark"] .spot-opt:hover{box-shadow:0 0 0 2px rgba(88,166,255,.15)}
+[data-theme="dark"] .spot{box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] .takeaway-card{box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] .finish-card{background:linear-gradient(135deg,#212838,#263044)}
+[data-theme="dark"] .spot-fb.pass{border-color:rgba(63,185,80,.25)}
+[data-theme="dark"] .spot-fb.fail{border-color:rgba(248,81,73,.25)}
+
+/* ─── TOGGLE BUTTON ─── */
+.theme-toggle{position:absolute;top:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--dim);cursor:pointer;z-index:20;display:flex;align-items:center;gap:6px;transition:background .2s,border-color .2s}
+.theme-toggle:hover{border-color:var(--blue)}
+@media(max-width:800px){.theme-toggle{position:fixed;top:12px;right:12px}}
+
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()"><span id="themeIcon">🌙</span> <span id="themeLabel">Темна</span></button>
+
+<div class="rail">
+  <div class="rail-icon">🔍</div>
+  <div class="rail-eye">Тема 3 · Інтерактив</div>
+  <h1>Що бачить ембеддинг і що ні</h1>
+  <div class="rail-sub">Чотири пастки<br>семантичного пошуку.</div>
+  <div class="rail-progress" id="progress">0 / 0</div>
+</div>
+
+<div class="main" id="timeline"></div>
+
+<script>
+
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  if(isDark){html.removeAttribute('data-theme');localStorage.setItem('theme','light');
+    document.getElementById('themeIcon').textContent='🌙';document.getElementById('themeLabel').textContent='Темна';
+  }else{html.setAttribute('data-theme','dark');localStorage.setItem('theme','dark');
+    document.getElementById('themeIcon').textContent='☀️';document.getElementById('themeLabel').textContent='Світла';
+  }
+}
+(function(){
+  const saved=localStorage.getItem('theme');
+  if(saved==='dark'){document.documentElement.setAttribute('data-theme','dark');
+    document.addEventListener('DOMContentLoaded',function(){
+      var i=document.getElementById('themeIcon');if(i)i.textContent='☀️';
+      var l=document.getElementById('themeLabel');if(l)l.textContent='Світла';
+    });
+  }
+})();
+
+const NODES = [
+  {
+    date:'Де ми', beat:'Від валідації до пошуку',
+    body:'<p>У Темах 1 і 2 ми побудували контур між моделлю і кодом. Тепер модель отримує доступ до ваших документів. Для цього документи потрібно перетворити на вектори і знайти найрелевантніші для запиту.</p><p>Цей інтерактив — про головну пастку конвеєра: <strong>семантична близькість не означає фактичну правильність</strong>. Ви побачите пари фрагментів із їхнім cosine similarity score і маєте визначити, чи можна довіряти результату пошуку.</p>'
+  },
+  {
+    date:'Візуал', beat:'Семантичний простір — що бачить модель',
+    body:'<svg viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:Segoe UI,sans-serif}.dot{r:6;stroke-width:2}.lb{font-size:11px}.dim{font-size:10px;fill:var(--dim,#6b7280)}.dist{font-size:10px;fill:var(--dim,#6b7280);font-style:italic}</style><rect x="0" y="0" width="680" height="380" rx="12" fill="var(--card,#fafafa)" stroke="var(--border,#dde0e6)"/><text class="dim" x="20" y="24">Семантичний простір (спрощена 2D-проєкція)</text><circle class="dot" cx="200" cy="120" fill="#22863a" stroke="#22863a"/><text class="lb" x="215" y="116" fill="#22863a">повернення дозволено</text><text class="dim" x="215" y="130">v3.1, is_active: true</text><circle class="dot" cx="220" cy="160" fill="#cf222e" stroke="#cf222e"/><text class="lb" x="235" y="156" fill="#cf222e">повернення НЕ дозволено</text><text class="dim" x="235" y="170">той самий документ</text><line x1="206" y1="126" x2="220" y2="154" stroke="var(--dim,#6b7280)" stroke-dasharray="3" opacity=".5"/><text class="dist" x="160" y="148">0.92</text><circle class="dot" cx="180" cy="220" fill="#d29922" stroke="#d29922"/><text class="lb" x="195" y="216" fill="#d29922">повернення 30 днів</text><text class="dim" x="195" y="230">v2.0, is_active: false</text><line x1="200" y1="126" x2="186" y2="214" stroke="var(--dim,#6b7280)" stroke-dasharray="3" opacity=".5"/><text class="dist" x="145" y="175">0.91</text><circle class="dot" cx="480" cy="100" fill="#0969da" stroke="#0969da"/><text class="lb" x="495" y="96" fill="#0969da">cancel order (EN)</text><text class="dim" x="495" y="110">lang: en</text><circle class="dot" cx="460" cy="150" fill="#0969da" stroke="#0969da"/><text class="lb" x="475" y="146" fill="#0969da">скасувати замовлення</text><text class="dim" x="475" y="160">lang: uk</text><line x1="480" y1="106" x2="466" y2="144" stroke="var(--dim,#6b7280)" stroke-dasharray="3" opacity=".5"/><text class="dist" x="500" y="132">0.86</text><circle class="dot" cx="400" cy="300" fill="var(--dim,#6b7280)" stroke="var(--dim,#6b7280)"/><text class="lb" x="415" y="296" fill="var(--dim,#6b7280)">ліміт 5 000</text><circle class="dot" cx="420" cy="310" fill="var(--dim,#6b7280)" stroke="var(--dim,#6b7280)"/><text class="lb" x="435" y="322" fill="var(--dim,#6b7280)">ліміт 50 000</text><line x1="406" y1="300" x2="420" y2="310" stroke="var(--dim,#6b7280)" stroke-dasharray="3" opacity=".5"/><text class="dist" x="365" y="312">0.90</text><text class="dim" x="20" y="365">Близько = та сама тема. НЕ означає = правильна відповідь.</text></svg>'
+  },
+  {
+    date:'Пара 1', beat:'Чинна і архівна політика',
+    body:'<p>Запит користувача: <em>«Скільки днів є на повернення товару?»</em></p><p>Пошук повернув два фрагменти:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px;width:50px;font-weight:600;color:var(--blue)">A</td><td style="padding:8px 10px">Фізичний товар належної якості можна повернути протягом <strong>14 днів</strong> після отримання.</td><td style="padding:8px 10px;width:90px;text-align:right;color:var(--dim)">score: 0.94</td></tr><tr><td style="padding:8px 10px;font-weight:600;color:var(--blue)">B</td><td style="padding:8px 10px">Фізичний товар можна було повернути протягом <strong>30 днів</strong> після отримання.</td><td style="padding:8px 10px;text-align:right;color:var(--dim)">score: 0.91</td></tr></table><p>Обидва — у топі результатів. Обидва — про повернення фізичного товару. Обидва мають високий score.</p>',
+    spot:{
+      type:'quiz', q:'Який фрагмент агент має використати для відповіді?',
+      opts:[
+        ['A — score вищий, тому він надійніший як джерело відповіді',0],
+        ['Обидва — вони доповнюють один одного',0],
+        ['Без метаданих is_active визначити не можна',1]
+      ],
+      fb:'Score показує семантичну близькість до запиту — обидва фрагменти про повернення товару, тому score високий у обох. Але B — архівна версія (v2.0, is_active: false). Без метаданих пошук не може відрізнити чинне від застарілого. Фільтр is_active=true відсіює B до порівняння.'
+    }
+  },
+  {
+    date:'Пара 2', beat:'Ствердження і заперечення', crit:1,
+    body:'<p>Запит: <em>«Чи дозволено доступ до адмін-панелі?»</em></p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px;width:50px;font-weight:600;color:var(--blue)">A</td><td style="padding:8px 10px">Доступ до адміністративної панелі <strong>дозволено</strong> лише користувачам із роллю administrator.</td><td style="padding:8px 10px;width:90px;text-align:right;color:var(--dim)">score: 0.93</td></tr><tr><td style="padding:8px 10px;font-weight:600;color:var(--blue)">B</td><td style="padding:8px 10px">Звичайним користувачам і гостям доступ до адміністративної панелі <strong>не дозволено</strong>.</td><td style="padding:8px 10px;text-align:right;color:var(--dim)">score: 0.92</td></tr></table><p>Score майже ідентичний. Тексти протилежні за змістом. Це один і той самий документ — два речення з одного абзацу.</p>',
+    spot:{
+      type:'quiz', q:'Чому cosine similarity між «дозволено» і «не дозволено» така висока?',
+      opts:[
+        ['Модель зламана — вона має розрізняти ствердження і заперечення',0],
+        ['Ембеддинг кодує тему, а не логіку',1],
+        ['Score 0.92 — це насправді низька подібність',0]
+      ],
+      fb:'Ембеддинг перетворює текст у позицію в семантичному просторі. «Дозволено» і «не дозволено» мають однакову лексику і одну тему. Частка «не» майже не зсуває вектор. Така поведінка — межа того, що ембеддинг кодує, а не помилка моделі.'
+    }
+  },
+  {
+    date:'Пара 3', beat:'Різні мови — одна тема',
+    body:'<p>Запит: <em>«Як скасувати замовлення?»</em></p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px;width:50px;font-weight:600;color:var(--blue)">A</td><td style="padding:8px 10px">Замовлення можна скасувати до передавання перевізнику. <span style="color:var(--dim)">[uk]</span></td><td style="padding:8px 10px;width:90px;text-align:right;color:var(--dim)">score: 0.89</td></tr><tr><td style="padding:8px 10px;font-weight:600;color:var(--blue)">B</td><td style="padding:8px 10px">An order can be cancelled before it is transferred to the carrier. <span style="color:var(--dim)">[en]</span></td><td style="padding:8px 10px;text-align:right;color:var(--dim)">score: 0.86</td></tr></table><p>Мультимовна модель (<code>multilingual-e5-small</code>) знаходить обидва, бо зміст однаковий. Але агент відповідає українською — англійський фрагмент зайвий у контексті.</p>',
+    spot:{
+      type:'predict', q:'Як відфільтрувати англомовний фрагмент?',
+      opts:[
+        ['Знизити score для англійських текстів через алгоритмічну корекцію ваг',0],
+        ['Pre-filter language=uk до пошуку',1],
+        ['Ембеддинг сам має надавати перевагу мові запиту',0]
+      ],
+      fb:'Ембеддинг навмисно не розрізняє мови — це його сильна сторона для мультимовного пошуку. Фільтрація за мовою — задача метаданих, не моделі. Pre-filter language=uk відсіює до пошуку, не витрачаючи місця в результатах.'
+    }
+  },
+  {
+    date:'Пара 4', beat:'Числові значення',
+    body:'<p>Запит: <em>«Який ліміт повернення коштів?»</em></p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 10px;width:50px;font-weight:600;color:var(--blue)">A</td><td style="padding:8px 10px">Ліміт автоматичного повернення — <strong>5 000 ₴</strong>. Вище — потрібне підтвердження.</td><td style="padding:8px 10px;width:90px;text-align:right;color:var(--dim)">score: 0.90</td></tr><tr><td style="padding:8px 10px;font-weight:600;color:var(--blue)">B</td><td style="padding:8px 10px">Ліміт автоматичного повернення — <strong>50 000 ₴</strong>. Вище — потрібне підтвердження.</td><td style="padding:8px 10px;text-align:right;color:var(--dim)">score: 0.90</td></tr></table><p>Score однаковий. Різниця — в одному нулі. Для ембеддингу «5 000» і «50 000» семантично ідентичні: обидва — числа після слова «ліміт».</p>',
+    spot:{
+      type:'quiz', q:'Чи може ембеддинг розрізнити 5 000 і 50 000?',
+      opts:[
+        ['Так, якщо використати потужнішу модель з більшою розмірністю вектора',0],
+        ['Ні — числа не кодуються у вектор',1],
+        ['Так, якщо нормалізувати числа перед індексацією',0]
+      ],
+      fb:'Ембеддинг кодує «тема: ліміт повернення». Числове значення для нього — деталь, яка майже не впливає на вектор. Різниця між 5 000 і 50 000 — це задача для коду (семантична валідація з Теми 1), не для пошуку.'
+    }
+  },
+  {
+    date:'Висновок', beat:'Що ембеддинг бачить і що ні',
+    body:'<p>Ви побачили чотири пастки одного й того самого конвеєра:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;width:160px">Версійність</td><td style="padding:6px 10px">Чинна і застаріла — однаковий score. Потрібен фільтр is_active.</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Заперечення</td><td style="padding:6px 10px">«дозволено» і «не дозволено» — score 0.92. Ембеддинг не кодує логіку.</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Мова</td><td style="padding:6px 10px">Мультимовна модель знаходить усе — потрібен фільтр language.</td></tr><tr><td style="padding:6px 10px;font-weight:600">Числа</td><td style="padding:6px 10px">5 000 і 50 000 — однаковий score. Числа не кодуються.</td></tr></table><p><strong>Ембеддинг знаходить кандидатів. Метадані, фільтри і семантична валідація визначають правильність.</strong></p>'
+  },
+  {
+    date:'Що забрати з собою', beat:'Три речі, які варто запамʼятати', scene2:1,
+    body:'',
+    spot:{type:'takeaways', items:[
+      ['🔍','Високий score — це тема, не факт','Cosine similarity 0.93 означає «про те саме». Не означає «правильна відповідь».'],
+      ['🏷️','Метадані вирішують те, що ембеддинг не може','version, is_active, language — три фільтри, без яких результати ненадійні.'],
+      ['🔢','Числа і заперечення — сліпі зони','Ембеддинг не розрізняє 5 000 і 50 000, «дозволено» і «не дозволено». Це задача для коду.']
+    ]}
+  }
+];
+
+let answered = new Set(), score = 0, totalQ = 0;
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  let html = '';
+  NODES.forEach((n, i) => {
+    const locked = i > 0 ? ' locked' : '';
+    const dotClass = n.crit ? 'red' : (n.scene2 ? 'blue' : '');
+    html += `<div class="node${locked}" id="node${i}"><div class="dot ${dotClass}"></div><div class="node-date">${n.date}</div><div class="node-beat">${n.beat}</div><div class="node-body">${n.body}</div>${n.spot ? renderSpot(n.spot, i) : ''}</div>`;
+  });
+  tl.innerHTML = html;
+  updateProgress();
+  const first = document.querySelector('#node0 .spot');
+  if (first) first.classList.add('open');
+  unlockNext(0);
+}
+function renderSpot(s, ni) {
+  if (s.type === 'takeaways') {
+    return `<div class="spot open" id="spot${ni}">${s.items.map(([icon,title,body]) => `<div class="takeaway-card"><div class="tk-icon">${icon}</div><div class="tk-title">${title}</div><div class="tk-body">${body}</div></div>`).join('')}<div class="finish-card" style="margin-top:24px"><h2>validate_and_execute пройдено</h2><div class="score-bar" id="scoreDisplay"></div><p>Один рядок коду. Сім рівнів захисту від наміру моделі до виконання дії.</p></div></div>`;
+  }
+  totalQ++;
+  const tag = s.type === 'predict' ? 'Що далі?' : 'Перевірте себе';
+  return `<div class="spot" id="spot${ni}"><div class="spot-tag">${tag}</div><div class="spot-q">${s.q}</div><div class="spot-opts">${s.opts.map(([text, correct], oi) => `<div class="spot-opt" onclick="answer(${ni},${oi},${correct})">${text}</div>`).join('')}</div><div class="spot-fb" id="fb${ni}">${s.fb}</div></div>`;
+}
+function answer(ni, oi, correct) {
+  if (answered.has(ni)) return;
+  answered.add(ni);
+  const spot = document.getElementById('spot'+ni);
+  const opts = spot.querySelectorAll('.spot-opt');
+  opts.forEach((o,i) => { o.classList.add('disabled'); if (i === oi) o.classList.add(correct ? 'correct' : 'wrong'); if (NODES[ni].spot.opts[i][1]) o.classList.add('correct'); });
+  if (correct) score++;
+  const fb = document.getElementById('fb'+ni);
+  fb.classList.add('show', correct ? 'pass' : 'fail');
+  unlockNext(ni);
+  updateProgress();
+  const sd = document.getElementById('scoreDisplay');
+  if (sd) sd.textContent = score + ' / ' + totalQ;
+}
+function unlockNext(fromIdx) {
+  let next = fromIdx + 1;
+  while (next < NODES.length) {
+    const node = document.getElementById('node'+next);
+    if (!node) break;
+    node.classList.remove('locked');
+    const spot = document.getElementById('spot'+next);
+    if (spot && !spot.classList.contains('open')) spot.classList.add('open');
+    if (NODES[next].spot && NODES[next].spot.type !== 'takeaways' && !answered.has(next)) break;
+    next++;
+  }
+}
+function updateProgress() { document.getElementById('progress').textContent = answered.size + ' / ' + totalQ; }
+renderTimeline();
+</script>
+</body>
+</html>

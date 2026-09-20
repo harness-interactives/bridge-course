@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Інтегрована архітектура — Тема 8</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f0f0f2;--card:#fafafa;--border:#dde0e6;--text:#2c2c2c;--dim:#6b7280;
+--green:#22863a;--greenBg:rgba(34,134,58,.08);--red:#cf222e;--redBg:rgba(207,34,46,.08);
+--blue:#0969da;--blueBg:rgba(9,105,218,.08);--gold:#9a6700;--goldBg:rgba(154,103,0,.08);
+--accent:#1a7f37;--font:'Segoe UI','Helvetica Neue',sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;min-height:100vh}
+
+.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:linear-gradient(180deg,#e8e8ec 0%,#e2e2e8 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:32px 20px}
+.rail-icon{font-size:48px;margin-bottom:16px}
+.rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
+.rail h1{font-size:20px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:12px;color:#1a1a1a}
+.rail-sub{font-size:13px;color:var(--dim);text-align:center;line-height:1.5}
+.rail-progress{position:absolute;bottom:24px;font-size:12px;color:var(--dim)}
+
+.main{margin-left:260px;max-width:860px;padding:40px 24px 120px}
+
+.node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
+.node.locked{opacity:.25;pointer-events:none}
+.node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
+.node .dot.red{background:var(--red)}
+.node .dot.blue{background:var(--blue)}
+.node .dot.gold{background:var(--gold)}
+.node-date{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px}
+.node-beat{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:12px}
+.node-body{font-size:14px;color:var(--text);line-height:1.7}
+.node-body p{margin-bottom:10px}
+
+.codeblock{background:#f6f6f8;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'Fira Code','Cascadia Code',monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;color:#24292f;white-space:pre}
+.kw{color:#cf222e}.fn{color:#8250df}.str{color:#0a3069}.cm{color:#6e7781}.tp{color:#0550ae}
+
+.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.spot.open{display:block}
+.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px;font-weight:600}
+.spot-q{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:14px}
+.spot-opts{display:flex;flex-direction:column;gap:8px}
+.spot-opt{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;text-align:left;color:var(--text)}
+.spot-opt:hover{border-color:var(--blue);box-shadow:0 0 0 2px rgba(9,105,218,.12)}
+.spot-opt.correct{border-color:var(--green);background:var(--greenBg)}
+.spot-opt.wrong{border-color:var(--red);background:var(--redBg)}
+.spot-opt.disabled{pointer-events:none;opacity:.6}
+.spot-fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
+.spot-fb.show{display:block}
+.spot-fb.pass{background:var(--greenBg);border:1px solid rgba(34,134,58,.2)}
+.spot-fb.fail{background:var(--redBg);border:1px solid rgba(207,34,46,.2)}
+
+.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.takeaway-card .tk-icon{font-size:24px;margin-bottom:6px}
+.takeaway-card .tk-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:6px}
+.takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
+
+.finish-card{background:linear-gradient(135deg,#f0f0f2,#e8eaef);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
+.finish-card h2{font-size:22px;color:#1a1a1a;margin-bottom:8px}
+.finish-card p{font-size:14px;color:var(--dim)}
+.score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
+
+.risk-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;margin:0 2px}
+.risk-read{background:var(--greenBg);color:var(--green)}
+.risk-write{background:var(--goldBg);color:var(--gold)}
+.risk-dest{background:var(--redBg);color:var(--red)}
+
+@media(max-width:800px){.rail{display:none}.main{margin-left:0;padding:24px 16px 80px}}
+
+
+/* ─── DARK THEME ─── */
+[data-theme="dark"]{--bg:#181d28;--card:#212838;--border:#333d52;--text:#c9d1d9;--dim:#8b949e;
+--green:#3fb950;--greenBg:rgba(63,185,80,.10);--red:#f85149;--redBg:rgba(248,81,73,.10);
+--blue:#58a6ff;--blueBg:rgba(88,166,255,.10);--gold:#d29922;--goldBg:rgba(210,153,34,.10);
+--accent:#7ee787}
+[data-theme="dark"] body{background:linear-gradient(180deg,#181d28 0%,#1c2230 60%,#202840 100%);background-attachment:fixed}
+[data-theme="dark"] .rail{background:linear-gradient(180deg,#151a26 0%,#1c2436 100%)}
+[data-theme="dark"] .rail h1,[data-theme="dark"] .node-beat,[data-theme="dark"] .spot-q,
+[data-theme="dark"] .takeaway-card .tk-title,[data-theme="dark"] .finish-card h2{color:#e2e8f0}
+[data-theme="dark"] .codeblock{background:#0e1219;color:#c9d1d9}
+[data-theme="dark"] .kw{color:#ff7b72}[data-theme="dark"] .fn{color:#d2a8ff}
+[data-theme="dark"] .str{color:#a5d6ff}[data-theme="dark"] .cm{color:#8b949e}[data-theme="dark"] .tp{color:#79c0ff}
+[data-theme="dark"] .spot-opt{background:#181d28}
+[data-theme="dark"] .spot-opt:hover{box-shadow:0 0 0 2px rgba(88,166,255,.15)}
+[data-theme="dark"] .spot{box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] .takeaway-card{box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] .finish-card{background:linear-gradient(135deg,#212838,#263044)}
+[data-theme="dark"] .spot-fb.pass{border-color:rgba(63,185,80,.25)}
+[data-theme="dark"] .spot-fb.fail{border-color:rgba(248,81,73,.25)}
+
+/* ─── TOGGLE BUTTON ─── */
+.theme-toggle{position:absolute;top:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--dim);cursor:pointer;z-index:20;display:flex;align-items:center;gap:6px;transition:background .2s,border-color .2s}
+.theme-toggle:hover{border-color:var(--blue)}
+@media(max-width:800px){.theme-toggle{position:fixed;top:12px;right:12px}}
+
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()"><span id="themeIcon">🌙</span> <span id="themeLabel">Темна</span></button>
+
+<div class="rail">
+  <div class="rail-icon">🏗️</div>
+  <div class="rail-eye">Тема 8 · Інтерактив</div>
+  <h1>Від компонентів до архітектури</h1>
+  <div class="rail-sub">Два контури. Один сценарій.<br>Happy path і failure path.</div>
+  <div class="rail-progress" id="progress">0 / 0</div>
+</div>
+
+<div class="main" id="timeline"></div>
+
+<script>
+
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  if(isDark){html.removeAttribute('data-theme');localStorage.setItem('theme','light');
+    document.getElementById('themeIcon').textContent='🌙';document.getElementById('themeLabel').textContent='Темна';
+  }else{html.setAttribute('data-theme','dark');localStorage.setItem('theme','dark');
+    document.getElementById('themeIcon').textContent='☀️';document.getElementById('themeLabel').textContent='Світла';
+  }
+}
+(function(){
+  const saved=localStorage.getItem('theme');
+  if(saved==='dark'){document.documentElement.setAttribute('data-theme','dark');
+    document.addEventListener('DOMContentLoaded',function(){
+      var i=document.getElementById('themeIcon');if(i)i.textContent='☀️';
+      var l=document.getElementById('themeLabel');if(l)l.textContent='Світла';
+    });
+  }
+})();
+
+const NODES = [
+  {
+    date:'Де ми', beat:'Сім тем — один агент',
+    body:'<p>За сім тем ви побудували всі компоненти агентної системи: валідацію виходів, виклик інструментів, семантичний пошук, памʼять, оцінювання, безпеку, оркестрацію. Кожен компонент працює окремо.</p><p>Ця тема ставить фінальне питання: <strong>як вони працюють разом як одна архітектура?</strong> Наявність правильних компонентів ще не означає наявності правильної архітектури. Контракт може бути коректним, retrieval — знаходити релевантні документи, інструмент — надійно виконувати операцію. Але якщо вони неправильно зʼєднані — система ненадійна.</p><p>Ви побачите архітектуру як два контури — робочий і контрольний — і простежите один сценарій через обидва.</p>'
+  },
+  {
+    date:'Візуал', beat:'Два контури агентної архітектури',
+    body:'<svg viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:Segoe UI,sans-serif}.lb{font-size:11px;font-weight:600}.sm{font-size:9px;fill:var(--dim,#6b7280)}.hd{font-size:13px;font-weight:700}</style><rect x="30" y="60" width="620" height="180" rx="16" fill="none" stroke="#0969da" stroke-width="2" stroke-dasharray="6"/><text class="hd" x="50" y="85" fill="#0969da">Робочий контур</text><rect x="60" y="100" width="100" height="40" rx="8" fill="var(--blueBg,rgba(9,105,218,.08))" stroke="#0969da"/><text class="lb" x="110" y="124" text-anchor="middle" fill="#0969da">Вхід</text><line x1="160" y1="120" x2="185" y2="120" stroke="var(--dim,#6b7280)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="185" y="100" width="100" height="40" rx="8" fill="var(--blueBg,rgba(9,105,218,.08))" stroke="#0969da"/><text class="lb" x="235" y="124" text-anchor="middle" fill="#0969da">LLM</text><line x1="285" y1="120" x2="310" y2="120" stroke="var(--dim,#6b7280)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="310" y="100" width="120" height="40" rx="8" fill="var(--goldBg,rgba(154,103,0,.08))" stroke="#d29922"/><text class="lb" x="370" y="124" text-anchor="middle" fill="#d29922">Оркестратор</text><line x1="430" y1="120" x2="455" y2="120" stroke="var(--dim,#6b7280)" stroke-width="1.5" marker-end="url(#a8)"/><rect x="455" y="100" width="100" height="40" rx="8" fill="var(--greenBg,rgba(34,134,58,.08))" stroke="#22863a"/><text class="lb" x="505" y="124" text-anchor="middle" fill="#22863a">Інструменти</text><rect x="185" y="170" width="100" height="40" rx="8" fill="var(--blueBg,rgba(9,105,218,.08))" stroke="#0969da"/><text class="lb" x="235" y="194" text-anchor="middle" fill="#0969da">Retrieval</text><rect x="310" y="170" width="120" height="40" rx="8" fill="var(--blueBg,rgba(9,105,218,.08))" stroke="#0969da"/><text class="lb" x="370" y="194" text-anchor="middle" fill="#0969da">Памʼять</text><line x1="370" y1="140" x2="370" y2="170" stroke="var(--dim,#6b7280)" stroke-width="1" stroke-dasharray="3"/><line x1="235" y1="140" x2="235" y2="170" stroke="var(--dim,#6b7280)" stroke-width="1" stroke-dasharray="3"/><rect x="30" y="260" width="620" height="60" rx="12" fill="none" stroke="#cf222e" stroke-width="2" stroke-dasharray="6"/><text class="hd" x="50" y="282" fill="#cf222e">Контрольний контур</text><text class="lb" x="210" y="298" fill="#cf222e">Policy</text><text class="lb" x="310" y="298" fill="#cf222e">Evaluation</text><text class="lb" x="430" y="298" fill="#cf222e">Tracing</text><text class="lb" x="540" y="298" fill="#cf222e">Human-in-the-loop</text><line x1="340" y1="240" x2="340" y2="260" stroke="#cf222e" stroke-width="1.5" marker-end="url(#a8r)"/><text class="sm" x="340" y="30" text-anchor="middle">Робочий контур — що агент робить. Контрольний — що перевіряє, записує і обмежує.</text><defs><marker id="a8" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="var(--dim,#6b7280)"/></marker><marker id="a8r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#cf222e"/></marker></defs></svg>'
+  },
+  {
+    date:'Принцип', beat:'Пʼять властивостей інтегрованої архітектури',
+    body:'<p>Наявність компонентів в одному репозиторії — ще не інтеграція. Інтегрована архітектура має пʼять властивостей:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;width:170px">Явні контракти</td><td style="padding:6px 10px">Кожен компонент має визначений вхід і вихід. Retrieval повертає фрагменти з метаданими, інструмент — результат або типізовану помилку.</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Визначений потік керування</td><td style="padding:6px 10px">Архітектура відповідає, хто визначає наступний крок — LLM чи детермінований код. У різних місцях по-різному.</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Явний стан</td><td style="padding:6px 10px">Компоненти мають узгоджене уявлення про те, що вже відбулося. Неузгодженість → подвійний побічний ефект.</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Наскрізні обмеження</td><td style="padding:6px 10px">Безпека, дозволи, бюджети застосовуються в контрольованих точках, а не реалізуються незалежно в кожному компоненті.</td></tr><tr><td style="padding:6px 10px;font-weight:600">Керована відмова</td><td style="padding:6px 10px">Система знає, що робити, коли retrieval не знайшов доказів, policy повернув DENY, інструмент завершився таймаутом.</td></tr></table>',
+    spot:{
+      type:'quiz', q:'Система має Pydantic-контракт, retrieval, інструменти, tracing і evaluation dataset. Але retrieval повертає документи без перевірки is_active. Чого бракує?',
+      opts:[
+        ['Ще одного інструменту, який перевірятиме версію кожного знайденого документа',0],
+        ['Контрактів і обмежень між компонентами',1],
+        ['Більшого evaluation dataset із тестами на версійність',0]
+      ],
+      fb:'Компоненти є, але між ними немає узгоджених обмежень. Retrieval повертає все, policy не фільтрує за чинністю, tracing не записує, який документ використано. Інтеграція — це звʼязки і правила між компонентами, а не їхня кількість.'
+    }
+  },
+  {
+    date:'Happy path', beat:'Один сценарій через усі шари', crit:1,
+    body:'<p>Клієнт: <em>«Поверніть гроші за замовлення ORD-2024-7891, мене списали двічі.»</em></p><p>Сценарій проходить через обидва контури:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--blue)">1</td><td style="padding:6px 10px;font-weight:600;width:140px">Вхід</td><td style="padding:6px 10px">Нормалізація запиту, визначення tenant і сесії</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--blue)">2</td><td style="padding:6px 10px;font-weight:600">LLM</td><td style="padding:6px 10px">Класифікація: payment_issue, high, should_escalate, check_payment → Pydantic-контракт</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--gold)">3</td><td style="padding:6px 10px;font-weight:600">Оркестратор</td><td style="padding:6px 10px">Перевірка пропозиції за правилами → дозволено → крок classify → verify</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--green)">4</td><td style="padding:6px 10px;font-weight:600">Інструмент</td><td style="padding:6px 10px">check_payment_status(ORD-2024-7891) → підтверджено подвійне списання</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--blue)">5</td><td style="padding:6px 10px;font-weight:600">Retrieval</td><td style="padding:6px 10px">Знайдено чинну політику повернення v3.1 (pre-filter is_active=true)</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--red)">6</td><td style="padding:6px 10px;font-weight:600">Policy</td><td style="padding:6px 10px">process_refund = DESTRUCTIVE → REQUIRE_APPROVAL</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--red)">7</td><td style="padding:6px 10px;font-weight:600">Human</td><td style="padding:6px 10px">Оператор підтвердив → ідемпотентне виконання → облік ефекту</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--red)">8</td><td style="padding:6px 10px;font-weight:600">Tracing</td><td style="padding:6px 10px">Повна траса: кожен крок, кожне рішення, кожен результат</td></tr></table><p>Кожен крок — компонент із попередніх тем. Тепер вони працюють разом, і між ними діють контракти.</p>',
+    spot:{
+      type:'predict', q:'На кроці 6 policy повернув REQUIRE_APPROVAL. Що відбувається з процесом?',
+      opts:[
+        ['Процес зупиняється — стан у checkpoint',1],
+        ['Процес продовжується і повертає результат без підтвердження',0],
+        ['Агент переформульовує запит і самостійно пробує менш ризиковану альтернативну дію',0]
+      ],
+      fb:'REQUIRE_APPROVAL розриває процес у часі. Стан зберігається в контрольній точці (Тема 7). Людина може підтвердити через хвилину або через годину. Після підтвердження процес відновлюється з того самого стану — ідемпотентний ключ вже створений (Тема 2).'
+    }
+  },
+  {
+    date:'Failure path', beat:'Що відбувається, коли щось не працює',
+    body:'<p>Той самий сценарій, але на кроці 4 інструмент повертає таймаут:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;width:50px;color:var(--green)">1–3</td><td style="padding:6px 10px">Вхід, LLM, оркестратор — як у happy path</td><td style="padding:6px 10px;width:30px;color:var(--green)">✓</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--red)">4</td><td style="padding:6px 10px">check_payment_status → <strong>timeout 30s</strong></td><td style="padding:6px 10px;color:var(--red)">✗</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--gold)">5</td><td style="padding:6px 10px">Оркестратор: retry #1 (транзієнтна помилка) → timeout знову</td><td style="padding:6px 10px;color:var(--red)">✗</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--gold)">6</td><td style="padding:6px 10px">Оркестратор: бюджет retry вичерпано → стан: unresolved</td><td style="padding:6px 10px;color:var(--gold)">⏸️</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;color:var(--blue)">7</td><td style="padding:6px 10px">Відповідь клієнту: «Не вдалось перевірити статус. Заявку передано оператору.»</td><td style="padding:6px 10px;color:var(--green)">✓</td></tr><tr><td style="padding:6px 10px;font-weight:600;color:var(--red)">8</td><td style="padding:6px 10px">Tracing: повна траса включно з причиною ескалації</td><td style="padding:6px 10px;color:var(--green)">✓</td></tr></table><p>Система не вдала вигляду «все зламалось». Вона коректно визначила, що не може завершити процес, зберегла стан, повідомила клієнта і передала оператору. Це керована відмова — пʼята властивість інтеграції.</p>',
+    spot:{
+      type:'quiz', q:'Чому failure path важливіший за happy path для оцінки архітектури?',
+      opts:[
+        ['Failure path трапляється частіше, і саме тому його треба тестувати першим',0],
+        ['Happy path працює навіть без інтеграції — failure path ні',1],
+        ['Failure path простіший для тестування',0]
+      ],
+      fb:'Happy path може працювати випадково — навіть якщо компоненти не інтегровані. Failure path вимагає узгодженого стану, бюджетів, керованих переходів і коректної комунікації з клієнтом. Саме тут видно, чи є архітектура чи лише набір компонентів.'
+    }
+  },
+  {
+    date:'Артефакти', beat:'Що залишається після проєкту',
+    body:'<p>Фінальний проєкт — це evidence package, який доводить, що система працює:</p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600;width:180px">Архітектурна схема</td><td style="padding:6px 10px">Компоненти, межі, контракти, джерела істини, потоки даних</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Потік станів</td><td style="padding:6px 10px">Автомат із переходами, інваріантами і точками ескалації</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Реєстр ризиків</td><td style="padding:6px 10px">Що може піти не так, яка ймовірність, який вплив, який residual risk</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Evaluation plan</td><td style="padding:6px 10px">Які сценарії перевіряються, якими способами, які критерії прийнятності</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Обмеження і out of scope</td><td style="padding:6px 10px">Що свідомо залишено за межами MVP і де проходитиме межа в повнішій реалізації</td></tr><tr><td style="padding:6px 10px;font-weight:600">README</td><td style="padding:6px 10px">Відтворювані інструкції: як запустити, як перевірити happy path і failure path</td></tr></table>',
+    spot:{
+      type:'quiz', q:'Проєкт використовує тестовий адаптер платіжної системи замість реального API. Це недолік?',
+      opts:[
+        ['Так — без реальних інтеграцій проєкт не демонструє production-готовність системи',0],
+        ['Ні, якщо задокументовано і показано межу заміни',1],
+        ['Залежить від вимог викладача',0]
+      ],
+      fb:'Обмеження — нормальна частина MVP. Тестовий адаптер, невеликий корпус, mock human approval — допустимі, якщо вони явно задокументовані. Архітектура має показувати, як компонент замінюється на production-версію без зміни контрактів.'
+    }
+  },
+  {
+    date:'Що забрати з собою', beat:'Три речі, які варто запамʼятати', scene2:1,
+    body:'',
+    spot:{type:'takeaways', items:[
+      ['🏗️','Інтеграція — це звʼязки між компонентами, а не їхня кількість','Контракти, межі відповідальності, джерела істини, узгоджений стан і керована відмова — пʼять властивостей, які відрізняють архітектуру від набору компонентів.'],
+      ['🔴','Failure path показує справжню архітектуру','Happy path може працювати випадково. Failure path вимагає бюджетів, стану, ескалації і коректної комунікації з клієнтом.'],
+      ['📦','Evidence package доводить, що система працює','Архітектурна схема, реєстр ризиків, evaluation plan, трасування обох сценаріїв і README з відтворюваними інструкціями.']
+    ]}
+  }
+];
+
+let answered = new Set(), score = 0, totalQ = 0;
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  let html = '';
+  NODES.forEach((n, i) => {
+    const locked = i > 0 ? ' locked' : '';
+    const dotClass = n.crit ? 'red' : (n.scene2 ? 'blue' : '');
+    html += `<div class="node${locked}" id="node${i}"><div class="dot ${dotClass}"></div><div class="node-date">${n.date}</div><div class="node-beat">${n.beat}</div><div class="node-body">${n.body}</div>${n.spot ? renderSpot(n.spot, i) : ''}</div>`;
+  });
+  tl.innerHTML = html;
+  updateProgress();
+  const first = document.querySelector('#node0 .spot');
+  if (first) first.classList.add('open');
+  unlockNext(0);
+}
+function renderSpot(s, ni) {
+  if (s.type === 'takeaways') {
+    return `<div class="spot open" id="spot${ni}">${s.items.map(([icon,title,body]) => `<div class="takeaway-card"><div class="tk-icon">${icon}</div><div class="tk-title">${title}</div><div class="tk-body">${body}</div></div>`).join('')}<div class="finish-card" style="margin-top:24px"><h2>validate_and_execute пройдено</h2><div class="score-bar" id="scoreDisplay"></div><p>Один рядок коду. Сім рівнів захисту від наміру моделі до виконання дії.</p></div></div>`;
+  }
+  totalQ++;
+  const tag = s.type === 'predict' ? 'Що далі?' : 'Перевірте себе';
+  return `<div class="spot" id="spot${ni}"><div class="spot-tag">${tag}</div><div class="spot-q">${s.q}</div><div class="spot-opts">${s.opts.map(([text, correct], oi) => `<div class="spot-opt" onclick="answer(${ni},${oi},${correct})">${text}</div>`).join('')}</div><div class="spot-fb" id="fb${ni}">${s.fb}</div></div>`;
+}
+function answer(ni, oi, correct) {
+  if (answered.has(ni)) return;
+  answered.add(ni);
+  const spot = document.getElementById('spot'+ni);
+  const opts = spot.querySelectorAll('.spot-opt');
+  opts.forEach((o,i) => { o.classList.add('disabled'); if (i === oi) o.classList.add(correct ? 'correct' : 'wrong'); if (NODES[ni].spot.opts[i][1]) o.classList.add('correct'); });
+  if (correct) score++;
+  const fb = document.getElementById('fb'+ni);
+  fb.classList.add('show', correct ? 'pass' : 'fail');
+  unlockNext(ni);
+  updateProgress();
+  const sd = document.getElementById('scoreDisplay');
+  if (sd) sd.textContent = score + ' / ' + totalQ;
+}
+function unlockNext(fromIdx) {
+  let next = fromIdx + 1;
+  while (next < NODES.length) {
+    const node = document.getElementById('node'+next);
+    if (!node) break;
+    node.classList.remove('locked');
+    const spot = document.getElementById('spot'+next);
+    if (spot && !spot.classList.contains('open')) spot.classList.add('open');
+    if (NODES[next].spot && NODES[next].spot.type !== 'takeaways' && !answered.has(next)) break;
+    next++;
+  }
+}
+function updateProgress() { document.getElementById('progress').textContent = answered.size + ' / ' + totalQ; }
+renderTimeline();
+</script>
+</body>
+</html>

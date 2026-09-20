@@ -6,24 +6,21 @@
 <title>Pipeline валідації — Тема 1</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#8b949e;
---green:#3fb950;--greenBg:rgba(63,185,80,.12);--red:#f85149;--redBg:rgba(248,81,73,.12);
---blue:#58a6ff;--blueBg:rgba(88,166,255,.12);--gold:#d29922;--goldBg:rgba(210,153,34,.12);
---accent:#7ee787;--font:'Segoe UI','Helvetica Neue',sans-serif}
-body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden}
+:root{--bg:#f0f0f2;--card:#fafafa;--border:#dde0e6;--text:#2c2c2c;--dim:#6b7280;
+--green:#22863a;--greenBg:rgba(34,134,58,.08);--red:#cf222e;--redBg:rgba(207,34,46,.08);
+--blue:#0969da;--blueBg:rgba(9,105,218,.08);--gold:#9a6700;--goldBg:rgba(154,103,0,.08);
+--accent:#1a7f37;--font:'Segoe UI','Helvetica Neue',sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;min-height:100vh}
 
-/* ─── RAIL ─── */
-.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:linear-gradient(180deg,#0d1117 0%,#101820 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:32px 20px}
+.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:linear-gradient(180deg,#e8e8ec 0%,#e2e2e8 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:32px 20px}
 .rail-icon{font-size:48px;margin-bottom:16px}
 .rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
-.rail h1{font-size:20px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:12px;color:#fff}
+.rail h1{font-size:20px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:12px;color:#1a1a1a}
 .rail-sub{font-size:13px;color:var(--dim);text-align:center;line-height:1.5}
 .rail-progress{position:absolute;bottom:24px;font-size:12px;color:var(--dim)}
 
-/* ─── MAIN ─── */
-.main{margin-left:260px;max-width:720px;padding:40px 32px 120px}
+.main{margin-left:260px;max-width:860px;padding:40px 24px 120px}
 
-/* ─── NODES ─── */
 .node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
 .node.locked{opacity:.25;pointer-events:none}
 .node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
@@ -31,50 +28,75 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .node .dot.blue{background:var(--blue)}
 .node .dot.gold{background:var(--gold)}
 .node-date{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px}
-.node-beat{font-size:18px;font-weight:700;color:#fff;margin-bottom:12px}
+.node-beat{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:12px}
 .node-body{font-size:14px;color:var(--text);line-height:1.7}
 .node-body p{margin-bottom:10px}
 
-/* ─── CODE BLOCK ─── */
-.codeblock{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'Fira Code','Cascadia Code',monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;color:#c9d1d9;white-space:pre}
-.kw{color:#ff7b72}.fn{color:#d2a8ff}.str{color:#a5d6ff}.cm{color:#8b949e}.tp{color:#79c0ff}
+.codeblock{background:#f6f6f8;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'Fira Code','Cascadia Code',monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;color:#24292f;white-space:pre}
+.kw{color:#cf222e}.fn{color:#8250df}.str{color:#0a3069}.cm{color:#6e7781}.tp{color:#0550ae}
 
-/* ─── SPOT (question) ─── */
-.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none}
+.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .spot.open{display:block}
-.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px}
-.spot-q{font-size:15px;font-weight:600;color:#fff;margin-bottom:14px}
+.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px;font-weight:600}
+.spot-q{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:14px}
 .spot-opts{display:flex;flex-direction:column;gap:8px}
-.spot-opt{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;color:var(--text)}
-.spot-opt:hover{border-color:var(--blue)}
+.spot-opt{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;text-align:left;color:var(--text)}
+.spot-opt:hover{border-color:var(--blue);box-shadow:0 0 0 2px rgba(9,105,218,.12)}
 .spot-opt.correct{border-color:var(--green);background:var(--greenBg)}
 .spot-opt.wrong{border-color:var(--red);background:var(--redBg)}
 .spot-opt.disabled{pointer-events:none;opacity:.6}
 .spot-fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
 .spot-fb.show{display:block}
-.spot-fb.pass{background:var(--greenBg);border:1px solid rgba(63,185,80,.3)}
-.spot-fb.fail{background:var(--redBg);border:1px solid rgba(248,81,73,.3)}
+.spot-fb.pass{background:var(--greenBg);border:1px solid rgba(34,134,58,.2)}
+.spot-fb.fail{background:var(--redBg);border:1px solid rgba(207,34,46,.2)}
 
-/* ─── TAKEAWAYS ─── */
-.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0}
+.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .takeaway-card .tk-icon{font-size:24px;margin-bottom:6px}
-.takeaway-card .tk-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+.takeaway-card .tk-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:6px}
 .takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
 
-/* ─── FINISH ─── */
-.finish-card{background:linear-gradient(135deg,#161b22,#1a2332);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
-.finish-card h2{font-size:22px;color:#fff;margin-bottom:8px}
+.finish-card{background:linear-gradient(135deg,#f0f0f2,#e8eaef);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
+.finish-card h2{font-size:22px;color:#1a1a1a;margin-bottom:8px}
 .finish-card p{font-size:14px;color:var(--dim)}
 .score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
 
-/* ─── RESPONSIVE ─── */
-@media(max-width:800px){
-.rail{display:none}
-.main{margin-left:0;padding:24px 16px 80px}
-}
+.risk-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;margin:0 2px}
+.risk-read{background:var(--greenBg);color:var(--green)}
+.risk-write{background:var(--goldBg);color:var(--gold)}
+.risk-dest{background:var(--redBg);color:var(--red)}
+
+@media(max-width:800px){.rail{display:none}.main{margin-left:0;padding:24px 16px 80px}}
+
+
+/* ─── DARK THEME ─── */
+[data-theme="dark"]{--bg:#181d28;--card:#212838;--border:#333d52;--text:#c9d1d9;--dim:#8b949e;
+--green:#3fb950;--greenBg:rgba(63,185,80,.10);--red:#f85149;--redBg:rgba(248,81,73,.10);
+--blue:#58a6ff;--blueBg:rgba(88,166,255,.10);--gold:#d29922;--goldBg:rgba(210,153,34,.10);
+--accent:#7ee787}
+[data-theme="dark"] body{background:linear-gradient(180deg,#181d28 0%,#1c2230 60%,#202840 100%);background-attachment:fixed}
+[data-theme="dark"] .rail{background:linear-gradient(180deg,#151a26 0%,#1c2436 100%)}
+[data-theme="dark"] .rail h1,[data-theme="dark"] .node-beat,[data-theme="dark"] .spot-q,
+[data-theme="dark"] .takeaway-card .tk-title,[data-theme="dark"] .finish-card h2{color:#e2e8f0}
+[data-theme="dark"] .codeblock{background:#0e1219;color:#c9d1d9}
+[data-theme="dark"] .kw{color:#ff7b72}[data-theme="dark"] .fn{color:#d2a8ff}
+[data-theme="dark"] .str{color:#a5d6ff}[data-theme="dark"] .cm{color:#8b949e}[data-theme="dark"] .tp{color:#79c0ff}
+[data-theme="dark"] .spot-opt{background:#181d28}
+[data-theme="dark"] .spot-opt:hover{box-shadow:0 0 0 2px rgba(88,166,255,.15)}
+[data-theme="dark"] .spot{box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] .takeaway-card{box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] .finish-card{background:linear-gradient(135deg,#212838,#263044)}
+[data-theme="dark"] .spot-fb.pass{border-color:rgba(63,185,80,.25)}
+[data-theme="dark"] .spot-fb.fail{border-color:rgba(248,81,73,.25)}
+
+/* ─── TOGGLE BUTTON ─── */
+.theme-toggle{position:absolute;top:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--dim);cursor:pointer;z-index:20;display:flex;align-items:center;gap:6px;transition:background .2s,border-color .2s}
+.theme-toggle:hover{border-color:var(--blue)}
+@media(max-width:800px){.theme-toggle{position:fixed;top:12px;right:12px}}
+
 </style>
 </head>
 <body>
+<button class="theme-toggle" onclick="toggleTheme()"><span id="themeIcon">🌙</span> <span id="themeLabel">Темна</span></button>
 
 <div class="rail">
   <div class="rail-icon">🔧</div>
@@ -87,11 +109,40 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 <div class="main" id="timeline"></div>
 
 <script>
+
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  if(isDark){html.removeAttribute('data-theme');localStorage.setItem('theme','light');
+    document.getElementById('themeIcon').textContent='🌙';document.getElementById('themeLabel').textContent='Темна';
+  }else{html.setAttribute('data-theme','dark');localStorage.setItem('theme','dark');
+    document.getElementById('themeIcon').textContent='☀️';document.getElementById('themeLabel').textContent='Світла';
+  }
+}
+(function(){
+  const saved=localStorage.getItem('theme');
+  if(saved==='dark'){document.documentElement.setAttribute('data-theme','dark');
+    document.addEventListener('DOMContentLoaded',function(){
+      var i=document.getElementById('themeIcon');if(i)i.textContent='☀️';
+      var l=document.getElementById('themeLabel');if(l)l.textContent='Світла';
+    });
+  }
+})();
+
 const NODES = [
+  // ──── SCENE 0: CONTEXT ────
+  {
+    date:'Про що це', beat:'Навіщо перевіряти те, що повернула модель',
+    body:`<p>LLM — недетермінований компонент. Один і той самий промпт може дати різні відповіді: правильну, майже правильну, і повністю неправильну. Модель не «виконує команду» — вона генерує найбільш імовірне продовження тексту. Іноді це саме те, що потрібно. Іноді — ні.</p>
+<p>Якщо ви будуєте систему, де відповідь LLM визначає, що зробить код (яку категорію присвоїти зверненню, який пріоритет поставити, чи ескалювати), — вам потрібен спосіб перевірити відповідь перед виконанням. Не вручну. Кодом.</p>
+<p>Pipeline валідації — це послідовність таких перевірок. Кожен шар ловить свій клас помилок: синтаксис, структуру, логіку, дозволи. Жоден шар не замінює інший. Разом вони формують контур, через який проходить кожна відповідь моделі.</p>
+<p>У цьому інтерактиві ви побачите, як один конкретний JSON проходить через п'ять шарів — і де зупиняється.</p>`
+  },
+
   // ──── SCENE 1: THE JSON ────
   {
-    date:'Контекст', beat:'Клієнт написав у підтримку',
-    body:`<p>«У мене списали гроші двічі за одне замовлення.» Агент підтримки — це LLM-система, яка класифікує звернення, визначає пріоритет і пропонує дію. Модель повертає структурований JSON, який код має перевірити перед виконанням.</p>
+    date:'Сценарій', beat:'Клієнт написав у підтримку',
+    body:`<p>«У мене списали гроші двічі за одне замовлення.» Агент підтримки — LLM-система, яка класифікує звернення, визначає пріоритет і пропонує дію. Модель повертає структурований JSON, який код має перевірити перед виконанням.</p>
 <p>Ось що повернула модель:</p>
 <div class="codeblock">{
   "<span class="str">category</span>":    "<span class="str">billing_problem</span>",
@@ -100,7 +151,11 @@ const NODES = [
   "<span class="str">recommended_action</span>": "<span class="str">check_payment_status</span>",
   "<span class="str">user_message</span>": "<span class="str">Ми перевіримо статус вашої оплати</span>"
 }</div>
-<p>Цей JSON пройде через п'ять шарів валідації. На кожному — інша перевірка. Подивимось, де він зупиниться.</p>`
+<p>На перший погляд — розумна відповідь. Але три з п'яти значень не відповідають контракту. Подивимось, як pipeline це виявить.</p>`
+  },
+  {
+    date:'Огляд', beat:'Pipeline одним поглядом',
+    body:'<svg viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:Segoe UI,sans-serif}.hd{font-size:13px;font-weight:700;fill:var(--text,#2c2c2c)}.sub{font-size:11px;fill:var(--dim,#6b7280)}.ok{fill:#22863a}.fail{fill:#cf222e}.bx{rx:8;ry:8;stroke-width:1.5}</style><rect class="bx" x="10" y="10" width="660" height="52" fill="var(--greenBg,rgba(34,134,58,.08))" stroke="#22863a"/><text class="hd ok" x="30" y="38">Шар 1</text><text class="sub" x="90" y="38">JSON parsing</text><text class="sub" x="560" y="38">✓ синтаксис OK</text><line x1="340" y1="62" x2="340" y2="78" stroke="var(--dim,#6b7280)" stroke-width="1.5" stroke-dasharray="4"/><rect class="bx" x="10" y="78" width="660" height="52" fill="var(--redBg,rgba(207,34,46,.08))" stroke="#cf222e"/><text class="hd fail" x="30" y="106">Шар 2</text><text class="sub" x="90" y="106">Pydantic + strict=True</text><text class="sub" x="460" y="106" style="fill:#cf222e">✗ 3 помилки: enum, enum, type</text><line x1="340" y1="130" x2="340" y2="146" stroke="var(--dim,#6b7280)" stroke-width="1.5" stroke-dasharray="4"/><rect class="bx" x="10" y="146" width="660" height="52" fill="var(--card,#fafafa)" stroke="var(--border,#dde0e6)" opacity=".5"/><text class="hd" x="30" y="174" opacity=".4">Шар 3</text><text class="sub" x="90" y="174" opacity=".4">Семантична валідація</text><text class="sub" x="500" y="174" opacity=".4">не досягнуто</text><line x1="340" y1="198" x2="340" y2="214" stroke="var(--dim,#6b7280)" stroke-width="1" stroke-dasharray="4" opacity=".3"/><rect class="bx" x="10" y="214" width="320" height="46" fill="var(--card,#fafafa)" stroke="var(--border,#dde0e6)" opacity=".5"/><text class="hd" x="30" y="240" opacity=".4">Шар 4</text><text class="sub" x="90" y="240" opacity=".4">Policy / дозволи</text><rect class="bx" x="350" y="214" width="320" height="46" fill="var(--card,#fafafa)" stroke="var(--border,#dde0e6)" opacity=".5"/><text class="hd" x="370" y="240" opacity=".4">Шар 5</text><text class="sub" x="430" y="240" opacity=".4">Executor</text><text class="sub" x="200" y="295" style="font-size:12px;fill:var(--dim,#6b7280)">Pipeline зупинився на шарі 2. Шари 3–5 не перевірялись.</text></svg>'
   },
 
   // ──── LAYER 1 ────
@@ -117,9 +172,9 @@ const NODES = [
     spot:{
       type:'predict', q:'Що НЕ перевіряє json.loads()?',
       opts:[
-        ['Чи закриті всі дужки',0],
+        ['Чи закриті всі дужки та коми між елементами',0],
         ['Чи є коми між елементами',0],
-        ['Чи значення "billing_problem" дозволене контрактом',1],
+        ['Чи значення дозволене контрактом',1],
         ['Чи рядки в подвійних лапках',0]
       ],
       fb:'json.loads() перевіряє лише синтаксис JSON. Він не знає нічого про контракт — які поля дозволені, які значення валідні. "billing_problem" пройде json.loads() без проблем.'
@@ -156,8 +211,8 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
     spot:{
       type:'predict', q:'Чому strict=True критичний у цьому контракті?',
       opts:[
-        ['Без нього Pydantic відхиляє зайві поля',0],
-        ['Без нього Pydantic тихо конвертує "yes" в true',1],
+        ['Без нього Pydantic не перевіряє зайві поля в JSON',0],
+        ['Без нього "yes" тихо стає true',1],
         ['Без нього json.loads() не парсить JSON',0],
         ['Без нього enum-перевірка не працює',0]
       ],
@@ -187,8 +242,8 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
     spot:{
       type:'quiz', q:'Pydantic (шар 2) міг би зловити цю помилку?',
       opts:[
-        ['Так — треба додати validator',0],
-        ['Ні — Pydantic перевіряє структуру, не бізнес-логіку',1],
+        ['Так — через Pydantic validator для залежностей між полями',0],
+        ['Ні — це бізнес-логіка, не структура',1],
         ['Так — через Field(ge=...) можна обмежити',0]
       ],
       fb:'Pydantic перевіряє типи, enum, обмеження полів. Залежності між полями ("якщо фінансова проблема, то priority не може бути low") — це бізнес-логіка, відповідальність шару 3. Змішування цих рівнів ускладнює підтримку.'
@@ -215,11 +270,11 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
     spot:{
       type:'quiz', q:'LLM запропонувала дію "approve_refund". Який шар зупинить першим?',
       opts:[
-        ['Шар 2 — Pydantic відхилить бо немає в enum',1],
-        ['Шар 4 — Policy зупинить бо не в allowlist',0],
+        ['Шар 2 — немає в enum контракту',1],
+        ['Шар 4 — Policy зупинить, бо дії немає в allowlist',0],
         ['Шар 3 — семантика виявить суперечність',0]
       ],
-      fb:'Шар 2 спрацює першим: "approve_refund" не входить в Literal enum контракту. Policy (шар 4) навіть не побачить цей запит — pipeline зупиняється на першому шарі, що виявив помилку. Це і є defence in depth: два незалежних бар\'єри для одної загрози.'
+      fb:'Шар 2 спрацює першим: "approve_refund" не входить в Literal enum контракту. Policy (шар 4) навіть не побачить цей запит — pipeline зупиняється на першому шарі, що виявив помилку. Це і є defence in depth: два незалежних барʼєри для одної загрози.'
     }
   },
 
@@ -247,8 +302,8 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
       type:'quiz', q:'Яке головне правило pipeline валідації?',
       opts:[
         ['Достатньо одного надійного шару',0],
-        ['Кожен шар ловить свій клас помилок — жоден не замінює інший',1],
-        ['Семантична валідація важливіша за структурну',0],
+        ['Шари незалежні — кожен ловить своє',1],
+        ['Семантика важливіша за структуру, тому інші шари зайві',0],
         ['Policy має перевіряти бізнес-логіку',0]
       ],
       fb:'Defence in depth: шари незалежні. json.loads() не знає про контракт. Pydantic не знає про бізнес-логіку. Семантика не знає про дозволи. Policy не знає про техніку виконання. Кожен робить одне — і робить добре.'
@@ -257,12 +312,12 @@ should_escalate: <span class="str">"yes"</span> — рядок замість bo
 
   // ──── TAKEAWAYS ────
   {
-    date:'Що забрати з собою', beat:'Три речі, які варто запам\'ятати', scene2:1,
+    date:'Що забрати з собою', beat:'Три речі, які варто запамʼятати', scene2:1,
     body:'',
     spot:{type:'takeaways', items:[
-      ['🔧','Вихід LLM — це пропозиція, не команда','Модель повертає структурований намір. Код перевіряє його на п\'яти рівнях перед виконанням. Без цих перевірок кожна відповідь — ризик.'],
+      ['🔧','Вихід LLM — це пропозиція, не команда','Модель повертає структурований намір. Код перевіряє його на пʼяти рівнях перед виконанням. Без цих перевірок кожна відповідь — ризик.'],
       ['🛡️','strict=True — не опція, а необхідність','Без strict-режиму Pydantic тихо конвертує "yes" в true, "1" в 1. Помилка проходить непоміченою і стає рішенням агента.'],
-      ['⚖️','Кожен шар — свій клас помилок','Структура (шар 2), логіка (шар 3) і дозволи (шар 4) — три незалежних бар\'єри. Змішування робить систему крихкою.']
+      ['⚖️','Кожен шар — свій клас помилок','Структура (шар 2), логіка (шар 3) і дозволи (шар 4) — три незалежних барʼєри. Змішування робить систему крихкою.']
     ]}
   }
 ];

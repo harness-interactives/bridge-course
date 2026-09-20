@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Знайди помилку — Тема 5</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f0f0f2;--card:#fafafa;--border:#dde0e6;--text:#2c2c2c;--dim:#6b7280;
+--green:#22863a;--greenBg:rgba(34,134,58,.08);--red:#cf222e;--redBg:rgba(207,34,46,.08);
+--blue:#0969da;--blueBg:rgba(9,105,218,.08);--gold:#9a6700;--goldBg:rgba(154,103,0,.08);
+--accent:#1a7f37;--font:'Segoe UI','Helvetica Neue',sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;min-height:100vh}
+
+.rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:linear-gradient(180deg,#e8e8ec 0%,#e2e2e8 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:32px 20px}
+.rail-icon{font-size:48px;margin-bottom:16px}
+.rail-eye{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:8px}
+.rail h1{font-size:20px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:12px;color:#1a1a1a}
+.rail-sub{font-size:13px;color:var(--dim);text-align:center;line-height:1.5}
+.rail-progress{position:absolute;bottom:24px;font-size:12px;color:var(--dim)}
+
+.main{margin-left:260px;max-width:860px;padding:40px 24px 120px}
+
+.node{position:relative;padding:24px 0 24px 40px;border-left:2px solid var(--border);margin-left:12px;opacity:1;transition:opacity .4s}
+.node.locked{opacity:.25;pointer-events:none}
+.node .dot{position:absolute;left:-7px;top:28px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
+.node .dot.red{background:var(--red)}
+.node .dot.blue{background:var(--blue)}
+.node .dot.gold{background:var(--gold)}
+.node-date{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);margin-bottom:4px}
+.node-beat{font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:12px}
+.node-body{font-size:14px;color:var(--text);line-height:1.7}
+.node-body p{margin-bottom:10px}
+
+.codeblock{background:#f6f6f8;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;font-family:'Fira Code','Cascadia Code',monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;color:#24292f;white-space:pre}
+.kw{color:#cf222e}.fn{color:#8250df}.str{color:#0a3069}.cm{color:#6e7781}.tp{color:#0550ae}
+
+.spot{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:16px 0 8px;padding:20px;display:none;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.spot.open{display:block}
+.spot-tag{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:8px;font-weight:600}
+.spot-q{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:14px}
+.spot-opts{display:flex;flex-direction:column;gap:8px}
+.spot-opt{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s;text-align:left;color:var(--text)}
+.spot-opt:hover{border-color:var(--blue);box-shadow:0 0 0 2px rgba(9,105,218,.12)}
+.spot-opt.correct{border-color:var(--green);background:var(--greenBg)}
+.spot-opt.wrong{border-color:var(--red);background:var(--redBg)}
+.spot-opt.disabled{pointer-events:none;opacity:.6}
+.spot-fb{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6;display:none}
+.spot-fb.show{display:block}
+.spot-fb.pass{background:var(--greenBg);border:1px solid rgba(34,134,58,.2)}
+.spot-fb.fail{background:var(--redBg);border:1px solid rgba(207,34,46,.2)}
+
+.takeaway-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:10px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.takeaway-card .tk-icon{font-size:24px;margin-bottom:6px}
+.takeaway-card .tk-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:6px}
+.takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
+
+.finish-card{background:linear-gradient(135deg,#f0f0f2,#e8eaef);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
+.finish-card h2{font-size:22px;color:#1a1a1a;margin-bottom:8px}
+.finish-card p{font-size:14px;color:var(--dim)}
+.score-bar{margin:16px auto;font-size:28px;font-weight:700;color:var(--accent)}
+
+.risk-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;margin:0 2px}
+.risk-read{background:var(--greenBg);color:var(--green)}
+.risk-write{background:var(--goldBg);color:var(--gold)}
+.risk-dest{background:var(--redBg);color:var(--red)}
+
+@media(max-width:800px){.rail{display:none}.main{margin-left:0;padding:24px 16px 80px}}
+
+
+/* ─── DARK THEME ─── */
+[data-theme="dark"]{--bg:#181d28;--card:#212838;--border:#333d52;--text:#c9d1d9;--dim:#8b949e;
+--green:#3fb950;--greenBg:rgba(63,185,80,.10);--red:#f85149;--redBg:rgba(248,81,73,.10);
+--blue:#58a6ff;--blueBg:rgba(88,166,255,.10);--gold:#d29922;--goldBg:rgba(210,153,34,.10);
+--accent:#7ee787}
+[data-theme="dark"] body{background:linear-gradient(180deg,#181d28 0%,#1c2230 60%,#202840 100%);background-attachment:fixed}
+[data-theme="dark"] .rail{background:linear-gradient(180deg,#151a26 0%,#1c2436 100%)}
+[data-theme="dark"] .rail h1,[data-theme="dark"] .node-beat,[data-theme="dark"] .spot-q,
+[data-theme="dark"] .takeaway-card .tk-title,[data-theme="dark"] .finish-card h2{color:#e2e8f0}
+[data-theme="dark"] .codeblock{background:#0e1219;color:#c9d1d9}
+[data-theme="dark"] .kw{color:#ff7b72}[data-theme="dark"] .fn{color:#d2a8ff}
+[data-theme="dark"] .str{color:#a5d6ff}[data-theme="dark"] .cm{color:#8b949e}[data-theme="dark"] .tp{color:#79c0ff}
+[data-theme="dark"] .spot-opt{background:#181d28}
+[data-theme="dark"] .spot-opt:hover{box-shadow:0 0 0 2px rgba(88,166,255,.15)}
+[data-theme="dark"] .spot{box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] .takeaway-card{box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] .finish-card{background:linear-gradient(135deg,#212838,#263044)}
+[data-theme="dark"] .spot-fb.pass{border-color:rgba(63,185,80,.25)}
+[data-theme="dark"] .spot-fb.fail{border-color:rgba(248,81,73,.25)}
+
+/* ─── TOGGLE BUTTON ─── */
+.theme-toggle{position:absolute;top:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--dim);cursor:pointer;z-index:20;display:flex;align-items:center;gap:6px;transition:background .2s,border-color .2s}
+.theme-toggle:hover{border-color:var(--blue)}
+@media(max-width:800px){.theme-toggle{position:fixed;top:12px;right:12px}}
+
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()"><span id="themeIcon">🌙</span> <span id="themeLabel">Темна</span></button>
+
+<div class="rail">
+  <div class="rail-icon">🔎</div>
+  <div class="rail-eye">Тема 5 · Інтерактив</div>
+  <h1>Знайди точку відхилення</h1>
+  <div class="rail-sub">Три кейси. Три траєкторії.<br>Де все пішло не так?</div>
+  <div class="rail-progress" id="progress">0 / 0</div>
+</div>
+
+<div class="main" id="timeline"></div>
+
+<script>
+
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  if(isDark){html.removeAttribute('data-theme');localStorage.setItem('theme','light');
+    document.getElementById('themeIcon').textContent='🌙';document.getElementById('themeLabel').textContent='Темна';
+  }else{html.setAttribute('data-theme','dark');localStorage.setItem('theme','dark');
+    document.getElementById('themeIcon').textContent='☀️';document.getElementById('themeLabel').textContent='Світла';
+  }
+}
+(function(){
+  const saved=localStorage.getItem('theme');
+  if(saved==='dark'){document.documentElement.setAttribute('data-theme','dark');
+    document.addEventListener('DOMContentLoaded',function(){
+      var i=document.getElementById('themeIcon');if(i)i.textContent='☀️';
+      var l=document.getElementById('themeLabel');if(l)l.textContent='Світла';
+    });
+  }
+})();
+
+const NODES = [
+  {
+    date:'Де ми', beat:'Від побудови до перевірки',
+    body:'<p>Агент побудований. Він валідує, шукає, викликає інструменти. Але як дізнатися, що він працює правильно — не зараз, а стабільно, з часом?</p><p>У цьому інтерактиві ви — інженер, який аналізує траєкторії агента. Ваше завдання: знайти <strong>першу точку відхилення</strong> — крок, де все пішло не так.</p>'
+  },
+  {
+    date:'Візуал', beat:'Як виглядає траєкторія агента',
+    body:'<svg viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:680px;margin:12px 0"><style>text{font-family:Segoe UI,sans-serif}.nd{rx:8;ry:8;stroke-width:2}.lb{font-size:11px;font-weight:600;fill:#fff}.sub{font-size:10px;fill:var(--dim,#6b7280)}</style><rect class="nd" x="10" y="30" width="120" height="44" fill="#22863a" stroke="#22863a"/><text class="lb" x="70" y="50" text-anchor="middle">Класифікація</text><text x="70" y="64" text-anchor="middle" fill="rgba(255,255,255,.7)" style="font-size:9px">payment_issue</text><line x1="130" y1="52" x2="160" y2="52" stroke="#22863a" stroke-width="2" marker-end="url(#ah)"/><rect class="nd" x="160" y="30" width="120" height="44" fill="#22863a" stroke="#22863a"/><text class="lb" x="220" y="50" text-anchor="middle">Пошук</text><text x="220" y="64" text-anchor="middle" fill="rgba(255,255,255,.7)" style="font-size:9px">3 фрагменти</text><line x1="280" y1="52" x2="310" y2="52" stroke="#22863a" stroke-width="2"/><rect class="nd" x="310" y="30" width="120" height="44" fill="#22863a" stroke="#22863a"/><text class="lb" x="370" y="50" text-anchor="middle">check_order</text><text x="370" y="64" text-anchor="middle" fill="rgba(255,255,255,.7)" style="font-size:9px">1 150 ₴</text><line x1="430" y1="52" x2="460" y2="52" stroke="#cf222e" stroke-width="2"/><rect class="nd" x="460" y="30" width="120" height="44" fill="#cf222e" stroke="#cf222e"/><text class="lb" x="520" y="50" text-anchor="middle">refund</text><text x="520" y="64" text-anchor="middle" fill="rgba(255,255,255,.7)" style="font-size:9px">2 300 ₴ ✗</text><line x1="580" y1="52" x2="610" y2="52" stroke="#cf222e" stroke-width="2"/><rect class="nd" x="610" y="30" width="60" height="44" fill="#cf222e" stroke="#cf222e"/><text class="lb" x="640" y="55" text-anchor="middle">✗</text><text class="sub" x="490" y="110" text-anchor="middle">↑ перша точка відхилення</text><line x1="490" y1="98" x2="490" y2="78" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="3"/></svg><p style="font-size:13px;color:var(--dim);margin-top:4px">Зелений → зелений → зелений → <span style="color:#cf222e;font-weight:600">червоний</span> → червоний. Четвертий крок — де все пішло не так. Пʼятий — наслідок.</p>'
+  },
+  {
+    date:'Кейс 1', beat:'Правильна відповідь, підозріла траєкторія',
+    body:'<p>Клієнт: <em>«Скільки коштує доставка в Одесу?»</em></p><p>Агент відповів: <strong>«Доставка в Одесу — 150 ₴, термін 2–3 дні.»</strong> Відповідь правильна.</p><p><strong>Траєкторія:</strong></p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;width:70px;font-weight:600">Крок 1</td><td style="padding:6px 10px">Класифікація: delivery_issue, priority: medium</td><td style="padding:6px 10px;width:30px;color:var(--green)">✓</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Крок 2</td><td style="padding:6px 10px">Пошук: знайдено 3 фрагменти, score .91, .87, .72</td><td style="padding:6px 10px;color:var(--green)">✓</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Крок 3</td><td style="padding:6px 10px">⚠️ Жоден інструмент не викликано</td><td style="padding:6px 10px;color:var(--gold)">?</td></tr><tr><td style="padding:6px 10px;font-weight:600">Крок 4</td><td style="padding:6px 10px">Відповідь згенерована з знайдених фрагментів</td><td style="padding:6px 10px;color:var(--green)">✓</td></tr></table>',
+    spot:{
+      type:'quiz', q:'Відповідь правильна. Де проблема?',
+      opts:[
+        ['Немає проблеми — відповідь правильна, фрагменти релевантні, score високий',0],
+        ['Крок 3: тариф — динамічні дані, потрібен API',1],
+        ['Крок 2: score .72 у третього фрагмента занизький',0]
+      ],
+      fb:'Тариф і термін доставки змінюються. Сьогодні 150 ₴ — правильно. Завтра перевізник змінить ціну — а в базі знань залишиться стара. Агент має викликати check_delivery_rates(), а не відповідати з кешованих фрагментів. Правильний результат, хибна траєкторія.'
+    }
+  },
+  {
+    date:'Кейс 2', beat:'Неправильна відповідь, знайди де зламалось', crit:1,
+    body:'<p>Клієнт: <em>«Поверніть мені гроші за замовлення ORD-2024-5511»</em></p><p>Агент відповів: <strong>«Повернення оформлено на суму 2 300 ₴.»</strong> Але реальна сума замовлення — 1 150 ₴.</p><p><strong>Траєкторія:</strong></p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;width:70px;font-weight:600">Крок 1</td><td style="padding:6px 10px">Класифікація: payment_issue, priority: high</td><td style="padding:6px 10px;width:30px;color:var(--green)">✓</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Крок 2</td><td style="padding:6px 10px">Пошук: знайдено 4 фрагменти</td><td style="padding:6px 10px;color:var(--green)">✓</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Крок 3</td><td style="padding:6px 10px">Виклик: check_order(ORD-2024-5511) → amount: 1 150 ₴</td><td style="padding:6px 10px;color:var(--green)">✓</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Крок 4</td><td style="padding:6px 10px">⚠️ Виклик: process_refund(amount=2 300)</td><td style="padding:6px 10px;color:var(--red)">✗</td></tr><tr><td style="padding:6px 10px;font-weight:600">Крок 5</td><td style="padding:6px 10px">Відповідь: «Повернення оформлено на 2 300 ₴»</td><td style="padding:6px 10px;color:var(--red)">✗</td></tr></table>',
+    spot:{
+      type:'quiz', q:'Де перша точка відхилення?',
+      opts:[
+        ['Крок 2 — пошук знайшов неправильні фрагменти',0],
+        ['Крок 4 — модель вказала хибну суму',1],
+        ['Крок 5 — відповідь згенерована з хибної суми, яку модель придумала',0]
+      ],
+      fb:'Крок 3 повернув правильну суму (1 150 ₴). Крок 4 — модель проігнорувала дані і вказала 2 300. Це перша точка відхилення. Крок 5 — наслідок, не причина. Рішення: контекстна валідація (Тема 2, крок 4) мала б порівняти amount із check_order і зупинити.'
+    }
+  },
+  {
+    date:'Кейс 3', beat:'Каскадна помилка від пошуку',
+    body:'<p>Клієнт: <em>«Чи можу я повернути відкритий ноутбук?»</em></p><p>Агент відповів: <strong>«Так, ви можете повернути ноутбук протягом 30 днів.»</strong> Але чинна політика — 14 днів, і для відкритої техніки діє окрема процедура.</p><p><strong>Траєкторія:</strong></p><table style="width:100%;border-collapse:collapse;font-size:13px;margin:12px 0"><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;width:70px;font-weight:600">Крок 1</td><td style="padding:6px 10px">Класифікація: delivery_issue, priority: medium</td><td style="padding:6px 10px;width:30px;color:var(--green)">✓</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Крок 2</td><td style="padding:6px 10px">⚠️ Пошук: top-1 = Політика повернення v2.0 (архівна, 30 днів)</td><td style="padding:6px 10px;color:var(--red)">✗</td></tr><tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 10px;font-weight:600">Крок 3</td><td style="padding:6px 10px">Жоден інструмент не викликано</td><td style="padding:6px 10px;color:var(--dim)">—</td></tr><tr><td style="padding:6px 10px;font-weight:600">Крок 4</td><td style="padding:6px 10px">Відповідь згенерована з архівного фрагмента</td><td style="padding:6px 10px;color:var(--red)">✗</td></tr></table>',
+    spot:{
+      type:'quiz', q:'Де перша точка відхилення?',
+      opts:[
+        ['Крок 1 — неправильна класифікація, delivery замість returns',0],
+        ['Крок 2 — пошук повернув архівну версію',1],
+        ['Крок 4 — модель мала перевірити дату документа',0]
+      ],
+      fb:'Крок 2: пошук без фільтра is_active повернув архівну v2.0 вище за чинну v3.1 (обидві мають високий score). Усе далі — наслідок. Рішення: pre-filter is_active=true (Тема 3, крок 3). Одна пропущена метадана → неправильна відповідь.'
+    }
+  },
+  {
+    date:'Що забрати з собою', beat:'Три речі, які варто запамʼятати', scene2:1,
+    body:'',
+    spot:{type:'takeaways', items:[
+      ['🎯','Шукайте першу точку відхилення в траєкторії','Неправильна відповідь — наслідок. Помилка — десь раніше в траєкторії. Пошук, аргументи, рішення — кожна потребує свого рішення.'],
+      ['👻','Правильний результат без перевірки даних — випадковість','Агент, який не викликає інструмент для динамічних даних, правильний сьогодні і неправильний завтра. Траєкторія важливіша за результат.'],
+      ['🔄','Кожен виявлений кейс стає регресійним тестом','Знайшли точку відхилення → додали перевірку → наступна версія цей кейс вже проходить.']
+    ]}
+  }
+];
+
+let answered = new Set(), score = 0, totalQ = 0;
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  let html = '';
+  NODES.forEach((n, i) => {
+    const locked = i > 0 ? ' locked' : '';
+    const dotClass = n.crit ? 'red' : (n.scene2 ? 'blue' : '');
+    html += `<div class="node${locked}" id="node${i}"><div class="dot ${dotClass}"></div><div class="node-date">${n.date}</div><div class="node-beat">${n.beat}</div><div class="node-body">${n.body}</div>${n.spot ? renderSpot(n.spot, i) : ''}</div>`;
+  });
+  tl.innerHTML = html;
+  updateProgress();
+  const first = document.querySelector('#node0 .spot');
+  if (first) first.classList.add('open');
+  unlockNext(0);
+}
+function renderSpot(s, ni) {
+  if (s.type === 'takeaways') {
+    return `<div class="spot open" id="spot${ni}">${s.items.map(([icon,title,body]) => `<div class="takeaway-card"><div class="tk-icon">${icon}</div><div class="tk-title">${title}</div><div class="tk-body">${body}</div></div>`).join('')}<div class="finish-card" style="margin-top:24px"><h2>validate_and_execute пройдено</h2><div class="score-bar" id="scoreDisplay"></div><p>Один рядок коду. Сім рівнів захисту від наміру моделі до виконання дії.</p></div></div>`;
+  }
+  totalQ++;
+  const tag = s.type === 'predict' ? 'Що далі?' : 'Перевірте себе';
+  return `<div class="spot" id="spot${ni}"><div class="spot-tag">${tag}</div><div class="spot-q">${s.q}</div><div class="spot-opts">${s.opts.map(([text, correct], oi) => `<div class="spot-opt" onclick="answer(${ni},${oi},${correct})">${text}</div>`).join('')}</div><div class="spot-fb" id="fb${ni}">${s.fb}</div></div>`;
+}
+function answer(ni, oi, correct) {
+  if (answered.has(ni)) return;
+  answered.add(ni);
+  const spot = document.getElementById('spot'+ni);
+  const opts = spot.querySelectorAll('.spot-opt');
+  opts.forEach((o,i) => { o.classList.add('disabled'); if (i === oi) o.classList.add(correct ? 'correct' : 'wrong'); if (NODES[ni].spot.opts[i][1]) o.classList.add('correct'); });
+  if (correct) score++;
+  const fb = document.getElementById('fb'+ni);
+  fb.classList.add('show', correct ? 'pass' : 'fail');
+  unlockNext(ni);
+  updateProgress();
+  const sd = document.getElementById('scoreDisplay');
+  if (sd) sd.textContent = score + ' / ' + totalQ;
+}
+function unlockNext(fromIdx) {
+  let next = fromIdx + 1;
+  while (next < NODES.length) {
+    const node = document.getElementById('node'+next);
+    if (!node) break;
+    node.classList.remove('locked');
+    const spot = document.getElementById('spot'+next);
+    if (spot && !spot.classList.contains('open')) spot.classList.add('open');
+    if (NODES[next].spot && NODES[next].spot.type !== 'takeaways' && !answered.has(next)) break;
+    next++;
+  }
+}
+function updateProgress() { document.getElementById('progress').textContent = answered.size + ' / ' + totalQ; }
+renderTimeline();
+</script>
+</body>
+</html>
