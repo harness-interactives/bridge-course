@@ -141,6 +141,13 @@ footer{margin-top:auto;padding-top:28px;font-size:13px;line-height:1.6;color:var
   .toggle{top:14px;right:16px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ───────── колофон ───────── */
+.colophon{margin-top:46px;border-top:2px solid var(--ink);padding-top:20px}
+.colophon h2{font-weight:600;font-size:16px;line-height:1.35;color:var(--ink);letter-spacing:-.01em;margin-bottom:12px}
+.colophon p{font-size:14.5px;line-height:1.68;max-width:66ch;margin-bottom:12px;color:var(--dim)}
+.colophon p:last-child{margin-bottom:0}
+@media(max-width:900px){.colophon{margin-top:32px}}
 </style>
 </head>
 <body>
@@ -347,6 +354,11 @@ footer{margin-top:auto;padding-top:28px;font-size:13px;line-height:1.6;color:var
 
   </div>
 
+  <div class="colophon">
+    <h2>Як зроблені ці інтерактиви</h2>
+    <p>Інтерактиви зібрані з конспектів курсу за допомогою AI-асистента. Ситуації, приклади й числа походять із матеріалів автора, проте подані стисло, а стиснення має свою ціну: формулювання може вийти ширшим за авторське, умова чи виняток — опуститися, а окрема деталь — виявитися правдоподібною, але доданою під час переказу.</p>
+    <p>Джерелом істини лишається конспект. Якщо інтерактив і текст теми розходяться, правильним є конспект. Матеріали оновлюються окремо, тому після правок автора інтерактив якийсь час може відставати.</p>
+  </div>
 
 </div>
 </div>
