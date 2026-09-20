@@ -9,7 +9,7 @@
 :root{--bg:#f0f0f2;--railBg:#e9e9ee;--card:#fafafa;--border:#dde0e6;--text:#2c2c2c;--dim:#6b7280;--head:#0f0f14;
 --green:#22863a;--greenBg:rgba(34,134,58,.08);--red:#cf222e;--redBg:rgba(207,34,46,.08);
 --blue:#0969da;--blueBg:rgba(9,105,218,.08);--gold:#9a6700;--goldBg:rgba(154,103,0,.08);
---accent:#1a7f37;--font:'Segoe UI','Helvetica Neue',sans-serif}
+--accent:#1a7f37;--font:'Segoe UI','Helvetica Neue',sans-serif;--fmono:'Fira Code','Cascadia Code',Consolas,monospace}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;min-height:100vh}
 
 .rail{position:fixed;left:0;top:0;width:260px;height:100vh;background:var(--railBg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:28px 18px;overflow-y:auto}
@@ -61,6 +61,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .takeaway-card .tk-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:6px}
 .takeaway-card .tk-body{font-size:13px;color:var(--text);line-height:1.6}
 
+.brief{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px 28px;margin-bottom:8px}
+.brief .br-eye{font-family:var(--fmono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.brief h2{font-size:19px;color:var(--head);margin-bottom:12px;line-height:1.35}
+.brief p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:12px}
+.brief .br-grid{display:grid;grid-template-columns:150px 1fr;gap:10px 18px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.brief .br-k{font-family:var(--fmono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);padding-top:2px}
+.brief .br-v{font-size:13.5px;color:var(--text);line-height:1.6}
+@media(max-width:640px){.brief .br-grid{grid-template-columns:1fr;gap:4px 0}.brief .br-k{margin-top:8px}}
 .finish-card{background:linear-gradient(135deg,#f0f0f2,#e8eaef);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-top:32px}
 .finish-card h2{font-size:22px;color:#1a1a1a;margin-bottom:8px}
 .finish-card p{font-size:14px;color:var(--dim)}
@@ -123,7 +131,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
   <div class="rail-progress" id="progress">0 / 0</div>
 </div>
 
-<div class="main" id="timeline"></div>
+<div class="main">
+  <div class="brief">
+    <div class="br-eye">Навіщо цей прохід</div>
+    <h2>П'ять шарів перевірки в роботі, зібрані в один прохід</h2>
+    <p>Конспект розбирає кожен шар окремим розділом: розбір JSON, контракт, семантична валідація, дозволи, виконання. На рівні окремого шару матеріал виглядає зрозумілим, а складність з'являється там, де шари працюють разом і треба сказати, який із них спрацює першим.</p>
+    <p>Цей прохід веде один JSON від моделі крізь усі п'ять шарів. На кожному ви вирішуєте, чи пропустити відповідь далі.</p>
+    <div class="br-grid">
+      <div class="br-k">Що робите</div>
+      <div class="br-v">Ведете конкретну відповідь моделі від отримання до виконаної дії, відповідаючи на питання кожного шару.</div>
+      <div class="br-k">Що отримуєте</div>
+      <div class="br-v">Перевірку того, чи вдається застосувати шари разом. Переказати п'ять рівнів по черзі простіше, ніж сказати, де саме зупиниться конкретний JSON.</div>
+      <div class="br-k">Скільки часу</div>
+      <div class="br-v">Близько п'ятнадцяти хвилин.</div>
+      <div class="br-k">Якщо не виходить</div>
+      <div class="br-v">Шар, на якому відповідь дається важко, вказує розділ конспекту, до якого варто повернутися.</div>
+    </div>
+  </div>
+  <div id="timeline"></div>
+</div>
 
 <script>
 
